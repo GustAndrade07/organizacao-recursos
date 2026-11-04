@@ -1,0 +1,12 @@
+target/
+.idea/
+*.iml
+.vscode/
+.DS_Store
+*.log
+.env
+*.jtl
+!docs/performance/*.jtl
+!perf/resultados/*.jtl
+perf/relatorio-*/
+node_modules/

@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # SonarCloud precisa do histórico completo
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+      - name: Build, testes e cobertura (JaCoCo 80/70 configurado no pom)
+        run: ./mvnw -B verify
+      - name: Relatórios como artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: relatorios
+          path: |
+            target/surefire-reports
+            target/site/jacoco
+      # Ative depois de criar a conta no SonarCloud e o secret SONAR_TOKEN:
+      # - name: SonarCloud
+      #   env:
+      #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      #   run: ./mvnw -B org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
