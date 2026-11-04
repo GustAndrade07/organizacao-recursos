@@ -22,3 +22,26 @@ Arquivo Figma (só design): [Organização de Recursos — Design System](https:
 - Toda tela nova entra primeiro no inventário (`telas.md`) com rota e prefixo de `data-testid`.
 - Critério de aceite de uma tela é a spec do módulo no Notion; o PR da tela cita a spec e o teste E2E que o comprova.
 - RF-13 é comprovado por E2E Playwright em 375 px ([ADR-0004](../adr/0004-playwright.md), [RTM](../rtm.md)).
+
+## Layout base e menu
+
+`src/main/resources/templates/layout.html` é o fragmento que toda tela usa. Ele importa `tokens.css` e `app.css`, e traz a barra superior, o menu e o `<main>`.
+
+```html
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: pagina(titulo='Minhas reservas', conteudo=~{::#conteudo-pagina})}">
+<body><div id="conteudo-pagina"> ... </div></body></html>
+```
+
+O menu é montado a partir de dois atributos de modelo, que o back-end (RF-01) preenche:
+
+| Atributo | Conteúdo | Sem ele |
+|---|---|---|
+| `usuario` | `nome`, `perfil` | Visitante: só a marca (login e erros 401) |
+| `menu` | lista de `id`, `rotulo`, `href`, `ativo` | Sem itens |
+
+Itens propostos por perfil (a confirmar com o Pedro): Solicitante: Buscar recursos e Minhas reservas. Responsável: Aprovações, Empréstimos e Relatórios. Administrador: Recursos e Relatórios.
+
+`Sair` é um formulário `POST /logout` (proposta, depende da decisão de autenticação). Detalhes de acessibilidade: link "Pular para o conteúdo", botão do menu com `aria-expanded`, item atual com `aria-current="page"`.
+
+O teste `CssSemValoresSoltosTest` reprova cor, medida ou fonte solta em qualquer CSS de tela (só `tokens.css` pode ter valor literal).

@@ -8,7 +8,7 @@ Os critérios de aceite de cada tela estão na spec do módulo, no Notion ([Spec
 | # | Tela | Spec | Perfil | Rota proposta | Requisito | Prefixo `data-testid` | Situação |
 |---|---|---|---|---|---|---|---|
 | 1 | Login | 01 | Todos | `GET /login` | RF-01 | `login-` | — |
-| 2 | Layout base e menu | 01 | Todos | (fragmento `layout.html`) | RF-01, RF-13 | `menu-` | — |
+| 2 | Layout base e menu | 01 | Todos | (fragmento `layout.html`) | RF-01, RF-13 | `menu-` | `html` |
 | 3 | Erro 401 / 403 / 404 / 500 | 01 | Todos | `/error` (fragmentos por status) | RF-13 | `erro-` | — |
 | 4 | Buscar disponibilidade | 02 | Solicitante | `GET /recursos/disponiveis` | RF-03 | `busca-` | — |
 | 5 | Resultados da busca | 02 | Solicitante | mesma rota, com parâmetros | RF-03 | `resultado-` | — |
