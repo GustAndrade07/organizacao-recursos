@@ -8,9 +8,15 @@ on:
 permissions:
   contents: read
 
+# Um novo push na mesma branch/PR cancela a execução anterior ainda em andamento.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   verify:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
         with:
@@ -30,8 +36,10 @@ jobs:
           path: |
             target/surefire-reports
             target/site/jacoco
-      # Ative depois de criar a conta no SonarCloud e o secret SONAR_TOKEN:
-      # - name: SonarCloud
-      #   env:
-      #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      #   run: ./mvnw -B org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
+      # PR vindo de fork não recebe secrets; nossos PRs saem de branches do próprio repositório.
+      - name: SonarCloud
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: ./mvnw -B org.sonarsource.scanner.maven:sonar-maven-plugin:5.8.0.7211:sonar
