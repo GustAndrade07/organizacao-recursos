@@ -1,0 +1,24 @@
+# Front-end
+
+Telas em Thymeleaf no mesmo projeto Spring ([ADR-0003](../adr/0003-thymeleaf.md)). Dono: Leandro.
+
+## Onde está cada coisa
+
+| O quê | Onde | Observação |
+|---|---|---|
+| Specs (visão geral, problema, objetivos de negócio, critérios de aceite) | Figma, página **Specs** | Ficam **só no Figma**, não no repositório |
+| Design System (tokens, estilos, componentes) | Figma, página **Design System** | Fonte da verdade dos tokens |
+| Telas (375 px e 1280 px) | Figma, página **Telas** | Uma seção por módulo e por largura |
+| Tokens em CSS | [`src/main/resources/static/css/tokens.css`](../../src/main/resources/static/css/tokens.css) | Espelho das variáveis do Figma |
+| Referência dos tokens | [`design-tokens.md`](design-tokens.md) | Nomes, valores e regras de uso |
+| Inventário de telas | [`telas.md`](telas.md) | Tela → perfil → rota → requisito → `data-testid` |
+
+Arquivo Figma: [Organização de Recursos — Design System](https://www.figma.com/design/ogVFcwHpGNgPXuv6X9cLPE)
+
+## Regras
+
+- Nenhuma cor, espaçamento, raio ou fonte solta no CSS: use os tokens semânticos de `tokens.css`.
+- Mudou um token? Mude no Figma **e** em `tokens.css` no mesmo PR, e atualize `design-tokens.md`.
+- Toda tela nova entra primeiro no inventário (`telas.md`) com rota e prefixo de `data-testid`.
+- Critério de aceite de uma tela é a spec do módulo no Figma; o PR da tela cita a spec e o teste E2E que o comprova.
+- RF-13 é comprovado por E2E Playwright em 375 px ([ADR-0004](../adr/0004-playwright.md), [RTM](../rtm.md)).

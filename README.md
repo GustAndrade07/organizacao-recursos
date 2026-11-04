@@ -40,7 +40,7 @@ Relatório de cobertura: `target/site/jacoco/index.html`.
 - Nenhum token ou senha no repositório (SonarCloud usa o secret `SONAR_TOKEN`).
 
 ## Documentação
-`docs/prd.md` · `docs/rtm.md` · `docs/status-requisitos.md` · `docs/adr/` · `docs/defeitos/` · `docs/testes/` · `docs/performance/` · `perf/` (plano JMeter) · `docs/entrega/checklist.md` · `docs/prova-oral/`
+`docs/prd.md` · `docs/frontend/` (design system, tokens e inventário de telas) · `docs/rtm.md` · `docs/status-requisitos.md` · `docs/adr/` · `docs/defeitos/` · `docs/testes/` · `docs/performance/` · `perf/` (plano JMeter) · `docs/entrega/checklist.md` · `docs/prova-oral/`
 
 ## Histórico de CI vermelho proposital
 (anotar aqui o CI vermelho proposital e a recuperação)
