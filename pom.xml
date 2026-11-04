@@ -23,6 +23,13 @@
         <jacoco.version>0.8.16</jacoco.version>
         <jacoco.min.line>0.80</jacoco.min.line>
         <jacoco.min.branch>0.70</jacoco.min.branch>
+
+        <!-- SonarCloud (o token vem do secret SONAR_TOKEN, nunca do repositório) -->
+        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+        <sonar.organization>gustandrade07</sonar.organization>
+        <sonar.projectKey>GustAndrade07_organizacao-recursos</sonar.projectKey>
+        <sonar.coverage.jacoco.xmlReportPaths>target/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
+        <sonar.coverage.exclusions>**/RecursosApplication.java</sonar.coverage.exclusions>
     </properties>
 
     <dependencies>

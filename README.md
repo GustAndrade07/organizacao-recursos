@@ -42,5 +42,11 @@ Relatório de cobertura: `target/site/jacoco/index.html`.
 ## Documentação
 `docs/prd.md` · `docs/frontend/` (design system, tokens e inventário de telas) · `docs/rtm.md` · `docs/status-requisitos.md` · `docs/adr/` · `docs/defeitos/` · `docs/testes/` · `docs/performance/` · `perf/` (plano JMeter) · `docs/entrega/checklist.md` · `docs/prova-oral/`
 
+## Qualidade e CI
+- **CI:** GitHub Actions (`.github/workflows/ci.yml`) roda `./mvnw -B verify` em todo pull request e em push na `main`; os relatórios do Surefire e do JaCoCo ficam como artifact.
+- **Cobertura:** JaCoCo com gate de 80% de linhas e 70% de branches no `verify`.
+- **Análise estática:** SonarCloud, projeto [GustAndrade07_organizacao-recursos](https://sonarcloud.io/project/overview?id=GustAndrade07_organizacao-recursos). O token fica só no secret `SONAR_TOKEN` do GitHub.
+- A `main` é protegida: só recebe código por pull request aprovado por outra pessoa, com o check `verify` verde.
+
 ## Histórico de CI vermelho proposital
 (anotar aqui o CI vermelho proposital e a recuperação)
