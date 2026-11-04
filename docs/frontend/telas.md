@@ -1,6 +1,6 @@
 # Inventário de telas
 
-Os critérios de aceite de cada tela estão na spec do módulo, no Figma (página **Specs**). Este arquivo é o mapa técnico: rota, perfil, requisito e prefixo de `data-testid` usado pelos testes E2E.
+Os critérios de aceite de cada tela estão na spec do módulo, no Notion ([Specs do Front-end](https://app.notion.com/p/40e8bb977b7b81dbbcbadb904897cbb9)). O design de cada tela está no Figma, página **Telas**. Este arquivo é o mapa técnico: rota, perfil, requisito e prefixo de `data-testid` usado pelos testes E2E.
 
 > **Rotas são proposta** e precisam ser combinadas com o Pedro antes da implementação (controllers do Spring).
 > Situação: `figma` (só no Figma) · `html` (template feito) · `e2e` (coberta por teste Playwright).
