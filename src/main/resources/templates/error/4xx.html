@@ -1,0 +1,5 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: pagina(titulo='Pedido não atendido', conteudo=~{fragments/erro :: erro(${status}, 'aviso', 'Não foi possível atender o pedido', 'Confira o que foi enviado e tente de novo. Se o problema continuar, volte ao início.', 'Voltar ao início', @{/}, null, null)})}">
+<body></body>
+</html>
