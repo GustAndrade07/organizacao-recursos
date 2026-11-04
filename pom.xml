@@ -23,6 +23,7 @@
         <jacoco.version>0.8.16</jacoco.version>
         <jacoco.min.line>0.80</jacoco.min.line>
         <jacoco.min.branch>0.70</jacoco.min.branch>
+        <jsoup.version>1.21.1</jsoup.version>
 
         <!-- SonarCloud (o token vem do secret SONAR_TOKEN, nunca do repositório) -->
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
@@ -74,6 +75,13 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!-- Lê o HTML renderizado nos testes das telas (não depende da ordem dos atributos) -->
+        <dependency>
+            <groupId>org.jsoup</groupId>
+            <artifactId>jsoup</artifactId>
+            <version>${jsoup.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>

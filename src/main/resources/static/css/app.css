@@ -1,0 +1,249 @@
+/*
+ * Estilos das telas. Só tokens semânticos de tokens.css (docs/frontend/design-tokens.md):
+ * nada de cor, espaçamento, raio ou fonte solta. Mobile primeiro; números só em media query.
+ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-bg-page);
+  color: var(--color-text-primary);
+  font: var(--font-body-default);
+}
+
+h1 {
+  margin: 0 0 var(--space-4);
+  font: var(--font-heading-h1);
+}
+
+a {
+  color: var(--color-text-brand);
+}
+
+:focus-visible {
+  outline: var(--border-width-focus) solid var(--color-border-focus);
+  outline-offset: var(--border-width-focus);
+}
+
+/* Link para pular ao conteúdo: só aparece com o foco do teclado */
+.pular-conteudo {
+  position: absolute;
+  left: var(--space-4);
+  top: var(--space-2);
+  z-index: 1;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-surface);
+  box-shadow: var(--shadow-overlay);
+  transform: translateY(-200%);
+}
+
+.pular-conteudo:focus {
+  transform: translateY(0);
+}
+
+/* Botões */
+.botao {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--size-control-md);
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-md);
+  font: var(--font-label-default);
+  cursor: pointer;
+}
+
+.botao--secundario {
+  border: var(--border-width-default) solid var(--color-border-input);
+  background: var(--color-bg-surface);
+  color: var(--color-text-primary);
+}
+
+.botao--secundario:hover {
+  background: var(--color-bg-subtle);
+}
+
+/* Barra superior e menu */
+.barra {
+  background: var(--color-bg-surface);
+  border-bottom: var(--border-width-default) solid var(--color-border-subtle);
+}
+
+.barra__linha {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  max-width: var(--breakpoint-desktop);
+  min-height: calc(var(--size-control-md) + var(--space-3));
+  margin: 0 auto;
+  padding: 0 var(--space-4);
+}
+
+.barra__marca {
+  color: var(--color-text-primary);
+  font: var(--font-heading-h3);
+  text-decoration: none;
+}
+
+.menu__botao {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  width: var(--size-control-md);
+  height: var(--size-control-md);
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: transparent;
+  cursor: pointer;
+}
+
+.menu__barra {
+  display: block;
+  width: var(--size-icon);
+  height: var(--border-width-focus);
+  background: var(--color-text-primary);
+}
+
+.menu__painel {
+  flex-basis: 100%;
+}
+
+.menu__lista {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: 0;
+  padding: var(--space-2) 0;
+  list-style: none;
+}
+
+.menu__item {
+  display: flex;
+  align-items: center;
+  min-height: var(--size-control-md);
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-md);
+  color: var(--color-text-primary);
+  font: var(--font-label-default);
+  text-decoration: none;
+}
+
+.menu__item:hover {
+  background: var(--color-bg-subtle);
+}
+
+.menu__item[aria-current="page"] {
+  background: var(--color-bg-info-subtle);
+  color: var(--color-text-brand);
+}
+
+.menu__rodape {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4) 0;
+  border-top: var(--border-width-default) solid var(--color-border-subtle);
+}
+
+.menu__usuario {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: 0;
+}
+
+.menu__nome {
+  font: var(--font-label-default);
+}
+
+.menu__perfil {
+  color: var(--color-text-secondary);
+  font: var(--font-caption);
+}
+
+.menu__rodape form {
+  margin: 0;
+}
+
+.menu__rodape .botao {
+  width: 100%;
+}
+
+/* Conteúdo da tela */
+.conteudo {
+  flex: 1;
+  width: 100%;
+  max-width: var(--breakpoint-desktop);
+  margin: 0 auto;
+  padding: var(--space-6) var(--space-4);
+}
+
+.conteudo:focus {
+  outline: none;
+}
+
+/* Mobile: com JavaScript o painel começa fechado; sem JavaScript fica sempre visível */
+@media (max-width: 767px) {
+  .js .barra[data-aberto="false"] .menu__painel {
+    display: none;
+  }
+}
+
+/* Tablet e desktop: menu horizontal, sem botão */
+@media (min-width: 768px) {
+  .barra__linha {
+    flex-wrap: nowrap;
+    padding: 0 var(--space-8);
+  }
+
+  .menu__botao {
+    display: none;
+  }
+
+  .menu__painel {
+    display: flex;
+    flex: 1;
+    flex-basis: auto;
+    align-items: center;
+    justify-content: space-between;
+    margin-left: var(--space-8);
+  }
+
+  .menu__lista {
+    flex-direction: row;
+    padding: 0;
+  }
+
+  .menu__rodape {
+    flex-direction: row;
+    align-items: center;
+    gap: var(--space-4);
+    padding: 0;
+    border-top: 0;
+  }
+
+  .menu__usuario {
+    align-items: flex-end;
+  }
+
+  .menu__rodape .botao {
+    width: auto;
+  }
+
+  .conteudo {
+    padding: var(--space-8);
+  }
+}
