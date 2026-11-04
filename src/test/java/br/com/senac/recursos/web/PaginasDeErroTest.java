@@ -9,7 +9,14 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.web.WebProperties;
+import org.springframework.boot.autoconfigure.web.servlet.error.DefaultErrorViewResolver;
+import org.springframework.boot.autoconfigure.web.servlet.error.ErrorViewResolver;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -20,7 +27,17 @@ import org.springframework.test.web.servlet.MvcResult;
  * e um caminho para continuar).
  */
 @WebMvcTest
+@Import(PaginasDeErroTest.ResolvedorDeErro.class)
 class PaginasDeErroTest {
+
+    /** O recorte @WebMvcTest não tem servidor, então o Spring não registra este resolvedor; em produção ele existe. */
+    @TestConfiguration
+    static class ResolvedorDeErro {
+        @Bean
+        ErrorViewResolver errorViewResolver(ApplicationContext contexto) {
+            return new DefaultErrorViewResolver(contexto, new WebProperties().getResources());
+        }
+    }
 
     @Autowired
     MockMvc mvc;
