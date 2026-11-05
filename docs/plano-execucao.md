@@ -155,7 +155,7 @@ Regras de trabalho valem para todas as etapas:
 
 ### Etapa 3 — Testes e integração (Dias 3–5 · qua 04/11 – sex 06/11)
 **Equivale às Aulas 05, 06, 08 e 09.**
-- [ ] **[Aula 09]** Decidir com o grupo as "Perguntas em aberto" de `docs/testes/bdd-aprovacao-bloqueio.md` (fronteiras do período de manutenção: termina exatamente no início, começa exatamente no fim, cruza um segundo) **antes** do primeiro teste vermelho. O professor manda registrar a dúvida em vez de inventar a política. A decisão também define os limites do intervalo no banco (`tstzrange` com limite inferior fechado e superior aberto, ou outro; fica no ADR).
+- [ ] **[Aula 09 · decisão D1, pendente, seção 9]** Decidir com o grupo as "Perguntas em aberto" de `docs/testes/bdd-aprovacao-bloqueio.md` (fronteiras do período de manutenção: termina exatamente no início, começa exatamente no fim, cruza um segundo) **antes** do primeiro teste vermelho. O professor manda registrar a dúvida em vez de inventar a política. A decisão também define os limites do intervalo no banco (`tstzrange` com limite inferior fechado e superior aberto, ou outro; fica no ADR).
 - [ ] **TDD red:** testes vermelhos para cada regra do plano (commits `test(red): ...`).
 - [ ] **TDD green:** domínio e regras até a suíte ficar verde (`feat(green): ...`, `refactor: ...`). `Clock` injetado, nunca `Instant.now()` solto nem `Thread.sleep`.
 - [ ] Entidades: Recurso (sala/material, restrito, capacidade, localização), Professor (competências), Reserva + estados, Manutenção/Bloqueio, Retirada/Devolução, Auditoria, Usuário/Perfil.
@@ -234,5 +234,17 @@ Revisão em roda: Gustavo → Pedro → Leandro → Gustavo.
 3. **Telas:** Thymeleaf, com páginas HTML geradas pelo próprio Spring, no mesmo projeto. O repositório da disciplina usa esse modelo. Basta cumprir "interface responsiva e mensagens de erro claras".
 4. **Teste E2E:** Playwright para Java (roda sem tela no CI).
 
-## 9. Como este plano se mantém atualizado
+## 9. Decisões pendentes do grupo
+Perguntas que o PRD não resolve e que **ninguém decidiu ainda**. Enquanto estiverem abertas, ninguém inventa a política: o código, os testes e os ADRs tratam o ponto como "decisão pendente". Registrado em 05/11/2026; o Gustavo ainda não olhou nenhuma delas.
+
+| # | Pergunta | Quem decide | Prazo (o que trava) | Impacto | Proposta (não é decisão) |
+|---|---|---|---|---|---|
+| D1 | O intervalo de reserva e de manutenção é **semiaberto `[início, fim)`**? Ou seja: uma reserva que termina exatamente quando a manutenção começa (ou começa exatamente quando ela termina) é aceita? | Grupo (Gustavo propõe, Pedro implementa a regra, Leandro confere as mensagens de tela); confirmar com o professor se houver dúvida | **Antes do primeiro teste vermelho** das regras de manutenção e de sobreposição (Etapa 3) e **antes da migração Flyway V1** | Define os limites do `tstzrange` na constraint `EXCLUDE USING gist` (ADR-0002), a tabela de fronteiras do BDD (`docs/testes/bdd-aprovacao-bloqueio.md`), os testes de manutenção e o relatório (reserva que cruza a borda do período) | `[início, fim)`: é o padrão do `tstzrange` no PostgreSQL e os exemplos do BDD já assumem "termina exatamente no início → aceita". Se aceito, vira registro no ADR-0002 |
+| D2 | A tentativa recusada por sobreposição é gravada **fora** da transação que sofreu rollback? | Gustavo (banco) com o Pedro (serviço) | Antes da migração V1 (a tabela das tentativas entra no modelo) | Sem isso o "conflitos evitados" do relatório (RF-12) perde dado | Gravar em transação própria; teste que prova a contagem. Ver `docs/arquitetura.md`, seção 5.1 |
+| D3 | Qual código HTTP para transição de estado inválida: 409 ou 422? | Pedro (API) | Antes dos testes da máquina de estados | Contrato da API e matriz de autorização | Ver `docs/arquitetura.md`, seção 5.2 |
+| D4 | "0 vulnerabilidades críticas" se mede pelo CVSS das dependências ou pelo Quality Gate e issues do SonarCloud? | Professor (Gustavo pergunta) | Antes da entrega (13/11) | Define se os 2 críticos do Spring 6.2.19 precisam de algo além da justificativa | Ver `docs/seguranca/riscos-dependencias.md` |
+
+Quando uma decisão for tomada: anotar a data e quem decidiu na linha, ajustar o ADR ou documento afetado e acrescentar o que mudou na seção 9 do `AGENTS.md`, se virar regra.
+
+## 10. Como este plano se mantém atualizado
 Regra do grupo (detalhes em `AGENTS.md`): **todo pull request atualiza este plano**. Na descrição do PR entra a seção "Plano de execução" (o que foi marcado ou mudou aqui) e, neste arquivo, as caixas da etapa, a linha de status do topo (com a data) e, se for o caso, `docs/status-requisitos.md`, `docs/rtm.md` e `CHANGELOG.md`. Quando um defeito, um feedback ou a revisão de um colega ensinar algo novo ao grupo, a regra correspondente entra no `AGENTS.md` com a indicação de onde ela é verificada.
