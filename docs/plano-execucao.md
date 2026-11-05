@@ -5,6 +5,8 @@
 > **Entrega: sexta 13/11** (Aula 14), com meta interna de terminar antes. Prova oral: **sexta 20/11** (Semana 47).
 > Grupo (3): Gustavo Oliveira Fernandes de Andrade · Leandro Sato · Pedro Henrique (conferir o nome completo com a lista da turma).
 >
+> **Status em 05/11/2026 (quinta):** parte do Gustavo da Etapa 2 (arquitetura e ADRs) escrita na branch `docs/etapa-2-adrs`: ADRs 0001 a 0004 com "Consequências" completas e ADRs 0005 (notificação) e 0006 (Flyway) propostos, aguardando revisão. `docs/rtm.md` (Leandro), `docs/testes/plano-tdd.md` e a migração Flyway V1 **não iniciados**; D1 a D4 (seção 9) continuam **sem decisão**. O restante deste parágrafo é o estado de 04/11, com ajustes de 05/11.
+>
 > **Status em 04/11/2026 (quarta, noite):** Etapa 1 quase concluída. Repositório público criado (https://github.com/GustAndrade07/organizacao-recursos); PRs #1 a #8 já tratados (#1, #2, #4, #5, #6, #7 e #8 mergeados; #3 fechado sem merge e substituído pelo #5; os PRs do Gustavo são revisados pelo Leandro); esqueleto Spring Boot 3.5 / Java 21 / Maven Wrapper, CI `verify` + SonarCloud (`SONAR_TOKEN` criado, Quality Gate passou no PR #4) e `main` protegida por ruleset. Docker Desktop instalado e validado nesta máquina em 04/11 (`docker run hello-world`, `docker compose up -d`, `/actuator/health` = `UP`, `./mvnw -B verify` com 21 testes e 0 ignorados). Esqueleto de `docs/arquitetura.md` e `docs/plano-de-teste.md` escrito em 05/11 (proposta a validar com Pedro e Leandro). Ruleset conferido em 05/11 (SonarCloud agora é check obrigatório; bypass vazia). "Dependency risks" lidos em 05/11 (48; tratamento no PR `fix/dependencias-seguras`, ver Etapa 4). Pendentes da Etapa 1: Pedro aceitar o convite do repositório, validar o README em clone limpo (por outra pessoa) e confirmar a reanálise do SonarCloud depois do merge. Etapas 2 a 6 ainda não iniciadas (a Etapa 2 já tem parte do conteúdo no `arquitetura.md`). Regras de contexto para a IA e para o grupo: `AGENTS.md` (raiz). Releitura das Aulas 09 a 15 em 04/11: ajustes marcados com **[Aula NN]** nas etapas abaixo.
 
 ---
@@ -148,8 +150,8 @@ Regras de trabalho valem para todas as etapas:
 
 ### Etapa 2 — Requisitos, riscos e RTM (Dia 2 · ter 03/11)
 **Equivale às Aulas 02, 04 e 05 (parte de inventário).**
-- [ ] `docs/arquitetura.md`: C4 contexto/contêineres/componentes em Mermaid, sequências de "criar reserva" e "aprovar restrito", utility tree, cenários em 6 partes, sensibilidade, trade-off, riscos.
-- [ ] ADRs em `docs/adr/`: autenticação (JWT), proteção de concorrência (constraint `EXCLUDE USING gist` em `tstzrange` vs lock pessimista), notificação via HTTP isolada, migrações com Flyway.
+- [x] `docs/arquitetura.md`: C4 contexto/contêineres/componentes em Mermaid, sequências de "criar reserva" e "aprovar restrito", utility tree, cenários em 6 partes, sensibilidade, trade-off, riscos. — esqueleto em 05/11 (Etapa 1); em 05/11 os trade-offs apontam para os ADRs 0005 e 0006. Pacotes e rotas seguem como proposta a validar com Pedro e Leandro (pendência no fim do documento).
+- [x] ADRs em `docs/adr/`: autenticação (JWT), proteção de concorrência (constraint `EXCLUDE USING gist` em `tstzrange` vs lock pessimista), notificação via HTTP isolada, migrações com Flyway. — feito em 05/11: "Consequências" dos ADRs 0001 a 0004 (ganhamos, perdemos, exige de testes) e ADRs novos 0005 (notificação) e 0006 (Flyway), ambos com status **proposto** até a revisão. O ADR-0002 registra a D1 como decisão pendente; os ADRs 0005 e 0006 tratam D2 e D3 como pendentes. Nenhuma decisão da seção 9 foi tomada.
 - [ ] `docs/rtm.md` inicial: requisito → risco → teste (a escrever) → evidência.
 - [ ] `docs/testes/plano-tdd.md`: inventário de todas as regras com casos (feliz, limite, inválido, conflito, estado proibido).
 

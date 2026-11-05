@@ -116,7 +116,7 @@ sequenceDiagram
         API-->>S: 409 (ProblemDetail, sem stack trace)
     end
 ```
-Pontos a decidir (viram ADR ou pergunta em aberto): (a) a tentativa recusada precisa ser gravada **fora** da transação que sofreu rollback, senão o "conflitos evitados" do relatório (RF-12) perde dado; (b) a notificação só dispara depois do commit; (c) a agenda do **professor** também entra na constraint (RN-02), não só a do recurso.
+Pontos a decidir (viram ADR ou pergunta em aberto): (a) a tentativa recusada precisa ser gravada **fora** da transação que sofreu rollback, senão o "conflitos evitados" do relatório (RF-12) perde dado (**pendente**, D2, seção 9 do plano); (b) a notificação só dispara depois do commit ([ADR-0005](adr/0005-notificacao-cliente-http-isolado.md)); (c) a agenda do **professor** também entra na constraint (RN-02), não só a do recurso.
 
 ### 5.2 Aprovar reserva de recurso restrito (RF-07, RN-05, RN-06, RN-08)
 ```mermaid
@@ -142,7 +142,7 @@ sequenceDiagram
         API-->>R: 200
     else estado não permite a transição
         SRV-->>API: transição inválida
-        API-->>R: 409 ou 422 (a combinar com o Pedro)
+        API-->>R: 409 ou 422 (pendente, D3, seção 9 do plano)
     end
 ```
 A rota `POST /reservas/{id}/aprovacao` é **proposta**; as rotas definitivas saem do inventário de telas (`docs/frontend/telas.md`) e do controller do Pedro.
@@ -179,8 +179,8 @@ Outros cenários (esboço): **C4** mudança de estado sem auditoria → impossí
 | Proteção da reserva no banco (`EXCLUDE USING gist` sobre `tstzrange`, extensão `btree_gist`) em vez de lock pessimista | A **definição do intervalo** (semiaberto `[início, fim)`) muda o resultado das fronteiras; a constraint precisa cobrir recurso **e** professor | + Funciona com várias instâncias e é a prova mais forte para a banca; − depende de recurso específico do PostgreSQL e exige tratar a violação da constraint como 409 | [ADR-0002](adr/0002-anti-reserva-dupla.md) |
 | JWT temporário em cada requisição | Tempo de vida do token e perfil dentro dele | + Casa com os roteiros de JMeter e de teste por perfil; − revogação imediata não existe | [ADR-0001](adr/0001-login-jwt.md) |
 | Thymeleaf no mesmo projeto | Responsividade e testes E2E dependem de HTML do servidor | + Um deploy, menos peças; − sem SPA, interações ricas são limitadas | [ADR-0003](adr/0003-thymeleaf.md) |
-| Notificação via cliente HTTP isolado | Timeout e falha do provedor | + Falha externa não derruba a reserva e é testável com WireMock; − notificação pode se perder (aceito: é "simulada") | ADR a escrever (Etapa 2) |
-| Migrações Flyway como dono do esquema | Ordem e imutabilidade das versões | + Esquema reproduzível no CI e em clone limpo; − migração mergeada não se edita, corrige-se com a próxima | ADR a escrever (Etapa 2) |
+| Notificação via cliente HTTP isolado | Timeout e falha do provedor | + Falha externa não derruba a reserva e é testável com WireMock; − notificação pode se perder (aceito: é "simulada") | [ADR-0005](adr/0005-notificacao-cliente-http-isolado.md) (proposto) |
+| Migrações Flyway como dono do esquema | Ordem e imutabilidade das versões | + Esquema reproduzível no CI e em clone limpo; − migração mergeada não se edita, corrige-se com a próxima | [ADR-0006](adr/0006-flyway-dono-do-esquema.md) (proposto) |
 
 ## 9. Riscos
 | # | Risco | Efeito | Mitigação | Evidência prevista |
@@ -205,12 +205,13 @@ A coluna "Evidência" é preenchida conforme os testes existem (a RTM, `docs/rtm
 | RF-07 aprovação de restrito | máquina de estados | reserva, seguranca | a preencher |
 | RF-08 manutenção | intervalo semiaberto (a confirmar) | recurso, reserva | a preencher |
 | RF-10 histórico auditável | auditoria na mesma transação | auditoria | a preencher |
-| RF-11 notificação | adapter HTTP isolado | notificacao | a preencher |
+| RF-11 notificação | adapter HTTP isolado (ADR-0005) | notificacao | a preencher |
 | RF-12 relatório | tentativa recusada gravada | relatorio, banco | a preencher |
 | RF-13 telas e erros claros | ADR-0003 | web | a preencher |
 
 ## 11. Pendências deste documento
 - [ ] Validar pacotes e rotas com o Pedro e as telas com o Leandro.
-- [ ] Completar a seção "Consequências" dos ADRs 0001 a 0004 e escrever os ADRs de notificação e de Flyway (Etapa 2).
-- [ ] Decidir o intervalo semiaberto (pergunta em aberto do BDD) e registrar no ADR-0002.
+- [x] Completar a seção "Consequências" dos ADRs 0001 a 0004 e escrever os ADRs de notificação e de Flyway (Etapa 2). — feito em 05/11: ADRs 0001 a 0004 com ganhos, perdas e testes exigidos; ADR-0005 (notificação) e ADR-0006 (Flyway) escritos com status **proposto**, a validar com o Pedro.
+- [ ] Decidir o intervalo semiaberto (pergunta em aberto do BDD) e registrar no ADR-0002. — **decisão pendente do grupo** (D1, seção 9 do [plano](plano-execucao.md)); o ADR-0002 já aponta para ela, sem escolher.
+- [ ] Decisões D2 (tentativa recusada fora da transação) e D3 (409 ou 422 para transição inválida), seção 9 do plano: continuam abertas; os pontos 5.1(a) e 5.2 acima e os ADRs 0002, 0005 e 0006 as tratam como pendentes.
 - [ ] Ciclo 01 da avaliação arquitetural: `docs/avaliacao-arquitetural/ciclo-01.md` (Etapa 3).
