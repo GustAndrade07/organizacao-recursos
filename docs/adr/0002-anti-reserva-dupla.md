@@ -2,4 +2,23 @@
 - **Status:** aceito
 - **Contexto:** pedidos simultâneos não podem gerar reserva dupla.
 - **Decisão:** constraint de exclusão no PostgreSQL sobre tstzrange por recurso.
-- **Consequências:** (preencher)
+- **Consequências:**
+  - **Ganhamos:**
+    - A garantia vive **no banco**: vale para qualquer número de instâncias da aplicação e não depende de o serviço lembrar de travar nada. É a primeira opção citada pela Aula 10 e a prova mais forte para a banca (RN-02, RN-03, RF-06).
+    - O teste de concorrência pode **contar no banco** (uma linha para o intervalo disputado), não só olhar as respostas HTTP.
+    - Tirar a constraint deixa o teste vermelho, o que é exatamente a "checagem na mesa" do professor ([plano](../plano-execucao.md), seção 2.7).
+  - **Perdemos:**
+    - Dependência de recurso específico do PostgreSQL: exige a extensão `btree_gist` (criada pela migração, ver [ADR-0006](0006-flyway-dono-do-esquema.md)) e impede H2, que não é opção neste projeto.
+    - A violação da constraint sai do banco como erro de SQL: o serviço precisa **traduzi-la para 409** (`ProblemDetail`, sem SQL na resposta), e a transação que sofreu a violação não pode ser reaproveitada.
+    - A constraint precisa cobrir recurso **e** professor (RN-02, RF-05): são duas garantias a modelar na migração, não uma.
+    - Índice GiST encarece a escrita; o efeito sobre RNF-01 e RNF-03 está **não medido**.
+  - **Exige de testes:**
+    - Repositório com **Testcontainers** (PostgreSQL 16 real): inserção sobreposta recusada pelo banco, para recurso e para professor; tabela de fronteiras (termina exatamente no início, começa exatamente no fim, cruza 1 segundo) conforme a decisão D1.
+    - Concorrência: 20 pedidos simultâneos (`ExecutorService` + `CountDownLatch`) → 1 aceito, 19 × 409, contagem **no banco**; repetir para a agenda do professor; rodar 5 vezes.
+    - Mutação manual registrada em `docs/testes/mutacao-manual.md`: remover a constraint, ver o teste de concorrência falhar, restaurar.
+    - A API nunca devolve SQL, nome de constraint nem stack trace no 409.
+- **Pendências:**
+  - **D1 — decisão pendente do grupo** ([plano-execucao.md](../plano-execucao.md), seção 9): o intervalo é semiaberto `[início, fim)`? Define os limites do `tstzrange` desta constraint. Este ADR **não escolhe**; a migração só é escrita depois da decisão.
+  - **D2 — decisão pendente** (seção 9): a tentativa recusada ser gravada fora da transação que sofreu rollback; afeta o que acontece depois da violação da constraint.
+  - Ponto a levar ao grupo, **fora da lista da seção 9**: quais estados ainda ocupam o horário (por exemplo, `CANCELADA`, `REJEITADA` e `NAO_COMPARECEU` liberam o intervalo?). O PRD (RN-05) lista os estados mas não diz isso, e a constraint depende da resposta. Não decidido aqui.
+- **Fonte:** `docs/arquitetura.md` (seções 5.1, 8 e 9), `docs/prd.md` (RN-02, RN-03, RN-05), `docs/plano-execucao.md` (seções 2.3, 5 e 9), `AGENTS.md` (seção 5).
