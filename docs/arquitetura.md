@@ -116,7 +116,7 @@ sequenceDiagram
         API-->>S: 409 (ProblemDetail, sem stack trace)
     end
 ```
-Pontos a decidir (viram ADR ou pergunta em aberto): (a) a tentativa recusada precisa ser gravada **fora** da transação que sofreu rollback, senão o "conflitos evitados" do relatório (RF-12) perde dado (**pendente**, D2, seção 9 do plano); (b) a notificação só dispara depois do commit ([ADR-0005](adr/0005-notificacao-cliente-http-isolado.md)); (c) a agenda do **professor** também entra na constraint (RN-02), não só a do recurso.
+Pontos a decidir (viram ADR ou pergunta em aberto): (a) a tentativa recusada precisa ser gravada **fora** da transação que sofreu rollback, senão o "conflitos evitados" do relatório (RF-12) perde dado (**decidido em 05/11, D2**: transação própria; [ADR-0002](adr/0002-anti-reserva-dupla.md)); (b) a notificação só dispara depois do commit ([ADR-0005](adr/0005-notificacao-cliente-http-isolado.md)); (c) a agenda do **professor** também entra na constraint (RN-02), não só a do recurso.
 
 ### 5.2 Aprovar reserva de recurso restrito (RF-07, RN-05, RN-06, RN-08)
 ```mermaid
@@ -142,7 +142,7 @@ sequenceDiagram
         API-->>R: 200
     else estado não permite a transição
         SRV-->>API: transição inválida
-        API-->>R: 409 ou 422 (pendente, D3, seção 9 do plano)
+        API-->>R: 409 (decidido em 05/11, D3, `ProblemDetail` de tipo próprio; a confirmar com o Pedro)
     end
 ```
 A rota `POST /reservas/{id}/aprovacao` é **proposta**; as rotas definitivas saem do inventário de telas (`docs/frontend/telas.md`) e do controller do Pedro.
@@ -188,7 +188,7 @@ Outros cenários (esboço): **C4** mudança de estado sem auditoria → impossí
 | R1 | Dupla reserva sob concorrência | **Zera a nota** (limitador) | Constraint no banco + teste de 20 pedidos que fica vermelho sem a proteção | Teste de concorrência; `docs/testes/mutacao-manual.md` |
 | R2 | Falha de autorização | **Zera a nota** | Matriz perfil × operação testada célula a célula; 401 e 403 explícitos | `docs/seguranca/matriz-autorizacao.md` e teste parametrizado |
 | R3 | Tentativa recusada perdida no rollback | "Conflitos evitados" do relatório fica errado | Gravar em transação própria; teste que prova a contagem | Teste do relatório com valores calculados à mão |
-| R4 | Fronteira do intervalo não decidida | Teste e banco discordam | Fechar a pergunta em aberto do BDD antes do primeiro teste vermelho | `docs/testes/bdd-aprovacao-bloqueio.md` |
+| R4 | Fronteira do intervalo (decidida em 05/11, D1: `[início, fim)`) não refletida no BDD e nos testes | Teste e banco discordam | Atualizar a tabela de fronteiras do BDD (Pedro) antes do primeiro teste vermelho | `docs/testes/bdd-aprovacao-bloqueio.md` |
 | R5 | Prazo curto (entrega 13/11) | Escopo não fecha | Limitadores primeiro; UI mínima; PRs pequenos por etapa | Plano de execução |
 | R6 | Docker indisponível em alguma máquina | Teste de integração não roda local | Docker como pré-requisito; CI já tem Docker | `Skipped: 0` no `verify` |
 | R7 | Token do provedor de notificação vazar na resposta ou no log | Falha de segurança | Segredo só em variável de ambiente; teste do WireMock "token não vaza" | Teste do adapter |
@@ -203,7 +203,7 @@ A coluna "Evidência" é preenchida conforme os testes existem (a RTM, `docs/rtm
 | RF-04, RF-05 reservas e sobreposição | ADR-0002 | reserva, banco | a preencher |
 | RF-06 reserva dupla | ADR-0002 | banco (constraint) | a preencher |
 | RF-07 aprovação de restrito | máquina de estados | reserva, seguranca | a preencher |
-| RF-08 manutenção | intervalo semiaberto (a confirmar) | recurso, reserva | a preencher |
+| RF-08 manutenção | intervalo semiaberto (D1, decidido em 05/11) | recurso, reserva | a preencher |
 | RF-10 histórico auditável | auditoria na mesma transação | auditoria | a preencher |
 | RF-11 notificação | adapter HTTP isolado (ADR-0005) | notificacao | a preencher |
 | RF-12 relatório | tentativa recusada gravada | relatorio, banco | a preencher |
@@ -212,6 +212,8 @@ A coluna "Evidência" é preenchida conforme os testes existem (a RTM, `docs/rtm
 ## 11. Pendências deste documento
 - [ ] Validar pacotes e rotas com o Pedro e as telas com o Leandro.
 - [x] Completar a seção "Consequências" dos ADRs 0001 a 0004 e escrever os ADRs de notificação e de Flyway (Etapa 2). — feito em 05/11: ADRs 0001 a 0004 com ganhos, perdas e testes exigidos; ADR-0005 (notificação) e ADR-0006 (Flyway) escritos com status **proposto**, a validar com o Pedro.
-- [ ] Decidir o intervalo semiaberto (pergunta em aberto do BDD) e registrar no ADR-0002. — **decisão pendente do grupo** (D1, seção 9 do [plano](plano-execucao.md)); o ADR-0002 já aponta para ela, sem escolher.
-- [ ] Decisões D2 (tentativa recusada fora da transação) e D3 (409 ou 422 para transição inválida), seção 9 do plano: continuam abertas; os pontos 5.1(a) e 5.2 acima e os ADRs 0002, 0005 e 0006 as tratam como pendentes.
+- [x] Decidir o intervalo semiaberto (pergunta em aberto do BDD) e registrar no ADR-0002. — D1 decidida em 05/11 pelo Gustavo (`[início, fim)`), registrada no ADR-0002 e na seção 9 do [plano](plano-execucao.md); a confirmar com Pedro e Leandro na revisão.
+- [x] D2 (tentativa recusada em transação própria), D3 (409 para transição inválida) e D5 (estados que ocupam o horário), seção 9 do plano: decididas em 05/11 e registradas nos ADRs 0002, 0005 e 0006.
+- [ ] Atualizar a tabela de fronteiras e a pergunta em aberto de `docs/testes/bdd-aprovacao-bloqueio.md` com a D1 (arquivo do Pedro; não alterado neste PR).
+- [ ] D4 (critério de "0 vulnerabilidades críticas"): resposta do professor ainda pendente.
 - [ ] Ciclo 01 da avaliação arquitetural: `docs/avaliacao-arquitetural/ciclo-01.md` (Etapa 3).

@@ -32,7 +32,7 @@
     - A contagem de reservas após cada falha do provedor é feita **no banco**, não pela resposta.
     - Teste de unidade do serviço de reserva usa a porta com dublê (mock só em teste de unidade isolado); a integração real do adapter usa WireMock.
 - **Pendências:**
-  - **pendente (seção 9 do plano, D2):** se uma falha de notificação, ou uma tentativa recusada, é registrada de forma persistente fora da transação da reserva depende da decisão D2. Este ADR não decide.
-  - **pendente (seção 9 do plano, D3):** o código HTTP da recusa por transição de estado inválida (409 ou 422) é decisão da API; este ADR só diz que **recusa não gera notificação**, porque não houve mudança.
+  - **D2 decidida** (Gustavo, 05/11/2026, seção 9 do plano): a tentativa recusada é gravada em transação própria ([ADR-0002](0002-anti-reserva-dupla.md)). **Recusa por conflito não gera notificação**, porque não houve reserva. Se a **falha da notificação** também deixa registro persistente não foi decidido (aberto com o Pedro); este ADR só exige log sem o token.
+  - **D3 decidida** (Gustavo, 05/11/2026, a confirmar com o Pedro): transição de estado inválida responde **409**, com `ProblemDetail` de tipo próprio. **Recusa por transição inválida não gera notificação**, porque não houve mudança.
   - Valor do timeout e modelo (síncrono ou assíncrono depois do commit): abertos com o Pedro.
 - **Fonte:** `docs/arquitetura.md` (seções 5.1, 8, 9 e 10), `docs/prd.md` (RF-11), `docs/plano-execucao.md` (Etapa 3, linha da notificação), `docs/plano-de-teste.md` (seção 2), `AGENTS.md` (seção 5). WireMock ainda **não está no `pom.xml`**.

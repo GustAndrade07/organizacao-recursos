@@ -13,7 +13,7 @@
     - Histórico de mudanças do banco revisável em PR, como código.
     - `validate` pega cedo a divergência entre entidade e tabela (o teste de fumaça já sobe o contexto completo).
   - **Perdemos:**
-    - **Migração mergeada não se edita**: erro de V1 vira V2, e o histórico guarda o erro. Por isso a V1 só deve ser escrita depois das decisões que mudam o esquema (D1 e D2 abaixo).
+    - **Migração mergeada não se edita**: erro de V1 vira V2, e o histórico guarda o erro. Por isso a V1 só foi adiada até as decisões que mudam o esquema (D1, D2 e D5, abaixo) estarem tomadas.
     - Banco local que aplicou uma migração depois editada fica inconsistente e precisa de `docker compose down -v` (AGENTS.md, seção 8).
     - A extensão `btree_gist` precisa poder ser criada no banco de destino. A imagem `postgres:16` (a do `docker-compose.yml` e a do `AplicacaoSmokeTest`) a traz: conferido em 05/11/2026 num container descartável (PostgreSQL 16.15, `btree_gist` 1.7 disponível, `CREATE EXTENSION` e uma `EXCLUDE USING gist` criadas sem erro). Em outro ambiente (banco gerenciado, outra versão) isso **não foi conferido**.
     - Mais disciplina de PR: toda mudança de modelo exige migração, não só alteração de entidade.
@@ -23,8 +23,9 @@
     - Revisão de PR (e, como proposta, uma checagem no CI que falhe se um arquivo já existente em `db/migration` for modificado em relação a `origin/main`; **não existe hoje**).
     - O `AplicacaoSmokeTest` continua cobrindo a subida; a troca de `disabledWithoutDocker` entra junto com os testes de repositório ([plano-de-teste.md](../plano-de-teste.md), seção 3).
 - **Pendências:**
-  - **pendente (seção 9 do plano, D1):** os limites do `tstzrange` na constraint (intervalo semiaberto `[início, fim)` ou outro) entram na V1 e só podem ser escritos depois da decisão.
-  - **pendente (seção 9 do plano, D2):** se a tentativa recusada é gravada fora da transação que sofreu rollback define se a tabela das tentativas (base do "conflitos evitados", RF-12) entra na V1.
-  - **D3** (409 ou 422 para transição inválida) não muda o esquema; nada a fazer aqui.
-  - A migração V1 **não foi escrita** e só será depois de D1 e D2 decididas e do pedido do Gustavo.
+  - **D1 decidida** (Gustavo, 05/11/2026, seção 9 do plano): intervalo semiaberto `[início, fim)`; os limites do `tstzrange` na V1 seguem isso.
+  - **D2 decidida** (idem): a tentativa recusada é gravada em transação própria, então a **tabela das tentativas recusadas** (base do "conflitos evitados", RF-12) entra na V1.
+  - **D5 decidida** (idem): a constraint de exclusão é parcial, só sobre os estados que ocupam o horário ([ADR-0002](0002-anti-reserva-dupla.md)).
+  - **D3** (409 para transição inválida) não muda o esquema; nada a fazer aqui.
+  - A migração V1 **ainda não foi escrita**: com D1, D2 e D5 decididas ela pode ser, mas fica para um PR próprio, a pedido do Gustavo.
 - **Fonte:** `pom.xml`, `src/main/resources/application.yml`, `docker-compose.yml`, `AGENTS.md` (seções 5 e 8), `docs/arquitetura.md` (seções 8 e 9), `docs/plano-execucao.md` (seção 9).
