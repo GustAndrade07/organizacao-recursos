@@ -338,3 +338,82 @@ a {
     width: auto;
   }
 }
+
+/* Cartão, aviso e formulário (tela 1: login) */
+.cartao {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  padding: var(--space-6);
+  border: var(--border-width-default) solid var(--color-border-default);
+  border-radius: var(--radius-lg);
+  background: var(--color-bg-surface);
+  box-shadow: var(--shadow-card);
+}
+
+.cartao--estreito {
+  max-width: calc(var(--space-16) * 7);
+  margin: 0 auto;
+}
+
+.cartao__cabecalho {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.cartao__titulo {
+  margin: 0;
+  font: var(--font-heading-h2);
+}
+
+.cartao__descricao {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font: var(--font-body-small);
+}
+
+.alerta {
+  margin: 0;
+  padding: var(--space-3);
+  border: var(--border-width-default) solid;
+  border-radius: var(--radius-md);
+  font: var(--font-body-small);
+}
+
+.alerta--perigo {
+  background: var(--color-bg-danger-subtle);
+  border-color: var(--color-border-danger);
+  color: var(--color-text-danger);
+}
+
+.formulario {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.campo__rotulo {
+  font: var(--font-label-default);
+}
+
+.campo__entrada {
+  width: 100%;
+  min-height: var(--size-control-md);
+  padding: 0 var(--space-3);
+  border: var(--border-width-default) solid var(--color-border-input);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-surface);
+  color: var(--color-text-primary);
+  font: var(--font-body-default);
+}
+
+.campo__entrada::placeholder {
+  color: var(--color-text-muted);
+}
