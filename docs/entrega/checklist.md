@@ -13,9 +13,9 @@
 | PRD com RF, RN e RNF numerados | sim | parcial | `docs/prd.md` |
 | RTM (requisito → risco → teste → evidência) | parcial | não | `docs/rtm.md` |
 | Status dos requisitos | sim | sim | `docs/status-requisitos.md` |
-| Diagramas: contexto, contêineres/componentes e sequências críticas | não | não | `docs/arquitetura.md` |
+| Diagramas: contexto, contêineres/componentes e sequências críticas | parcial | não | `docs/arquitetura.md` (esqueleto de 05/11, a validar) |
 | ADRs (JWT, anti reserva dupla, Thymeleaf, Playwright) | parcial | não | `docs/adr/` |
-| Plano de testes | não | não | `docs/testes/plano-tdd.md` |
+| Plano de testes | parcial | não | `docs/plano-de-teste.md` (esqueleto de 05/11) e `docs/testes/plano-tdd.md` (inventário, a fazer) |
 | Evidência de TDD (commits red → green → refactor) | não | não | `docs/testes/evidencia-tdd.md` |
 | BDD (cenários e `.feature`) | parcial | não | `docs/testes/bdd-aprovacao-bloqueio.md` |
 | Mutação manual das regras críticas | não | não | `docs/testes/mutacao-manual.md` |
