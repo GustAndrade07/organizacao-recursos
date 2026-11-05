@@ -10,4 +10,5 @@
 - Plano de execução atualizado (status de 04/11, SonarCloud feito) e ajustado com os pontos das Aulas 09 a 15 reconferidas no Hub do professor; item "Apresentação e demonstração" entra no checklist de entrega.
 - Páginas de erro 401, 403, 404 e 500 em Thymeleaf (mais modelo genérico 4xx/5xx), com caminho para continuar e teste de servidor que prova a 404 real.
 - Tela de login em Thymeleaf (`GET /login`): formulário acessível e aviso de falha (`/login?erro`); a autenticação continua com o back-end.
+- Dependências atualizadas por risco no SonarCloud (Tomcat 10.1.61, Jackson 2.22.4, PostgreSQL 42.7.14, Logback 1.5.38, log4j 2.25.5, jsoup 1.22.2); templates Thymeleaf incluídos na análise do Sonar; `docs/seguranca/riscos-dependencias.md` com os riscos e as justificativas dos 2 críticos do Spring Framework 6.2.19 sem correção na linha 3.5.
 - `docs/arquitetura.md` (esqueleto): C4 em Mermaid, sequências críticas, utility tree, cenários, trade-offs e riscos; `docs/plano-de-teste.md` (esqueleto): níveis, política de mock, metas e responsabilidades. Pacotes, rotas e níveis são proposta a validar com Pedro e Leandro.
