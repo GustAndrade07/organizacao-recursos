@@ -16,8 +16,8 @@ Aplicação que não executa · pipeline ausente ou vermelho · falha de autoriz
 ## 3. Fluxo de trabalho
 | Regra | Como se confere |
 |---|---|
-| Nunca commitar direto na `main`: branch curta a partir da `main` atualizada → pull request → revisão de **outra pessoa** | Ruleset `proteger-main` e histórico de PRs |
-| Revisão em roda: Gustavo revisa Pedro, Pedro revisa Leandro, Leandro revisa Gustavo | Revisor aprovado em cada PR |
+| Nunca commitar direto na `main`: branch curta a partir da `main` atualizada → pull request → revisão de **outra pessoa** | Ruleset `proteger-main` (conferido em 05/11: 1 aprovação, stale dismiss, só Merge, branch atualizada, checks `verify` e `SonarCloud Code Analysis`, sem exceções) e histórico de PRs |
+| Revisão em roda: Gustavo revisa Pedro, Pedro revisa Leandro, Leandro revisa Gustavo. O GitHub aceita aprovação de qualquer colaborador com escrita, então a roda é combinado do grupo, não regra do ruleset. Pendente em 05/11: o Pedro aceitar o convite | Revisor aprovado em cada PR |
 | Merge só com o método **Merge** (sem squash, sem rebase), para preservar `test(red)` → `feat(green)` → `refactor` | Configuração do repositório e `git log --graph` |
 | Atualizar a branch **com merge** de `origin/main` (nunca rebase) antes de pedir revisão | Branch sem "behind" no PR |
 | `./mvnw -B verify` verde antes de cada commit (PowerShell: `.\mvnw.cmd -B verify`) | Check `verify` do CI no PR |
