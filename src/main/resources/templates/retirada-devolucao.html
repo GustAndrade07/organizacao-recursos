@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<!--/*
+  Tela 10 do inventário (prefixo "retirada-devolucao-"), RF-09, RN-05 e RN-08. Atributos de modelo (docs/frontend/README.md):
+    filtro         : ativas | aprovada | em-uso | todos                (o controller preenche)
+    reservas       : lista de id, recurso, solicitante, data, horario (já formatados), estado (texto) e horarioPassou
+                     (o back-end preenche; vazia ou ausente = estado vazio)
+    naoCompareceu  : a reserva em confirmação (mesmos campos); abre o diálogo, mas só se for Aprovada com horarioPassou
+                     (o back-end deve responder 404 ou ignorar o parâmetro nos outros casos)
+    confirmacao    : titulo, reserva e estado da ação que acabou de ser registrada
+*/-->
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: pagina(titulo='Retirada e devolução', conteudo=~{::#conteudo-pagina})}">
+<head>
+    <title>Retirada e devolução</title>
+</head>
+<body>
+<div id="conteudo-pagina">
+    <div class="secao"
+         th:with="dialogoAberto=${naoCompareceu != null and naoCompareceu.estado == 'Aprovada' and naoCompareceu.horarioPassou}">
+        <div th:replace="${confirmacao != null} ? ~{fragments/confirmacao :: confirmacao(${confirmacao}, 'retirada-devolucao-sucesso')} : ~{}"></div>
+
+        <header class="pagina__cabecalho">
+            <h1 data-testid="retirada-devolucao-titulo">Retirada e devolução</h1>
+            <p class="pagina__descricao">Registre quem retirou e quem devolveu cada recurso.</p>
+        </header>
+
+        <form class="cartao formulario" method="get" th:action="@{/retirada-devolucao}" data-testid="retirada-devolucao-filtros">
+            <div class="grade-campos">
+                <div class="campo">
+                    <label class="campo__rotulo" for="retirada-devolucao-estado">Estado</label>
+                    <select class="campo__entrada" id="retirada-devolucao-estado" name="estado" data-testid="retirada-devolucao-estado">
+                        <option value="ativas" th:selected="${filtro == 'ativas'}">Aprovadas e em uso</option>
+                        <option value="aprovada" th:selected="${filtro == 'aprovada'}">Aprovada</option>
+                        <option value="em-uso" th:selected="${filtro == 'em-uso'}">Em uso</option>
+                        <option value="todos" th:selected="${filtro == 'todos'}">Todos os estados</option>
+                    </select>
+                </div>
+            </div>
+            <div class="formulario__acoes">
+                <button type="submit" class="botao botao--primario" data-testid="retirada-devolucao-filtrar">Aplicar</button>
+            </div>
+        </form>
+
+        <section class="vazio" aria-labelledby="retirada-devolucao-vazio-titulo" data-testid="retirada-devolucao-vazio" th:if="${#lists.isEmpty(reservas)}">
+            <h2 class="vazio__titulo" id="retirada-devolucao-vazio-titulo">Nenhuma reserva aguardando retirada ou devolução</h2>
+            <p class="pagina__descricao">Reservas aprovadas e em uso aparecem aqui.</p>
+        </section>
+
+        <table class="tabela" data-testid="retirada-devolucao-tabela" th:unless="${#lists.isEmpty(reservas)}">
+            <caption class="so-leitor">Reservas para retirada e devolução</caption>
+            <thead>
+            <tr>
+                <th scope="col">Recurso</th>
+                <th scope="col">Solicitante</th>
+                <th scope="col">Data</th>
+                <th scope="col">Horário</th>
+                <th scope="col">Estado</th>
+                <th scope="col"><span class="so-leitor">Ações</span></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="reserva : ${reservas}" th:attr="data-testid='retirada-devolucao-linha-' + ${reserva.id}"
+                th:with="aprovada=${reserva.estado == 'Aprovada'}, emUso=${reserva.estado == 'Em uso'}">
+                <th scope="row" class="tabela__nome" th:text="${reserva.recurso}">Projetor portátil P-07</th>
+                <td data-rotulo="Solicitante" th:text="${reserva.solicitante}">Ana Lima</td>
+                <td data-rotulo="Data" th:text="${reserva.data}">06/11/2026</td>
+                <td data-rotulo="Horário"><th:block th:text="${reserva.horario}">10:00 às 12:00</th:block>
+                    <span class="etiqueta" th:if="${aprovada and reserva.horarioPassou}"
+                          th:attr="data-testid='retirada-devolucao-vencida-' + ${reserva.id}">Horário já passou</span></td>
+                <td data-rotulo="Estado">
+                    <span th:replace="~{fragments/estado :: badge(${reserva.estado}, 'retirada-devolucao-estado-' + ${reserva.id})}">Aprovada</span>
+                </td>
+                <td class="tabela__acao">
+                    <div class="botoes-linha" th:if="${aprovada or emUso}">
+                        <form method="post" data-envio-unico th:if="${aprovada}" th:action="@{/retirada-devolucao/{id}/retirar(id=${reserva.id})}">
+                            <button type="submit" class="botao botao--primario"
+                                    th:attr="data-testid='retirada-devolucao-retirar-' + ${reserva.id}, aria-label='Registrar retirada de ' + ${reserva.recurso} + ' por ' + ${reserva.solicitante}">Registrar retirada</button>
+                        </form>
+                        <form method="post" data-envio-unico th:if="${emUso}" th:action="@{/retirada-devolucao/{id}/devolver(id=${reserva.id})}">
+                            <button type="submit" class="botao botao--primario"
+                                    th:attr="data-testid='retirada-devolucao-devolver-' + ${reserva.id}, aria-label='Registrar devolução de ' + ${reserva.recurso} + ' por ' + ${reserva.solicitante}">Registrar devolução</button>
+                        </form>
+                        <a class="botao botao--secundario" th:if="${aprovada and reserva.horarioPassou}"
+                           th:href="@{/retirada-devolucao(estado=${filtro},naoCompareceu=${reserva.id})}"
+                           th:attr="data-testid='retirada-devolucao-nao-compareceu-' + ${reserva.id}, aria-label='Marcar como não compareceu a reserva de ' + ${reserva.recurso} + ' por ' + ${reserva.solicitante}">Marcar como não compareceu</a>
+                    </div>
+                    <p class="tabela__nota" th:unless="${aprovada or emUso}"
+                       th:attr="data-testid='retirada-devolucao-sem-acao-' + ${reserva.id}">Sem ação disponível</p>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <dialog class="dialogo" open role="alertdialog" aria-labelledby="retirada-devolucao-nc-titulo" aria-describedby="retirada-devolucao-nc-texto"
+                data-testid="retirada-devolucao-nc-dialogo" th:if="${dialogoAberto}"
+                th:attr="data-origem='retirada-devolucao-nao-compareceu-' + ${naoCompareceu.id}">
+            <form method="post" data-envio-unico th:action="@{/retirada-devolucao/{id}/nao-compareceu(id=${naoCompareceu.id})}">
+                <h2 class="cartao__titulo" id="retirada-devolucao-nc-titulo">Marcar como não compareceu?</h2>
+                <p class="pagina__descricao" id="retirada-devolucao-nc-texto"><th:block th:text="${naoCompareceu.recurso} + ', de ' + ${naoCompareceu.solicitante} + ', ' + ${naoCompareceu.data} + ', das ' + ${naoCompareceu.horario}">Kit de microscópio M-02, de Beatriz Nogueira, 05/11/2026, das 09:00 às 11:00</th:block>. A reserva passa para <span th:replace="~{fragments/estado :: badge('Não compareceu', null)}">Não compareceu</span> e a mudança fica registrada.</p>
+                <div class="formulario__acoes">
+                    <a class="botao botao--secundario" th:href="@{/retirada-devolucao(estado=${filtro})}" autofocus data-fechar
+                       data-testid="retirada-devolucao-nc-voltar">Voltar</a>
+                    <button type="submit" class="botao botao--perigo" data-testid="retirada-devolucao-nc-confirmar">Sim, marcar como não compareceu</button>
+                </div>
+            </form>
+        </dialog>
+        <script th:if="${dialogoAberto}" th:src="@{/js/dialogo.js}" defer></script>
+    </div>
+</div>
+</body>
+</html>

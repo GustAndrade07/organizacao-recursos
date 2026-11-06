@@ -116,6 +116,53 @@ Envio: no evento `submit`, o `login.js` desabilita o botão Entrar, mostra "Entr
 - `reserva-form.js` bloqueia término igual ou anterior ao início antes do envio (RN-01) e desabilita o botão Confirmar durante o envio. Sem JavaScript o back-end valida.
 - Sucesso leva ao detalhe da reserva (tela 8), decisão do back-end.
 
+## Fila de aprovação
+
+`GET /aprovacoes` (`AprovacaoController`, template `aprovacoes.html`) é a tela 9, do Responsável (RF-07, RN-06). **Não lista nem decide pedidos**; o controller só devolve a view. Contrato com o back-end, a confirmar com o Pedro:
+
+| Atributo de modelo | Conteúdo | Sem ele |
+|---|---|---|
+| `pedidos` | lista dos pedidos Solicitados, os mais próximos do horário primeiro: `id`, `solicitante`, `recurso`, `data` e `horario` (texto já formatado, ex. "09/11/2026" e "08:00 às 10:00"), `estado` (nome por extenso, "Solicitada") e `proprio` (verdadeiro se o pedido é do próprio Responsável) | Lista ausente ou vazia mostra "Nenhum pedido aguardando aprovação" |
+| `rejeitando` | o pedido que está sendo rejeitado (mesmos campos de `pedidos`); o back-end o preenche quando a URL traz `?rejeitar={id}`. O template só abre o diálogo se o pedido estiver Solicitado e não for do próprio Responsável (`proprio` falso); o back-end deve responder 404 ou ignorar o parâmetro quando o id não existe ou o estado não permite | Sem diálogo |
+| `erros` | mapa com a chave `motivo` e o texto do erro, para a rejeição sem motivo (só vale com `rejeitando`) | Sem erro no campo |
+| `confirmacao` | `titulo` (ex. "Reserva aprovada"), `reserva` (ex. "Laboratório de Química, de Laura Mendes") e `estado` (novo estado por extenso); o aviso diz "{reserva}, agora está {estado}. A mudança ficou registrada." | Sem aviso |
+| `erroAprovacao` | verdadeiro quando a API respondeu 403 à aprovação ("Você não pode aprovar esta reserva", estado inalterado) | Sem aviso |
+
+- Ações por formulário: `POST /aprovacoes/{id}/aprovar` (sem corpo) e `POST /aprovacoes/{id}/rejeitar` com o campo `motivo`. Rotas propostas. Depois de decidir, o back-end pode redirecionar para `GET /aprovacoes` com `confirmacao` (atributo flash) ou renderizar a view; a tela não depende disso. Rejeitar sem motivo: renderizar a view de novo com `pedidos`, `rejeitando` e `erros`.
+- O pedido do próprio Responsável (`proprio`) não mostra Aprovar nem Rejeitar, só "Você não pode decidir a sua própria reserva." O back-end continua responsável por recusar a decisão (RN-06); a tela apenas não a oferece.
+- Rejeitar é um link (anunciado como "link" pelos leitores de tela) para `?rejeitar={id}`: foi uma escolha consciente, para o diálogo vir do servidor e funcionar sem JavaScript.
+- Acessibilidade: todo botão da tabela tem nome acessível com a ação, o recurso e o solicitante; o motivo é obrigatório (`required`, rótulo visível) e o erro fica junto ao campo, com `role="alert"`, `aria-invalid` e `aria-describedby`; o aviso de decisão é `role="status"` e o 403 é `role="alert"`. O estado aparece escrito, além da cor (RN-05).
+
+## Retirada e devolução
+
+`GET /retirada-devolucao` (`RetiradaDevolucaoController`, template `retirada-devolucao.html`) é a tela 10, do Responsável (RF-09, RN-05, RN-08). **Não lista nem registra nada**; o controller devolve o filtro de estado escolhido. Contrato com o back-end, a confirmar com o Pedro:
+
+| Atributo de modelo | Conteúdo | Sem ele |
+|---|---|---|
+| `filtro` | `ativas` (Aprovadas e em uso, o padrão), `aprovada`, `em-uso` ou `todos`; o controller preenche com `?estado=` (valor desconhecido vira `ativas`) e o back-end deve filtrar a lista por ele | — |
+| `reservas` | lista de `id`, `recurso`, `solicitante`, `data` e `horario` (texto já formatado), `estado` (nome por extenso: Solicitada, Aprovada, Em uso, Concluída, Rejeitada, Cancelada ou Não compareceu) e `horarioPassou` (verdadeiro se o horário da reserva já passou) | Lista ausente ou vazia mostra "Nenhuma reserva aguardando retirada ou devolução" (o filtro continua na página) |
+| `naoCompareceu` | a reserva em confirmação (mesmos campos de `reservas`); o back-end a preenche quando a URL traz `?naoCompareceu={id}`. O template só abre o diálogo se a reserva estiver Aprovada e com `horarioPassou` verdadeiro; o back-end deve responder 404 ou ignorar o parâmetro quando o id não existe ou o estado não permite | Sem diálogo |
+| `confirmacao` | `titulo` (ex. "Retirada registrada"), `reserva` (ex. "Sala 203, de Rafael Costa") e `estado` (novo estado por extenso) | Sem aviso |
+
+- Ações por formulário: `POST /retirada-devolucao/{id}/retirar`, `POST /retirada-devolucao/{id}/devolver` e `POST /retirada-devolucao/{id}/nao-compareceu` (sem corpo). Rotas propostas.
+- Só a ação que o estado permite é oferecida (RN-05): Aprovada mostra "Registrar retirada", Em uso mostra "Registrar devolução" e qualquer outro estado mostra "Sem ação disponível". O back-end continua validando a transição.
+- Reserva Aprovada com `horarioPassou` mostra a etiqueta "Horário já passou" e o botão "Marcar como não compareceu", que leva a `?estado={filtro}&naoCompareceu={id}` e abre um diálogo de confirmação (`role="alertdialog"`, foco em "Voltar"), porque a mudança não tem volta: Não compareceu é estado terminal (RN-05) e fica registrada para auditoria (RN-08). "Marcar como não compareceu" também é um link, pelo mesmo motivo de "Rejeitar". O prazo para marcar NAO_COMPARECEU ainda é decisão pendente do back-end: a tela mostra o botão quando ele disser `horarioPassou`. Reserva Em uso nunca mostra a etiqueta nem o botão.
+- Depois de cada ação o aviso `role="status"` diz o novo estado; o redirecionamento para `GET /retirada-devolucao` com `confirmacao` fica a cargo do back-end.
+
+### Diálogos (telas 9 e 10)
+
+Os dois diálogos são `<dialog>` que o servidor entrega com o atributo `open`, e `dialogo.js` (só carregado quando há diálogo) troca `open` por `showModal()`: fundo escurecido, foco preso, Esc fecha e o endereço volta ao da lista. Sem JavaScript o `<dialog open>` fica não modal, aparece fixo sobre a lista sem o fundo escurecido e vem depois da tabela na ordem de tabulação (quem navega por teclado precisa passar pela lista para chegar a ele); "Voltar" é um link para a lista. Com JavaScript, ao fechar com Esc o foco volta ao link que abriu o diálogo (`data-origem` guarda o `data-testid` dele) e o endereço volta ao da lista. O foco inicial é o campo do motivo na rejeição e o botão "Voltar" na confirmação de não compareceu.
+
+O badge do estado vem de `fragments/estado.html :: badge` (ver "Estado da reserva (RN-05)" abaixo: nome desconhecido aparece escrito, com cor neutra; estado nulo não aparece). O aviso de confirmação é o fragmento `fragments/confirmacao.html`, usado pelas duas telas.
+
+**As decisões de ação comparam o nome EXATO e diferenciam maiúsculas.** A tela 10 só oferece "Registrar retirada" se `estado` for exatamente `Aprovada` e "Registrar devolução" se for exatamente `Em uso`; a tela 9 só abre o diálogo de rejeição para `Solicitada`, e a tela 10 só abre o de não compareceu para `Aprovada`. Qualquer outro texto (`aprovada`, `EM USO`, `Em análise`, nulo) mostra "Sem ação disponível" e nenhum botão, mesmo que o badge consiga colori-lo.
+
+**`confirmacao` tem duas formas no projeto:** `{titulo, reserva, estado}` nas telas 9 e 10 (o aviso monta "{reserva}, agora está {estado}. A mudança ficou registrada.") e `{titulo, texto}` na tela de recursos (seção 05), que não tem estado de reserva. Não misture os dois: cada tela documenta a sua.
+
+Todo formulário que envia uma ação (aprovar, rejeitar, retirar, devolver, confirmar não compareceu) tem `data-envio-unico` e um botão de envio, então `envio-unico.js` (carregado pelo layout) desabilita o botão no primeiro envio e a ação não sai duas vezes; ver "Envio único de formulário" abaixo. O formulário do filtro (GET) não precisa. O diálogo reaproveita `cartao__titulo`, `pagina__descricao` e `formulario__acoes`, e o "(você)" usa `tabela__nota`.
+
+Risco aberto: `dialogo.js` não tem teste automatizado (o teste de servidor só confere o HTML). O comportamento com JavaScript (modal, foco, Esc, endereço) foi conferido à mão no Chromium e depende do E2E Playwright em 375 px (RF-13) para ficar coberto.
+
 ## Estado da reserva (RN-05)
 
 O contrato com o back-end é **só o nome por extenso**, em `estado` (String): `Solicitada`, `Aprovada`, `Em uso`, `Concluída`, `Rejeitada`, `Cancelada` ou `Não compareceu`. O modelo não traz classe nem código; quem converte o nome em classe é **um único** fragmento, `fragments/estado.html`:
