@@ -109,6 +109,12 @@ class ManutencaoPaginaTest {
                     bloqueio(LocalDateTime.of(2026, 11, 10, 8, 0), LocalDateTime.of(2026, 11, 20, 18, 0)));
         }
 
+        @GetMapping("/teste/manutencao/com-tipo")
+        String comTipo(Model model) {
+            model.addAttribute("tipo", TipoRecurso.MATERIAIS);
+            return base(model, auditorio(false), new FormularioBloqueio("3", null, null, null));
+        }
+
         @GetMapping("/teste/manutencao/afetada-uma")
         String afetadaUma(Model model) {
             model.addAttribute("afetadas", List.of(
@@ -332,6 +338,45 @@ class ManutencaoPaginaTest {
     }
 
     @Test
+    void comReservasAfetadasInicioFimEMotivoSaoSomenteLeituraParaNaoBurlarOAviso() throws Exception {
+        Document doc = pagina("/teste/manutencao/afetadas");
+
+        for (String id : new String[] {"manutencao-inicio", "manutencao-fim", "manutencao-motivo"}) {
+            assertThat(doc.getElementById(id).hasAttr("readonly")).as("readonly em %s", id).isTrue();
+            assertThat(doc.getElementById(id).hasAttr("required")).as("required em %s", id).isTrue();
+        }
+    }
+
+    @Test
+    void semReservasAfetadasOsCamposSaoEditaveis() throws Exception {
+        Document doc = pagina("/teste/manutencao/preenchido");
+
+        assertThat(doc.select("#manutencao-inicio[readonly], #manutencao-fim[readonly], #manutencao-motivo[readonly]")).isEmpty();
+    }
+
+    @Test
+    void comReservasAfetadasOPrimeiroBotaoDeEnvioDoFormularioEOConfirmarEOAvisoVemAntesDele() throws Exception {
+        Document doc = pagina("/teste/manutencao/afetadas");
+
+        var form = doc.getElementById("manutencao-form");
+        var botoes = doc.select("button[type=submit]").stream()
+                .filter(b -> form.equals(b.closest("form")) || "manutencao-form".equals(b.attr("form")))
+                .toList();
+        assertThat(botoes).isNotEmpty();
+        assertThat(botoes.get(0).attr("data-testid")).isEqualTo("manutencao-confirmar");
+        var aviso = doc.selectFirst("[data-testid=manutencao-afetadas]");
+        assertThat(aviso.elementSiblingIndex()).isLessThan(form.elementSiblingIndex());
+    }
+
+    @Test
+    void voltarECancelarLevamParaAAbaDoTipoQuandoOBackEndInforma() throws Exception {
+        Document doc = pagina("/teste/manutencao/com-tipo");
+
+        assertThat(doc.selectFirst("a[data-testid=manutencao-voltar]").attr("href")).isEqualTo("/admin/recursos?tipo=materiais");
+        assertThat(doc.selectFirst("a[data-testid=manutencao-cancelar]").attr("href")).isEqualTo("/admin/recursos?tipo=materiais");
+    }
+
+    @Test
     void listaVaziaDeAfetadasNaoMostraAviso() throws Exception {
         Document doc = pagina("/teste/manutencao/afetadas-vazio");
 
@@ -351,8 +396,9 @@ class ManutencaoPaginaTest {
         assertThat(doc.selectFirst("[data-testid=manutencao-afetada-1] span").text()).contains("<u>Fulano</u>");
     }
 
+    /** Só confere que o script é carregado; o comportamento dele fica para o E2E de 375 px (RF-13). */
     @Test
-    void scriptDaTelaChecaOFimAntesDoEnvioETelaFuncionaSemEle() throws Exception {
+    void carregaOScriptDaTelaComDefer() throws Exception {
         Document doc = pagina("/teste/manutencao/novo");
 
         assertThat(doc.select("script[src='/js/manutencao-form.js'][defer]")).hasSize(1);

@@ -77,6 +77,19 @@ class RecursoFormTest {
             return formulario(model, TipoRecurso.SALAS, vazio(), Map.of("geral", "Já existe um recurso com esse nome."));
         }
 
+        @GetMapping("/teste/recurso-form/erro-geral-e-campo")
+        String erroGeralECampo(Model model) {
+            Map<String, String> erros = new LinkedHashMap<>();
+            erros.put("geral", "Já existe um recurso com esse nome.");
+            erros.put("nome", "Informe o nome do recurso.");
+            return formulario(model, TipoRecurso.SALAS, vazio(), erros);
+        }
+
+        @GetMapping("/teste/recurso-form/erro-campo-de-outro-tipo")
+        String erroCampoDeOutroTipo(Model model) {
+            return formulario(model, TipoRecurso.SALAS, vazio(), Map.of("competencias", "Informe ao menos uma competência."));
+        }
+
         @GetMapping("/teste/recurso-form/novo-preenchido")
         String novoPreenchido(Model model) {
             return formulario(model, TipoRecurso.MATERIAIS,
@@ -164,15 +177,33 @@ class RecursoFormTest {
     }
 
     @Test
-    void trocarOTipoFuncionaSemJavaScriptComUmBotaoQueRecarregaPorGet() throws Exception {
+    void trocarOTipoEUmBotaoSempreVisivelQueRecarregaPorGetSemEnvioAutomatico() throws Exception {
         Document doc = pagina("/teste/recurso-form/sala");
 
-        var botao = doc.selectFirst("button[data-testid=recurso-form-trocar-tipo]");
+        var tipo = doc.selectFirst("select#recurso-form-tipo");
+        assertThat(tipo.attr("autocomplete")).isEqualTo("off");
+        assertThat(tipo.hasAttr("onchange")).isFalse();
+        assertThat(doc.getElementById("recurso-form-tipo-ajuda").text()).isEqualTo("Depois de escolher o tipo, use Atualizar campos.");
+        assertThat(tipo.attr("aria-describedby")).isEqualTo("recurso-form-tipo-ajuda");
+        var botao = doc.selectFirst("form[data-testid=recurso-form] button[data-testid=recurso-form-trocar-tipo]");
+        assertThat(botao.hasAttr("hidden")).isFalse();
         assertThat(botao.text()).isEqualTo("Atualizar campos");
         assertThat(botao.attr("type")).isEqualTo("submit");
         assertThat(botao.attr("formmethod")).isEqualTo("get");
         assertThat(botao.attr("formaction")).isEqualTo("/admin/recursos/novo");
         assertThat(botao.hasAttr("formnovalidate")).isFalse();
+    }
+
+    @Test
+    void oPrimeiroBotaoDeEnvioDoFormularioESalvarParaOEnterNaoTrocarOTipo() throws Exception {
+        for (String caminho : new String[] {"/teste/recurso-form/sala", "/teste/recurso-form/edicao-sala"}) {
+            Document doc = pagina(caminho);
+
+            var primeiro = doc.selectFirst("form[data-testid=recurso-form] button[type=submit]");
+            assertThat(primeiro.text()).as(caminho).isEqualTo(caminho.contains("edicao") ? "Salvar alterações" : "Salvar recurso");
+            assertThat(primeiro.hasAttr("formaction")).as(caminho).isFalse();
+            assertThat(primeiro.hasAttr("formmethod")).as(caminho).isFalse();
+        }
     }
 
     @Test
@@ -283,6 +314,23 @@ class RecursoFormTest {
     }
 
     @Test
+    void oResumoSoContaOsCamposDoTipoENaoGeraLinkParaCampoQueATelaNaoMostra() throws Exception {
+        Document doc = pagina("/teste/recurso-form/erro-geral-e-campo");
+        var resumo = doc.selectFirst("[data-testid=recurso-form-erros]");
+        assertThat(resumo.selectFirst(".alerta__texto").text()).isEqualTo("Corrija o campo destacado:");
+        assertThat(resumo.select("li")).hasSize(2);
+        assertThat(resumo.select("li a")).hasSize(1);
+
+        Document so = pagina("/teste/recurso-form/erro-geral");
+        assertThat(so.select("[data-testid=recurso-form-erros] .alerta__texto")).isEmpty();
+
+        Document outro = pagina("/teste/recurso-form/erro-campo-de-outro-tipo");
+        assertThat(outro.select("[data-testid=recurso-form-erros] li a")).isEmpty();
+        assertThat(outro.selectFirst("[data-testid=recurso-form-erros] li").text()).isEqualTo("Informe ao menos uma competência.");
+        assertThat(outro.select("[data-testid=recurso-form-erros] .alerta__texto")).isEmpty();
+    }
+
+    @Test
     void edicaoMudaTituloEBotaoEEnviaParaOIdDoRecurso() throws Exception {
         Document doc = pagina("/teste/recurso-form/edicao-sala");
 
@@ -301,10 +349,9 @@ class RecursoFormTest {
         assertThat(doc.select("select")).isEmpty();
         assertThat(doc.select("[data-testid=recurso-form-trocar-tipo]")).isEmpty();
         assertThat(doc.selectFirst("input[type=hidden][name=tipo]").val()).isEqualTo("salas");
-        var tipo = doc.selectFirst("input#recurso-form-tipo");
-        assertThat(tipo.val()).isEqualTo("Sala");
-        assertThat(tipo.hasAttr("disabled")).isTrue();
-        assertThat(doc.selectFirst("label[for=recurso-form-tipo]").text()).isEqualTo("Tipo de recurso");
+        assertThat(doc.select("input#recurso-form-tipo")).isEmpty();
+        assertThat(doc.selectFirst("[data-testid=recurso-form-tipo]").text()).isEqualTo("Sala");
+        assertThat(doc.select("label[for=recurso-form-tipo]")).isEmpty();
         assertThat(doc.getElementById("recurso-form-nome").val()).isEqualTo("Laboratório de Química");
         assertThat(doc.getElementById("recurso-form-capacidade").val()).isEqualTo("25");
         assertThat(doc.getElementById("recurso-form-localizacao").val()).isEqualTo("Bloco C, térreo");
@@ -342,8 +389,9 @@ class RecursoFormTest {
         assertThat(doc.getElementById("recurso-form-nome-erro").text()).isEqualTo("<i>erro</i>");
     }
 
+    /** Só confere que o script é carregado; o comportamento dele fica para o E2E de 375 px (RF-13). */
     @Test
-    void scriptDaTelaTrocaOTipoSozinhoEATelaFuncionaSemEle() throws Exception {
+    void carregaOScriptDaTelaComDefer() throws Exception {
         Document doc = pagina("/teste/recurso-form/sala");
 
         assertThat(doc.select("script[src='/js/recurso-form.js'][defer]")).hasSize(1);

@@ -243,11 +243,20 @@ class ListaRecursosTest {
         var editar = doc.selectFirst("a[data-testid=recursos-editar-2]");
         assertThat(editar.text()).isEqualTo("Editar");
         assertThat(editar.attr("aria-label")).isEqualTo("Editar Laboratório de Química");
-        assertThat(editar.attr("href")).isEqualTo("/admin/recursos/2");
+        assertThat(editar.attr("href")).isEqualTo("/admin/recursos/2?tipo=salas");
         var manutencao = doc.selectFirst("a[data-testid=recursos-manutencao-2]");
         assertThat(manutencao.text()).isEqualTo("Manutenção");
         assertThat(manutencao.attr("aria-label")).isEqualTo("Manutenção de Laboratório de Química");
-        assertThat(manutencao.attr("href")).isEqualTo("/admin/recursos/2/manutencao");
+        assertThat(manutencao.attr("href")).isEqualTo("/admin/recursos/2/manutencao?tipo=salas");
+    }
+
+    @Test
+    void editarEManutencaoLevamOTipoDaAbaParaATelaVoltarAMesmaAba() throws Exception {
+        Document doc = pagina("/teste/recursos/materiais");
+
+        assertThat(doc.selectFirst("a[data-testid=recursos-editar-12]").attr("href")).isEqualTo("/admin/recursos/12?tipo=materiais");
+        assertThat(doc.selectFirst("a[data-testid=recursos-manutencao-12]").attr("href"))
+                .isEqualTo("/admin/recursos/12/manutencao?tipo=materiais");
     }
 
     @Test
@@ -281,7 +290,7 @@ class ListaRecursosTest {
         assertThat(linha.selectFirst("td[data-rotulo=Competências]").text()).isEqualTo("Química orgânica, segurança em laboratório");
         assertThat(linha.selectFirst("[data-testid=recursos-situacao-20]").text()).isEqualTo("Ativo");
         var editar = linha.selectFirst("a[data-testid=recursos-editar-20]");
-        assertThat(editar.attr("href")).isEqualTo("/admin/recursos/20");
+        assertThat(editar.attr("href")).isEqualTo("/admin/recursos/20?tipo=professores");
         assertThat(editar.attr("aria-label")).isEqualTo("Editar Ana Lima");
         assertThat(doc.select("a[data-testid^=recursos-manutencao-]")).isEmpty();
         assertThat(doc.select("[data-testid^=recursos-restrito-]")).isEmpty();
