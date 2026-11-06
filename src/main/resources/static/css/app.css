@@ -744,8 +744,9 @@ a {
   color: var(--color-text-warning);
 }
 
-/* Estado da reserva (RN-05): o nome sempre aparece escrito, além da cor */
-.estado {
+/* Estado da reserva (RN-05) e situação do recurso: o nome sempre aparece escrito, além da cor */
+.estado,
+.situacao {
   display: inline-flex;
   align-items: center;
   padding: var(--space-1) var(--space-3);
@@ -867,7 +868,8 @@ a {
 }
 
 /* O badge não estica na largura do cartão no mobile */
-.cartao__linha .estado {
+.cartao__linha .estado,
+.cartao__linha .situacao {
   align-self: flex-start;
 }
 
@@ -1051,4 +1053,152 @@ a {
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
+}
+
+/* Cadastro de recursos e bloqueio por manutenção (telas 13 a 15) */
+.pagina__cabecalho--acao {
+  gap: var(--space-4);
+}
+
+/* Abas por tipo: links com aria-current, sem JavaScript */
+.abas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.aba {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--size-control-md);
+  padding: 0 var(--space-4);
+  border: var(--border-width-default) solid transparent;
+  border-radius: var(--radius-md);
+  color: var(--color-text-primary);
+  font: var(--font-label-default);
+  text-decoration: none;
+}
+
+.aba:hover {
+  background: var(--color-bg-subtle);
+}
+
+.aba[aria-current="page"] {
+  border-color: var(--color-border-info);
+  background: var(--color-bg-info-subtle);
+  color: var(--color-text-brand);
+}
+
+.busca-nome {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/* Situação do recurso: a base é a do .estado; aqui ficam a borda e as cores */
+.situacao {
+  border: var(--border-width-default) solid;
+}
+
+.situacao--ativo {
+  background: var(--color-bg-success-subtle);
+  border-color: var(--color-border-success);
+  color: var(--color-text-success);
+}
+
+.situacao--manutencao {
+  background: var(--color-bg-danger-subtle);
+  border-color: var(--color-border-danger);
+  color: var(--color-text-danger);
+}
+
+.situacoes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* Formulário de recurso e de bloqueio */
+.campo__obrig {
+  color: var(--color-text-secondary);
+  font: var(--font-body-small);
+}
+
+.campo__acao {
+  align-self: flex-start;
+}
+
+/* Valor só para conferir (reservas afetadas pelo bloqueio): o ajuste é por "Voltar e ajustar o período" */
+.campo__entrada[readonly] {
+  background: var(--color-bg-subtle);
+}
+
+.opcao {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border: var(--border-width-default) solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-subtle);
+}
+
+.opcao input {
+  flex: none;
+  width: var(--size-icon);
+  height: var(--size-icon);
+  margin: var(--space-3) 0 0;
+  accent-color: var(--color-bg-brand);
+}
+
+.opcao__texto {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.opcao__rotulo {
+  display: flex;
+  align-items: center;
+  min-height: var(--size-control-md);
+  font: var(--font-label-default);
+}
+
+.opcao .campo__ajuda {
+  color: var(--color-text-secondary);
+}
+
+/* Reservas afetadas pelo bloqueio, dentro do aviso */
+.reservas-afetadas {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: var(--space-3) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.reservas-afetadas li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+@media (min-width: 768px) {
+  .pagina__cabecalho--acao {
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+  }
+
+  .busca-nome {
+    flex-direction: row;
+    align-items: flex-end;
+  }
+
+  .busca-nome .campo {
+    flex: 1;
+  }
 }

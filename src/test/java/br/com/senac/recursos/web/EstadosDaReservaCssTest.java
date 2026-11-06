@@ -39,8 +39,9 @@ class EstadosDaReservaCssTest {
 
     @Test
     void regraBaseDoBadgeTemCorNeutraParaEstadoDesconhecido() throws IOException {
-        Matcher regra = Pattern.compile("(?<![\\w-])\\.estado\\s*\\{([^}]*)\\}").matcher(css());
+        Matcher regra = Pattern.compile("(?<![\\w-])\\.estado\\s*(?:,\\s*\\.situacao\\s*)?\\{([^}]*)\\}").matcher(css());
 
+        // a regra base é dividida com .situacao (situação do recurso, telas de recursos)
         assertThat(regra.find()).as("regra base .estado").isTrue();
         assertThat(regra.group(1))
                 .contains("background: var(--color-bg-subtle)")

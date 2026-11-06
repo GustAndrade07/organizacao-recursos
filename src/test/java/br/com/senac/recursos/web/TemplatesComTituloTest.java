@@ -16,6 +16,7 @@ import org.springframework.core.io.ClassPathResource;
 class TemplatesComTituloTest {
 
     private static final List<String> TEMPLATES_DE_TELA = List.of("busca", "reserva-nova", "fragments/estado", "historico", "relatorio", "login", "error/401",
+            "recursos", "recurso-form", "manutencao", "fragments/campo",
             "aprovacoes", "retirada-devolucao", "fragments/confirmacao");
 
     @Test
