@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="pt-BR" class="js">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Recurso salvo · 375</title>
+<link rel="stylesheet" href="../../../../src/main/resources/static/css/tokens.css">
+<link rel="stylesheet" href="../../../../src/main/resources/static/css/app.css">
+<link rel="stylesheet" href="secao02.css">
+<link rel="stylesheet" href="secao05.css">
+</head>
+<body>
+<a class="pular-conteudo" href="#conteudo" data-testid="menu-pular">Pular para o conteúdo</a>
+<header class="barra" data-aberto="false" data-menu>
+<div class="barra__linha">
+<a class="barra__marca" href="#" data-testid="menu-marca">Organização de Recursos</a>
+<button type="button" class="menu__botao" data-testid="menu-abrir" aria-label="Abrir menu" aria-expanded="false" aria-controls="menu-painel"><span class="menu__barra"></span><span class="menu__barra"></span><span class="menu__barra"></span></button>
+<nav class="menu__painel" id="menu-painel" aria-label="Principal">
+<ul class="menu__lista">
+<li><a class="menu__item" href="#" data-testid="menu-item-recursos" aria-current="page">Recursos</a></li>
+<li><a class="menu__item" href="#" data-testid="menu-item-relatorios">Relatórios</a></li>
+</ul>
+<div class="menu__rodape">
+<p class="menu__usuario"><span class="menu__nome" data-testid="menu-usuario">Marina Alves</span><span class="menu__perfil" data-testid="menu-perfil">Administrador</span></p>
+<form action="#" method="post"><button type="submit" class="botao botao--secundario" data-testid="menu-sair">Sair</button></form>
+</div>
+</nav>
+</div>
+</header>
+<main class="conteudo" id="conteudo" tabindex="-1">
+<div class="secao">
+<div class="alerta alerta--sucesso" role="status" data-testid="recursos-sucesso">
+<strong class="alerta__titulo">Recurso salvo</strong>
+<p class="alerta__texto">Sala 203 foi atualizada. A lista abaixo já mostra as mudanças.</p>
+</div>
+<header class="pagina__cabecalho pagina__cabecalho--acao">
+<div class="pagina__cabecalho">
+<h1 data-testid="recursos-titulo">Recursos</h1>
+<p class="pagina__descricao">Mantenha o cadastro de salas, materiais e professores.</p>
+</div>
+<a class="botao botao--primario" href="#" data-testid="recursos-cadastrar">Cadastrar recurso</a>
+</header>
+<nav class="abas" aria-label="Tipo de recurso" data-testid="recursos-abas">
+<a class="aba" href="#" data-testid="recursos-aba-salas" aria-current="page">Salas</a>
+<a class="aba" href="#" data-testid="recursos-aba-materiais">Materiais</a>
+<a class="aba" href="#" data-testid="recursos-aba-professores">Professores</a>
+</nav>
+<form class="cartao" role="search" aria-label="Buscar salas por nome" data-testid="recursos-busca">
+<div class="busca-nome">
+<div class="campo">
+<label class="campo__rotulo" for="recursos-nome">Buscar por nome</label>
+<input class="campo__entrada" id="recursos-nome" name="nome" type="search" data-testid="recursos-nome">
+</div>
+<button type="submit" class="botao botao--secundario" data-testid="recursos-buscar">Buscar</button>
+</div>
+</form>
+<table class="tabela" data-testid="recursos-tabela">
+<caption class="so-leitor">Salas cadastradas</caption>
+<thead><tr><th scope="col">Nome</th><th scope="col">Capacidade</th><th scope="col">Localização</th><th scope="col">Situação</th><th scope="col"><span class="so-leitor">Ações</span></th></tr></thead>
+<tbody>
+<tr data-testid="recursos-linha-1">
+<th scope="row" class="tabela__nome">Sala 203</th>
+<td data-rotulo="Capacidade">40 lugares</td>
+<td data-rotulo="Localização">Bloco B, 2º andar</td>
+<td data-rotulo="Situação"><div class="situacoes"><span class="situacao situacao--ativo" data-testid="recursos-situacao-1">Ativo</span></div></td>
+<td class="tabela__acao"><div class="botoes-linha">
+<a class="botao botao--secundario" href="#" aria-label="Editar Sala 203" data-testid="recursos-editar-1">Editar</a>
+<a class="botao botao--secundario" href="#" aria-label="Manutenção de Sala 203" data-testid="recursos-manutencao-1">Manutenção</a>
+</div></td>
+</tr>
+<tr data-testid="recursos-linha-2">
+<th scope="row" class="tabela__nome">Laboratório de Química</th>
+<td data-rotulo="Capacidade">25 lugares</td>
+<td data-rotulo="Localização">Bloco C, térreo</td>
+<td data-rotulo="Situação"><div class="situacoes"><span class="situacao situacao--ativo" data-testid="recursos-situacao-2">Ativo</span><span class="etiqueta" data-testid="recursos-restrito-2">Restrito</span></div></td>
+<td class="tabela__acao"><div class="botoes-linha">
+<a class="botao botao--secundario" href="#" aria-label="Editar Laboratório de Química" data-testid="recursos-editar-2">Editar</a>
+<a class="botao botao--secundario" href="#" aria-label="Manutenção de Laboratório de Química" data-testid="recursos-manutencao-2">Manutenção</a>
+</div></td>
+</tr>
+<tr data-testid="recursos-linha-3">
+<th scope="row" class="tabela__nome">Auditório Central</th>
+<td data-rotulo="Capacidade">120 lugares</td>
+<td data-rotulo="Localização">Bloco A, térreo</td>
+<td data-rotulo="Situação"><div class="situacoes"><span class="situacao situacao--manutencao" data-testid="recursos-situacao-3">Em manutenção</span><span class="tabela__nota">10/11/2026 a 20/11/2026</span></div></td>
+<td class="tabela__acao"><div class="botoes-linha">
+<a class="botao botao--secundario" href="#" aria-label="Editar Auditório Central" data-testid="recursos-editar-3">Editar</a>
+<a class="botao botao--secundario" href="#" aria-label="Manutenção de Auditório Central" data-testid="recursos-manutencao-3">Manutenção</a>
+</div></td>
+</tr>
+<tr data-testid="recursos-linha-4">
+<th scope="row" class="tabela__nome">Sala de reuniões 2</th>
+<td data-rotulo="Capacidade">12 lugares</td>
+<td data-rotulo="Localização">Bloco B, 1º andar</td>
+<td data-rotulo="Situação"><div class="situacoes"><span class="situacao situacao--ativo" data-testid="recursos-situacao-4">Ativo</span><span class="etiqueta" data-testid="recursos-restrito-4">Restrito</span></div></td>
+<td class="tabela__acao"><div class="botoes-linha">
+<a class="botao botao--secundario" href="#" aria-label="Editar Sala de reuniões 2" data-testid="recursos-editar-4">Editar</a>
+<a class="botao botao--secundario" href="#" aria-label="Manutenção de Sala de reuniões 2" data-testid="recursos-manutencao-4">Manutenção</a>
+</div></td>
+</tr>
+</tbody>
+</table>
+</div>
+</main>
+<script src="../../../../src/main/resources/static/js/menu.js" defer></script>
+</body>
+</html>

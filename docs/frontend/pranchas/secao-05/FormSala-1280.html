@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="pt-BR" class="js">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Formulário · sala · 1280</title>
+<link rel="stylesheet" href="../../../../src/main/resources/static/css/tokens.css">
+<link rel="stylesheet" href="../../../../src/main/resources/static/css/app.css">
+<link rel="stylesheet" href="secao02.css">
+<link rel="stylesheet" href="secao05.css">
+</head>
+<body>
+<a class="pular-conteudo" href="#conteudo" data-testid="menu-pular">Pular para o conteúdo</a>
+<header class="barra" data-aberto="false" data-menu>
+<div class="barra__linha">
+<a class="barra__marca" href="#" data-testid="menu-marca">Organização de Recursos</a>
+<button type="button" class="menu__botao" data-testid="menu-abrir" aria-label="Abrir menu" aria-expanded="false" aria-controls="menu-painel"><span class="menu__barra"></span><span class="menu__barra"></span><span class="menu__barra"></span></button>
+<nav class="menu__painel" id="menu-painel" aria-label="Principal">
+<ul class="menu__lista">
+<li><a class="menu__item" href="#" data-testid="menu-item-recursos" aria-current="page">Recursos</a></li>
+<li><a class="menu__item" href="#" data-testid="menu-item-relatorios">Relatórios</a></li>
+</ul>
+<div class="menu__rodape">
+<p class="menu__usuario"><span class="menu__nome" data-testid="menu-usuario">Marina Alves</span><span class="menu__perfil" data-testid="menu-perfil">Administrador</span></p>
+<form action="#" method="post"><button type="submit" class="botao botao--secundario" data-testid="menu-sair">Sair</button></form>
+</div>
+</nav>
+</div>
+</header>
+<main class="conteudo" id="conteudo" tabindex="-1">
+<div class="secao">
+<header class="pagina__cabecalho">
+<h1 data-testid="recurso-form-titulo">Cadastrar recurso</h1>
+<p class="pagina__descricao"><a href="#" data-testid="recurso-form-voltar">Voltar para a lista de recursos</a></p>
+</header>
+<form class="cartao formulario" novalidate data-testid="recurso-form">
+<div class="campo">
+<label class="campo__rotulo" for="recurso-form-tipo">Tipo de recurso</label>
+<select class="campo__entrada" id="recurso-form-tipo" name="tipo" data-testid="recurso-form-tipo"><option selected>Sala</option><option>Material</option><option>Professor</option></select>
+<p class="campo__ajuda">Os campos abaixo mudam conforme o tipo.</p>
+</div>
+<div class="campo">
+<label class="campo__rotulo" for="recurso-form-nome">Nome do recurso <span class="campo__obrig">(obrigatório)</span></label>
+<input class="campo__entrada" id="recurso-form-nome" name="nome" type="text" required aria-required="true" data-testid="recurso-form-nome">
+</div>
+<div class="campo">
+<label class="campo__rotulo" for="recurso-form-capacidade">Capacidade (lugares) <span class="campo__obrig">(obrigatório)</span></label>
+<input class="campo__entrada" id="recurso-form-capacidade" name="capacidade" type="number" required aria-required="true" data-testid="recurso-form-capacidade">
+</div>
+<div class="campo">
+<label class="campo__rotulo" for="recurso-form-localizacao">Localização <span class="campo__obrig">(obrigatório)</span></label>
+<input class="campo__entrada" id="recurso-form-localizacao" name="localizacao" type="text" required aria-required="true" data-testid="recurso-form-localizacao">
+</div>
+<div class="opcao">
+<input type="checkbox" id="recurso-form-restrito" name="restrito" aria-describedby="recurso-form-restrito-ajuda" data-testid="recurso-form-restrito">
+<div class="opcao__texto">
+<label class="opcao__rotulo" for="recurso-form-restrito">Recurso restrito (exige aprovação)</label>
+<p class="campo__ajuda" id="recurso-form-restrito-ajuda">Quem reservar este recurso fica com a reserva <span class="estado estado--solicitada">Solicitada</span> até um Responsável aprovar.</p>
+</div>
+</div>
+<div class="formulario__acoes">
+<button type="submit" class="botao botao--primario" data-testid="recurso-form-salvar">Salvar recurso</button>
+<a class="botao botao--secundario" href="#" data-testid="recurso-form-cancelar">Cancelar</a>
+</div>
+</form>
+</div>
+</main>
+<script src="../../../../src/main/resources/static/js/menu.js" defer></script>
+</body>
+</html>
