@@ -51,7 +51,7 @@ class LayoutBaseTest {
             model.addAttribute("usuario", Map.of("nome", "Carlos Lima", "perfil", "Responsável"));
             model.addAttribute("menu", List.of(
                     Map.of("id", "aprovacoes", "rotulo", "Aprovações", "href", "/aprovacoes", "ativo", false),
-                    Map.of("id", "emprestimos", "rotulo", "Empréstimos", "href", "/emprestimos", "ativo", false),
+                    Map.of("id", "retirada-devolucao", "rotulo", "Retirada e devolução", "href", "/retirada-devolucao", "ativo", false),
                     Map.of("id", "relatorios", "rotulo", "Relatórios", "href", "/relatorios/utilizacao", "ativo", false)));
             return "teste/pagina";
         }
@@ -123,7 +123,7 @@ class LayoutBaseTest {
     void responsavelNaoVeItensDeSolicitante() throws Exception {
         Document doc = pagina("/teste/responsavel");
 
-        assertThat(doc.select("[data-testid^=menu-item-]").eachText()).containsExactly("Aprovações", "Empréstimos", "Relatórios");
+        assertThat(doc.select("[data-testid^=menu-item-]").eachText()).containsExactly("Aprovações", "Retirada e devolução", "Relatórios");
         assertThat(doc.select("[data-testid=menu-item-buscar]")).isEmpty();
     }
 

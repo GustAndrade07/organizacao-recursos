@@ -1,0 +1,30 @@
+/*
+ * Estados novos da tela 1 (login). Só tokens de tokens.css.
+ * .botao:disabled e .alerta--aviso já existem na branch feat/nova-reserva (app.css) e são repetidos aqui só para a prancha.
+ */
+.botao:disabled {
+  border-color: transparent;
+  background: var(--color-bg-disabled);
+  color: var(--color-text-secondary);
+  cursor: not-allowed;
+}
+
+.alerta--aviso {
+  background: var(--color-bg-warning-subtle);
+  border-color: var(--color-border-warning);
+  color: var(--color-text-warning);
+}
+
+/* Botão em carregamento: anel parcial + texto "Entrando…" (não depende só de cor) */
+.botao--carregando {
+  gap: var(--space-2);
+}
+
+.carregando {
+  display: inline-block;
+  width: var(--size-icon);
+  height: var(--size-icon);
+  border: var(--border-width-focus) solid var(--color-text-secondary);
+  border-top-color: transparent;
+  border-radius: var(--radius-full);
+}
