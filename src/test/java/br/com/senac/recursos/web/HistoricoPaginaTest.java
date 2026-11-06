@@ -166,6 +166,7 @@ class HistoricoPaginaTest {
         var atual = doc.selectFirst("[data-testid=historico-estado-atual]");
         assertThat(atual.text()).isEqualTo(nome);
         assertThat(atual.hasClass(classe)).isTrue();
+        assertThat(atual.classNames()).filteredOn(c -> c.startsWith("estado--")).containsExactly(classe);
         var novo = doc.selectFirst("[data-testid=historico-evento-2-para]");
         assertThat(novo.text()).isEqualTo(nome);
         assertThat(novo.hasClass(classe)).isTrue();

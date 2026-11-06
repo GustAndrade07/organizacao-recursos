@@ -20,7 +20,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * Tela 12 do inventário (docs/frontend/telas.md): relatório de utilização, prefixo {@code relatorio-},
@@ -101,7 +100,7 @@ class RelatorioPaginaTest {
         }
 
         @GetMapping("/teste/relatorio/perigoso")
-        String perigoso(@RequestParam(defaultValue = "x") String x, Model model) {
+        String perigoso(Model model) {
             filtro(model);
             model.addAttribute("relatorio", Map.of(
                     "recursos", List.of(linha("<script>alert(1)</script>", 1, "<b>2 h</b>")),
