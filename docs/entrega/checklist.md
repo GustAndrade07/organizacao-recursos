@@ -22,7 +22,7 @@
 | Matriz de autorização | não | não | `docs/seguranca/matriz-autorizacao.md` |
 | Pipeline de CI (verde) | parcial | não | `.github/workflows/ci.yml` |
 | Relatório do JaCoCo (≥ 80% linhas / 70% branches) | não | não | artifact do CI / `target/site/jacoco` |
-| Quality Gate do SonarCloud | não | não | (link do SonarCloud) |
+| Quality Gate do SonarCloud | parcial | parcial | https://sonarcloud.io/project/overview?id=GustAndrade07_organizacao-recursos (Passed na `main` em 05/11; projeto precisa estar Public; riscos de dependência em `docs/seguranca/riscos-dependencias.md`) |
 | Plano de carga (JMeter) | não | não | `perf/reservas.jmx` |
 | RNF de desempenho (escrito antes da rodada) | não | não | `docs/performance/rnf.md` |
 | Resultado do teste de carga | não | não | `docs/performance/resultado-01.md` + `perf/resultados/rodada-01.jtl` |

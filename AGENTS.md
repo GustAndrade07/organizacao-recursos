@@ -76,5 +76,6 @@ Cada linha: a regra, de onde veio e **onde é verificada** (teste, CI ou revisã
 | 2 | Apagar a branch de origem depois do merge | PR #2 foi parar em `feat/esqueleto-spring` em vez de `main` porque a branch base não tinha sido apagada | Configuração "Automatically delete head branches" |
 | 3 | Todo PR atualiza o plano e a descrição traz "Plano de execução" | Pedido do grupo, 04/11/2026: a IA precisa de contexto sempre atual | Modelo de PR; revisão |
 | 4 | Fronteira de regra que o PRD não decide vira pergunta em aberto, não política inventada | Aula 09 | `docs/testes/bdd-aprovacao-bloqueio.md` |
+| 5 | Dependência com risco (CVE) no SonarCloud: subir a versão por propriedade no `pom.xml` quando houver correção na mesma linha; sem correção, justificar em `docs/seguranca/riscos-dependencias.md` com responsável. Nunca ignorar em silêncio | SonarCloud lido em 05/11/2026: 48 riscos, 8 Critical por CVSS | Painel "Dependency risks" e o documento de riscos |
 
 Como acrescentar uma regra: uma linha nova na tabela, na mesma PR que a motivou, e (se mudar o que se faz no dia a dia) o ajuste na seção correspondente acima.
