@@ -16,7 +16,7 @@ Os critérios de aceite de cada tela estão na spec do módulo, no Notion ([Spec
 | 7 | Minhas reservas | 02 | Solicitante | `GET /reservas/minhas` | RF-04 | `minhas-` | — |
 | 8 | Detalhe / alterar / cancelar | 02 | Solicitante | `GET /reservas/{id}` | RF-04 | `reserva-` | — |
 | 9 | Fila de aprovação | 03 | Responsável | `GET /aprovacoes` | RF-07 | `aprovacao-` | — |
-| 10 | Retirada e devolução | 03 | Responsável | `GET /emprestimos` | RF-09 | `emprestimo-` | — |
+| 10 | Retirada e devolução | 03 | Responsável | `GET /retirada-devolucao` | RF-09 | `retirada-devolucao-` | — |
 | 11 | Histórico da reserva | 04 | Responsável, Administrador | `GET /reservas/{id}/historico` | RF-10 | `historico-` | `html` |
 | 12 | Relatório de utilização | 04 | Responsável, Administrador | `GET /relatorios/utilizacao` | RF-12 | `relatorio-` | `html` |
 | 13 | Lista de recursos | 05 | Administrador | `GET /admin/recursos` | RF-02 | `recursos-` | — |
