@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="pt-BR" class="js">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Login · 1280</title>
+<link rel="stylesheet" href="../../../../src/main/resources/static/css/tokens.css">
+<link rel="stylesheet" href="../../../../src/main/resources/static/css/app.css">
+<link rel="stylesheet" href="secao01.css">
+</head>
+<body>
+<a class="pular-conteudo" href="#conteudo" data-testid="menu-pular">Pular para o conteúdo</a>
+<header class="barra" data-aberto="false" data-menu>
+<div class="barra__linha">
+<a class="barra__marca" href="#" data-testid="menu-marca">Organização de Recursos</a>
+</div>
+</header>
+<main class="conteudo" id="conteudo" tabindex="-1">
+<section class="cartao cartao--estreito">
+<header class="cartao__cabecalho">
+<h1 class="cartao__titulo" data-testid="login-titulo">Entrar</h1>
+<p class="cartao__descricao" data-testid="login-descricao">Use seu e-mail e senha para acessar o sistema de reservas.</p>
+</header>
+<form class="formulario" method="post" action="#" data-testid="login-formulario">
+<div class="campo">
+<label class="campo__rotulo" for="email">E-mail</label>
+<input class="campo__entrada" id="email" name="email" type="email" data-testid="login-email" autocomplete="username" placeholder="nome@exemplo.com" required>
+</div>
+<div class="campo">
+<label class="campo__rotulo" for="senha">Senha</label>
+<input class="campo__entrada" id="senha" name="senha" type="password" data-testid="login-senha" autocomplete="current-password" placeholder="Digite sua senha" required>
+</div>
+<button class="botao botao--primario botao--bloco" type="submit" data-testid="login-entrar">Entrar</button>
+</form>
+</section>
+</main>
+<script src="../../../../src/main/resources/static/js/menu.js" defer></script>
+</body>
+</html>
