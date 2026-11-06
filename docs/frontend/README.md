@@ -101,3 +101,56 @@ Acessibilidade: rótulos visíveis, `autocomplete="username"` e `"current-passwo
 - Erro de campo aparece junto ao campo e num resumo no topo (`role="alert"`), com link para o campo.
 - `reserva-form.js` bloqueia término igual ou anterior ao início antes do envio (RN-01) e desabilita o botão Confirmar durante o envio. Sem JavaScript o back-end valida.
 - Sucesso leva ao detalhe da reserva (tela 8), decisão do back-end.
+
+## Recursos e bloqueio por manutenção
+
+Telas 13, 14 e 15 do Administrador (`RecursoController`, RF-02 e RF-08). O controller **só recebe os parâmetros e devolve a tela**; quem lista, grava e consulta reservas afetadas é o back-end, que responde aos `POST` e preenche o modelo. Rotas propostas, a confirmar com o Pedro.
+
+| Rota | Template | Para quê |
+|---|---|---|
+| `GET /admin/recursos?tipo=salas\|materiais\|professores&nome=` | `recursos.html` | Tela 13: lista por aba, com busca por nome |
+| `GET /admin/recursos/novo?tipo=` | `recurso-form.html` | Tela 14, cadastro |
+| `GET /admin/recursos/{id}` | `recurso-form.html` | Tela 14, edição |
+| `GET /admin/recursos/{id}/manutencao` | `manutencao.html` | Tela 15, bloqueio |
+| `POST /admin/recursos` e `POST /admin/recursos/{id}` | (back-end) | Grava o recurso (campos `tipo`, `nome`, `capacidade`, `patrimonio`, `localizacao`, `competencias`, `restrito`) |
+| `POST /admin/recursos/{id}/manutencao` | (back-end) | Registra o bloqueio (`inicio`, `fim`, `motivo`; `confirmar=true` quando o Administrador confirma depois do aviso de reservas afetadas) |
+
+O parâmetro `tipo` é o mesmo nas duas telas: `salas`, `materiais` ou `professores` (valor desconhecido vira `salas`). O enum `TipoRecurso` traz os rótulos de cada tipo. Salvar leva de volta à lista com `confirmacao` (decisão do back-end).
+
+**Tela 13, lista (`recursos.html`)**
+
+| Atributo de modelo | Conteúdo | Sem ele |
+|---|---|---|
+| `tipo` | `TipoRecurso` da aba (o controller preenche com `?tipo=`) | — |
+| `nome` | texto da busca (o controller preenche com `?nome=`) | Campo vazio |
+| `recursos` | lista de `id`, `nome`, `capacidade` (texto pronto, ex. "40 lugares"), `local`, `patrimonio`, `competencias`, `emManutencao`, `periodoManutencao` (texto pronto, ex. "10/11/2026 a 20/11/2026"), `restrito`; `emManutencao` e `restrito` precisam ser booleanos | A página mostra só o cabeçalho, as abas e a busca. Lista vazia mostra "Nenhuma sala cadastrada" (ou o tipo da aba) com "Cadastrar o primeiro recurso"; vazia com `nome` mostra "Nenhum resultado para “nome”" e "Limpar busca" |
+| `confirmacao` | `titulo` e `texto`, depois de salvar o recurso ou registrar o bloqueio | Sem aviso |
+
+- Cada aba usa as colunas do seu tipo: Salas (Nome, Capacidade, Localização, Situação), Materiais (Nome, Patrimônio, Localização, Situação), Professores (Nome, Competências, Situação). Só os campos do tipo precisam vir preenchidos.
+- A situação aparece escrita ("Ativo" ou "Em manutenção" com o período) e "Restrito" é uma etiqueta. Professor mostra só "Ativo" e só tem **Editar**, porque professor não é reservável por enquanto.
+- Abas são links com `aria-current="page"`; a busca é um `GET` que mantém a aba. Tabela no desktop e cartões no mobile com o mesmo HTML (`data-rotulo` em cada célula). `confirmacao` é um `role="status"`.
+
+**Tela 14, formulário (`recurso-form.html`)**
+
+| Atributo de modelo | Conteúdo | Sem ele |
+|---|---|---|
+| `tipo` | `TipoRecurso`; no cadastro o controller preenche com `?tipo=`, na edição o back-end define o tipo do recurso | — |
+| `recurso` | `id`, `nome`, `capacidade` (texto), `localizacao`, `patrimonio`, `competencias`, `restrito`. Com `id` é a **edição** e o back-end preenche com o que está gravado; sem `id` é o cadastro e o controller devolve o que veio na URL | — |
+| `erros` | `LinkedHashMap` de `nome`, `capacidade`, `localizacao`, `patrimonio` ou `competencias` para texto pronto, na ordem do formulário; outra chave aparece no resumo como texto, sem link | Sem erros |
+
+- Sala: nome, capacidade, localização. Material: nome, patrimônio, localização. Professor: nome e competências, sem "Recurso restrito". Todo campo tem rótulo visível com "(obrigatório)", `required` e `aria-required`; o formulário tem `novalidate`, então quem valida é o back-end, que devolve `erros` (resumo `role="alert"` no topo com links e mensagem junto de cada campo).
+- A troca de tipo funciona **sem JavaScript**: o botão "Atualizar campos" envia o formulário por `GET /admin/recursos/novo` e a página volta com os campos do tipo e com o que já foi digitado. Com `recurso-form.js` o botão some e a própria mudança do seletor faz isso. Um botão de envio invisível (`data-padrao`) vem antes do "Atualizar campos" para a tecla Enter continuar salvando.
+- Na edição o título é "Editar recurso", o tipo aparece só para leitura (e vai num campo oculto) e o botão é "Salvar alterações".
+- "Recurso restrito (exige aprovação)" é uma caixa de seleção que explica que a reserva fica Solicitada até um Responsável aprovar.
+
+**Tela 15, bloqueio (`manutencao.html`)**
+
+| Atributo de modelo | Conteúdo | Sem ele |
+|---|---|---|
+| `recurso` | `id`, `nome`, `tipo` (texto pronto, ex. "Sala, 120 lugares"), `local`, `emManutencao` | Sem o resumo do recurso |
+| `bloqueio` | `recursoId`, `inicio` e `fim` (`LocalDateTime`), `motivo`; o controller preenche com a URL e o back-end devolve o que foi enviado | — |
+| `erros` | mapa de `inicio`, `fim` ou `motivo` para texto pronto | Sem erros |
+| `afetadas` | lista de `data` (`LocalDate`), `horario` (texto, ex. "14:00 às 16:00"), `solicitante`, `estado` (nome escrito, ex. "Em uso") e `estadoClasse` (sufixo da classe `estado--*`, ex. "em-uso") das reservas que caem no período | Sem aviso (lista vazia também) |
+
+- O back-end só preenche `afetadas` ao responder o `POST`. Com ela, a tela mostra o aviso `role="alert"` "N reservas caem no período do bloqueio", com data, solicitante e estado, e as ações "Confirmar bloqueio" (reenvia o formulário com `confirmar=true`) e "Voltar e ajustar o período" (link para o `GET` com os valores digitados). O que acontece com essas reservas (cancelar, manter ou notificar) é decisão pendente: a tela só lista.
+- Fim igual ou anterior ao início é barrado antes do envio por `manutencao-form.js` e também pode vir em `erros`, com "O fim do bloqueio precisa ser depois do início." junto do campo (`role="alert"`). Sem JavaScript o back-end valida.
