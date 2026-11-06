@@ -8,7 +8,10 @@
 
   O badge do estado vem de fragments/estado :: badge, único ponto que converte o estado em classe.
 */-->
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Aviso de confirmação</title>
+</head>
 <body>
 <div class="alerta alerta--sucesso" role="status" th:fragment="confirmacao(dados, testid)" th:attr="data-testid=${testid}">
     <strong class="alerta__titulo" th:text="${dados.titulo}">Reserva aprovada</strong>
