@@ -13,16 +13,16 @@
 | PRD com RF, RN e RNF numerados | sim | parcial | `docs/prd.md` |
 | RTM (requisito → risco → teste → evidência) | parcial | não | `docs/rtm.md` |
 | Status dos requisitos | sim | sim | `docs/status-requisitos.md` |
-| Diagramas: contexto, contêineres/componentes e sequências críticas | não | não | `docs/arquitetura.md` |
+| Diagramas: contexto, contêineres/componentes e sequências críticas | parcial | não | `docs/arquitetura.md` (esqueleto de 05/11, a validar) |
 | ADRs (JWT, anti reserva dupla, Thymeleaf, Playwright) | parcial | não | `docs/adr/` |
-| Plano de testes | não | não | `docs/testes/plano-tdd.md` |
+| Plano de testes | parcial | não | `docs/plano-de-teste.md` (esqueleto de 05/11) e `docs/testes/plano-tdd.md` (inventário, a fazer) |
 | Evidência de TDD (commits red → green → refactor) | não | não | `docs/testes/evidencia-tdd.md` |
 | BDD (cenários e `.feature`) | parcial | não | `docs/testes/bdd-aprovacao-bloqueio.md` |
 | Mutação manual das regras críticas | não | não | `docs/testes/mutacao-manual.md` |
 | Matriz de autorização | não | não | `docs/seguranca/matriz-autorizacao.md` |
 | Pipeline de CI (verde) | parcial | não | `.github/workflows/ci.yml` |
 | Relatório do JaCoCo (≥ 80% linhas / 70% branches) | não | não | artifact do CI / `target/site/jacoco` |
-| Quality Gate do SonarCloud | não | não | (link do SonarCloud) |
+| Quality Gate do SonarCloud | parcial | parcial | https://sonarcloud.io/project/overview?id=GustAndrade07_organizacao-recursos (Passed na `main` em 05/11; projeto precisa estar Public; riscos de dependência em `docs/seguranca/riscos-dependencias.md`) |
 | Plano de carga (JMeter) | não | não | `perf/reservas.jmx` |
 | RNF de desempenho (escrito antes da rodada) | não | não | `docs/performance/rnf.md` |
 | Resultado do teste de carga | não | não | `docs/performance/resultado-01.md` + `perf/resultados/rodada-01.jtl` |

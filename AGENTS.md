@@ -16,8 +16,8 @@ Aplicação que não executa · pipeline ausente ou vermelho · falha de autoriz
 ## 3. Fluxo de trabalho
 | Regra | Como se confere |
 |---|---|
-| Nunca commitar direto na `main`: branch curta a partir da `main` atualizada → pull request → revisão de **outra pessoa** | Ruleset `proteger-main` e histórico de PRs |
-| Revisão em roda: Gustavo revisa Pedro, Pedro revisa Leandro, Leandro revisa Gustavo | Revisor aprovado em cada PR |
+| Nunca commitar direto na `main`: branch curta a partir da `main` atualizada → pull request → revisão de **outra pessoa** | Ruleset `proteger-main` (conferido em 05/11: 1 aprovação, stale dismiss, só Merge, branch atualizada, checks `verify` e `SonarCloud Code Analysis`, sem exceções) e histórico de PRs |
+| Revisão em roda: Gustavo revisa Pedro, Pedro revisa Leandro, Leandro revisa Gustavo. O GitHub aceita aprovação de qualquer colaborador com escrita, então a roda é combinado do grupo, não regra do ruleset. Pendente em 05/11: o Pedro aceitar o convite | Revisor aprovado em cada PR |
 | Merge só com o método **Merge** (sem squash, sem rebase), para preservar `test(red)` → `feat(green)` → `refactor` | Configuração do repositório e `git log --graph` |
 | Atualizar a branch **com merge** de `origin/main` (nunca rebase) antes de pedir revisão | Branch sem "behind" no PR |
 | `./mvnw -B verify` verde antes de cada commit (PowerShell: `.\mvnw.cmd -B verify`) | Check `verify` do CI no PR |
@@ -76,5 +76,7 @@ Cada linha: a regra, de onde veio e **onde é verificada** (teste, CI ou revisã
 | 2 | Apagar a branch de origem depois do merge | PR #2 foi parar em `feat/esqueleto-spring` em vez de `main` porque a branch base não tinha sido apagada | Configuração "Automatically delete head branches" |
 | 3 | Todo PR atualiza o plano e a descrição traz "Plano de execução" | Pedido do grupo, 04/11/2026: a IA precisa de contexto sempre atual | Modelo de PR; revisão |
 | 4 | Fronteira de regra que o PRD não decide vira pergunta em aberto, não política inventada | Aula 09 | `docs/testes/bdd-aprovacao-bloqueio.md` |
+| 5 | Dependência com risco (CVE) no SonarCloud: subir a versão por propriedade no `pom.xml` quando houver correção na mesma linha; sem correção, justificar em `docs/seguranca/riscos-dependencias.md` com responsável. Nunca ignorar em silêncio | SonarCloud lido em 05/11/2026: 48 riscos, 8 Critical por CVSS | Painel "Dependency risks" e o documento de riscos |
+| 6 | ADR e documento nunca decidem um ponto da seção 9 do plano: escrevem "pendente (seção 9 do plano, Dn)" e apontam para ele. ADR novo entra como **proposto** e só vira **aceito** na revisão do PR | Pedido do Gustavo, 05/11/2026 (decisões D1 a D4 ainda sem dono nem data de decisão) | Revisão do PR; `grep -n "pendente" docs/adr/*.md` |
 
 Como acrescentar uma regra: uma linha nova na tabela, na mesma PR que a motivou, e (se mudar o que se faz no dia a dia) o ajuste na seção correspondente acima.
