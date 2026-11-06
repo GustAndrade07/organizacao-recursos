@@ -5,6 +5,7 @@
 - Pranchas da seção 01 (login, menu por perfil e páginas de erro) em `docs/frontend/pranchas/secao-01/`, em 375 px e 1280 px, para aprovação antes da implementação dos estados novos.
 - Esqueleto Spring Boot 3.5 (Java 21, Maven Wrapper), PostgreSQL + Flyway, JaCoCo com gate de 80% de linhas / 70% de branches e teste de fumaça com Testcontainers.
 - Design tokens do front-end (`src/main/resources/static/css/tokens.css`), espelhando o arquivo Figma do Design System.
+- Pranchas da seção 03 (fila de aprovação e retirada e devolução) em `docs/frontend/pranchas/secao-03/`, em 375 px e 1280 px, para aprovação antes da implementação.
 - Documentação do front-end em `docs/frontend/` (tokens e inventário de telas).
 - Layout base e menu em Thymeleaf (`layout.html`, `app.css`, `menu.js`), com teste que impede valor solto fora dos tokens.
 - Pranchas da seção 04 (histórico da reserva e relatório de utilização) em `docs/frontend/pranchas/secao-04/`, em 375 px e 1280 px, para aprovação antes da implementação.
