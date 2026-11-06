@@ -7,22 +7,20 @@ package br.com.senac.recursos.web;
  */
 public enum TipoRecurso {
 
-    SALAS("salas", "Sala", "Salas", "Nome do recurso", "Nenhuma sala cadastrada", "Salas cadastradas", "Buscar salas por nome"),
-    MATERIAIS("materiais", "Material", "Materiais", "Nome do recurso", "Nenhum material cadastrado", "Materiais cadastrados", "Buscar materiais por nome"),
-    PROFESSORES("professores", "Professor", "Professores", "Nome do professor", "Nenhum professor cadastrado", "Professores cadastrados", "Buscar professores por nome");
+    SALAS("salas", "Sala", "Nome do recurso", "Nenhuma sala cadastrada", "Salas cadastradas", "Buscar salas por nome"),
+    MATERIAIS("materiais", "Material", "Nome do recurso", "Nenhum material cadastrado", "Materiais cadastrados", "Buscar materiais por nome"),
+    PROFESSORES("professores", "Professor", "Nome do professor", "Nenhum professor cadastrado", "Professores cadastrados", "Buscar professores por nome");
 
     private final String chave;
     private final String singular;
-    private final String plural;
     private final String rotuloNome;
     private final String semRecursos;
     private final String legenda;
     private final String rotuloBusca;
 
-    TipoRecurso(String chave, String singular, String plural, String rotuloNome, String semRecursos, String legenda, String rotuloBusca) {
+    TipoRecurso(String chave, String singular, String rotuloNome, String semRecursos, String legenda, String rotuloBusca) {
         this.chave = chave;
         this.singular = singular;
-        this.plural = plural;
         this.rotuloNome = rotuloNome;
         this.semRecursos = semRecursos;
         this.legenda = legenda;
@@ -45,10 +43,6 @@ public enum TipoRecurso {
 
     public String getSingular() {
         return singular;
-    }
-
-    public String getPlural() {
-        return plural;
     }
 
     public String getRotuloNome() {

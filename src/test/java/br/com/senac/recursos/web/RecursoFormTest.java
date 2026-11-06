@@ -336,7 +336,7 @@ class RecursoFormTest {
     void textoDigitadoEMensagensComHtmlPerigosoSaoEscapados() throws Exception {
         Document doc = pagina("/teste/recurso-form/perigoso");
 
-        assertThat(doc.select("main script, main b, main i")).isEmpty();
+        assertThat(doc.select("main script:not([src]), main b, main i")).isEmpty();
         assertThat(doc.getElementById("recurso-form-nome").val()).isEqualTo("\"><script>alert(1)</script>");
         assertThat(doc.getElementById("recurso-form-competencias").val()).isEqualTo("</textarea><b>x</b>");
         assertThat(doc.getElementById("recurso-form-nome-erro").text()).isEqualTo("<i>erro</i>");

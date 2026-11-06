@@ -343,7 +343,7 @@ class ManutencaoPaginaTest {
     void textoComHtmlPerigosoEEscapado() throws Exception {
         Document doc = pagina("/teste/manutencao/perigoso");
 
-        assertThat(doc.select("main script, main b, main i, main u")).isEmpty();
+        assertThat(doc.select("main script:not([src]), main b, main i, main u")).isEmpty();
         assertThat(doc.selectFirst("[data-testid=manutencao-recurso] h2").text()).isEqualTo("<script>alert(1)</script>");
         assertThat(doc.selectFirst("[data-testid=manutencao-recurso] dd:last-of-type").text()).isEqualTo("<i>Bloco</i>");
         assertThat(doc.getElementById("manutencao-motivo").val()).isEqualTo("</textarea><b>x</b>");

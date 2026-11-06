@@ -55,7 +55,7 @@ class RecursoControllerTest {
 
     @Test
     void nomeEmBrancoNaoPreencheOCampoDeBusca() throws Exception {
-        assertThat(pagina("/admin/recursos?nome=%20%20").getElementById("recursos-nome").val()).isEmpty();
+        assertThat(pagina("/admin/recursos?nome=  ").getElementById("recursos-nome").val()).isEmpty();
     }
 
     @Test
