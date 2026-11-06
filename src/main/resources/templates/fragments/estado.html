@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<!--/*
+  Estado da reserva e aviso de confirmação, usados pelas telas 9 e 10 (RN-05: o nome do estado sempre escrito).
+
+  badge(estado, testid)         : estado é o nome por extenso (Solicitada, Aprovada, Em uso, Concluída, Rejeitada,
+                                  Cancelada ou Não compareceu); a classe estado--* sai do nome. testid pode ser null.
+  confirmacao(dados, testid)    : aviso role="status" com dados.titulo, dados.reserva e dados.estado.
+*/-->
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<span class="estado" th:fragment="badge(estado, testid)"
+      th:classappend="'estado--' + ${#strings.replace(#strings.replace(#strings.replace(#strings.toLowerCase(estado), ' ', '-'), 'í', 'i'), 'ã', 'a')}"
+      th:attr="data-testid=${testid}" th:text="${estado}">Solicitada</span>
+
+<div class="alerta alerta--sucesso" role="status" th:fragment="confirmacao(dados, testid)" th:attr="data-testid=${testid}">
+    <strong class="alerta__titulo" th:text="${dados.titulo}">Reserva aprovada</strong>
+    <p class="alerta__texto"><th:block th:text="${dados.reserva}">Sala 203, de Rafael Costa</th:block>, agora está <span th:replace="~{fragments/estado :: badge(${dados.estado}, null)}">Aprovada</span>. A mudança ficou registrada.</p>
+</div>
+</body>
+</html>

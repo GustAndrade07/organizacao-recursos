@@ -10,9 +10,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.core.io.ClassPathResource;
 
 /**
- * O diálogo das telas 9 e 10 é um {@code <dialog>} com {@code display: flex} em {@code .dialogo}. Sem uma
- * regra para o diálogo fechado, esse {@code display} vence o {@code display: none} do navegador e o
- * diálogo apareceria sempre. O fundo do modal vem do {@code ::backdrop}.
+ * O diálogo das telas 9 e 10 é um {@code <dialog>}. Se {@code .dialogo} definisse {@code display}, esse valor
+ * venceria o {@code display: none} do navegador e o diálogo fechado apareceria sempre; por isso o layout em
+ * coluna fica no formulário de dentro. O fundo do modal vem do {@code ::backdrop}.
  */
 class DialogoCssTest {
 
@@ -27,8 +27,9 @@ class DialogoCssTest {
     }
 
     @Test
-    void dialogoFechadoNaoApareceMesmoComDisplayFlexNaClasse() throws IOException {
-        assertThat(regra(".dialogo:not([open])")).contains("display: none");
+    void dialogoNaoSobrescreveODisplayDoNavegadorEOLayoutFicaNoFormulario() throws IOException {
+        assertThat(regra(".dialogo")).doesNotContain("display");
+        assertThat(regra(".dialogo > form")).contains("display: flex").contains("flex-direction: column");
     }
 
     @Test
