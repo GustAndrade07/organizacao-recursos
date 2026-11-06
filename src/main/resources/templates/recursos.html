@@ -55,13 +55,13 @@
 
         <section class="vazio" aria-labelledby="recursos-vazio-titulo" data-testid="recursos-vazio"
                  th:if="${recursos != null and #lists.isEmpty(recursos)}">
+            <h2 class="vazio__titulo" id="recursos-vazio-titulo"
+                th:text="${nome == null} ? ${tipo.semRecursos} : 'Nenhum resultado para “' + ${nome} + '”'">Nenhuma sala cadastrada</h2>
             <th:block th:if="${nome == null}">
-                <h2 class="vazio__titulo" id="recursos-vazio-titulo" th:text="${tipo.semRecursos}">Nenhuma sala cadastrada</h2>
                 <p class="pagina__descricao">Cadastre o primeiro recurso para que ele apareça na busca de disponibilidade.</p>
                 <div><a class="botao botao--primario" th:href="${cadastrar}" data-testid="recursos-cadastrar-primeiro">Cadastrar o primeiro recurso</a></div>
             </th:block>
             <th:block th:unless="${nome == null}">
-                <h2 class="vazio__titulo" id="recursos-vazio-titulo" th:text="'Nenhum resultado para “' + ${nome} + '”'">Nenhum resultado para “nome”</h2>
                 <p class="pagina__descricao">Confira a escrita ou limpe a busca para ver todos.</p>
                 <div><a class="botao botao--secundario" th:href="@{/admin/recursos(tipo=${tipo.chave})}" data-testid="recursos-limpar-busca">Limpar busca</a></div>
             </th:block>
