@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<!--/*
+  Telas 4 e 5 do inventário (prefixos "busca-" e "resultado-"), RF-03. Mesma rota, mesmo template.
+  Atributos de modelo (o back-end preenche; docs/frontend/README.md):
+    filtros    : tipo, capacidade, local, data, inicio, termino        (sempre presente)
+    tipos      : lista de textos para o filtro de tipo                  (opcional)
+    locais     : lista de textos para o filtro de localização           (opcional)
+    resultados : lista de id, nome, tipo, local, capacidade, restrito   (ausente = mostra o formulário)
+*/-->
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: pagina(titulo=${resultados != null ? 'Recursos livres' : 'Buscar disponibilidade'}, conteudo=~{::#conteudo-pagina})}">
+<head>
+    <title th:text="${resultados != null ? 'Recursos livres' : 'Buscar disponibilidade'}">Buscar disponibilidade</title>
+</head>
+<body>
+<div id="conteudo-pagina">
+
+    <div class="secao" th:if="${resultados == null}">
+        <header class="pagina__cabecalho">
+            <h1 data-testid="busca-titulo">Buscar disponibilidade</h1>
+            <p class="pagina__descricao">Escolha o dia e o horário e veja o que está livre.</p>
+        </header>
+
+        <form class="cartao formulario" method="get" th:action="@{/recursos/disponiveis}" data-testid="busca-formulario">
+            <div class="grade-campos grade-campos--busca">
+                <div class="campo">
+                    <label class="campo__rotulo" for="busca-tipo">Tipo de recurso</label>
+                    <select class="campo__entrada" id="busca-tipo" name="tipo" data-testid="busca-tipo">
+                        <option value="">Todos os tipos</option>
+                        <option th:each="opcao : ${tipos}" th:value="${opcao}" th:text="${opcao}"
+                                th:selected="${opcao == filtros.tipo}">Sala</option>
+                    </select>
+                </div>
+                <div class="campo">
+                    <label class="campo__rotulo" for="busca-capacidade">Capacidade mínima</label>
+                    <input class="campo__entrada" id="busca-capacidade" name="capacidade" type="number" min="1"
+                           inputmode="numeric" placeholder="Ex.: 30" th:value="${filtros.capacidade}"
+                           aria-describedby="busca-capacidade-ajuda" data-testid="busca-capacidade">
+                    <p class="campo__ajuda" id="busca-capacidade-ajuda">Número de pessoas</p>
+                </div>
+                <div class="campo">
+                    <label class="campo__rotulo" for="busca-local">Localização</label>
+                    <select class="campo__entrada" id="busca-local" name="local" data-testid="busca-local">
+                        <option value="">Qualquer local</option>
+                        <option th:each="opcao : ${locais}" th:value="${opcao}" th:text="${opcao}"
+                                th:selected="${opcao == filtros.local}">Bloco A</option>
+                    </select>
+                </div>
+                <div class="campo">
+                    <label class="campo__rotulo" for="busca-data">Data</label>
+                    <input class="campo__entrada" id="busca-data" name="data" type="date" required
+                           th:value="${filtros.data}" data-testid="busca-data">
+                </div>
+                <div class="campo">
+                    <label class="campo__rotulo" for="busca-inicio">Hora de início</label>
+                    <input class="campo__entrada" id="busca-inicio" name="inicio" type="time" required
+                           th:value="${filtros.inicio}" data-testid="busca-inicio">
+                </div>
+                <div class="campo">
+                    <label class="campo__rotulo" for="busca-termino">Hora de término</label>
+                    <input class="campo__entrada" id="busca-termino" name="termino" type="time" required
+                           th:value="${filtros.termino}" data-testid="busca-termino">
+                </div>
+            </div>
+            <div class="formulario__acoes">
+                <button type="submit" class="botao botao--primario" data-testid="busca-buscar">Buscar recursos livres</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="secao" th:unless="${resultados == null}" th:with="total=${#lists.size(resultados)}">
+        <header class="pagina__cabecalho">
+            <h1 data-testid="resultado-titulo">Recursos livres</h1>
+            <p class="pagina__descricao" data-testid="resultado-contagem"
+               th:text="${total} + (${total == 1} ? ' recurso livre' : ' recursos livres') + ' no horário escolhido.'">3 recursos livres no horário escolhido.</p>
+        </header>
+
+        <div class="resumo-busca" data-testid="resultado-resumo">
+            <p>
+                <strong th:if="${filtros.data != null}"
+                        th:text="${#strings.capitalize(#temporals.dayOfWeekName(filtros.data))} + ', ' + ${#temporals.format(filtros.data, 'dd/MM/yyyy')}">Quinta-feira, 12/11/2026</strong>
+                <span th:if="${filtros.inicio != null and filtros.termino != null}"
+                      th:text="'· ' + ${#temporals.format(filtros.inicio, 'HH:mm')} + ' às ' + ${#temporals.format(filtros.termino, 'HH:mm')}">· 14:00 às 15:30</span>
+                <span th:if="${filtros.tipo != null}" th:text="'· ' + ${filtros.tipo}"></span>
+                <span th:if="${filtros.capacidade != null}" th:text="'· ' + ${filtros.capacidade} + ' lugares ou mais'"></span>
+                <span th:if="${filtros.local != null}" th:text="'· ' + ${filtros.local}"></span>
+            </p>
+            <a class="botao botao--secundario" data-testid="resultado-alterar-busca"
+               th:href="@{/recursos/disponiveis(tipo=${filtros.tipo},capacidade=${filtros.capacidade},local=${filtros.local},data=${filtros.data},inicio=${filtros.inicio},termino=${filtros.termino},editar='')}">Alterar busca</a>
+        </div>
+
+        <section class="vazio" aria-labelledby="resultado-vazio-titulo" data-testid="resultado-vazio" th:if="${total == 0}">
+            <h2 class="vazio__titulo" id="resultado-vazio-titulo">Nenhum recurso livre nesse horário</h2>
+            <p class="pagina__descricao">Tente mudar a busca para encontrar outra opção:</p>
+            <ul class="vazio__lista">
+                <li>escolha outro horário ou outro dia;</li>
+                <li>diminua a capacidade mínima;</li>
+                <li>tire o filtro de localização.</li>
+            </ul>
+            <a class="botao botao--primario" data-testid="resultado-vazio-alterar"
+               th:href="@{/recursos/disponiveis(tipo=${filtros.tipo},capacidade=${filtros.capacidade},local=${filtros.local},data=${filtros.data},inicio=${filtros.inicio},termino=${filtros.termino},editar='')}">Alterar filtros</a>
+        </section>
+
+        <table class="tabela" data-testid="resultado-tabela" th:if="${total > 0}">
+            <caption class="so-leitor">Recursos livres no horário escolhido</caption>
+            <thead>
+            <tr>
+                <th scope="col">Nome</th>
+                <th scope="col">Tipo</th>
+                <th scope="col">Local</th>
+                <th scope="col">Capacidade</th>
+                <th scope="col"><span class="so-leitor">Ação</span></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="recurso : ${resultados}" th:attr="data-testid='resultado-linha-' + ${recurso.id}">
+                <th scope="row" class="tabela__nome" th:attr="data-testid='resultado-nome-' + ${recurso.id}">
+                    <th:block th:text="${recurso.nome}">Sala 203</th:block>
+                    <span class="etiqueta" th:if="${recurso.restrito}">Restrito</span>
+                </th>
+                <td data-rotulo="Tipo" th:text="${recurso.tipo}">Sala</td>
+                <td data-rotulo="Local" th:text="${recurso.local}">Bloco B</td>
+                <td data-rotulo="Capacidade" th:text="${recurso.capacidade}">40 lugares</td>
+                <td class="tabela__acao">
+                    <a class="botao botao--primario" th:text="'Reservar'" th:attr="data-testid='resultado-reservar-' + ${recurso.id}, aria-label='Reservar ' + ${recurso.nome}"
+                       th:href="@{/reservas/nova(recursoId=${recurso.id},data=${filtros.data},inicio=${filtros.inicio},termino=${filtros.termino})}">Reservar</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+</body>
+</html>
