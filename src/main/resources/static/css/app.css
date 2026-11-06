@@ -900,6 +900,123 @@ a {
   }
 }
 
+/* Histórico e relatório (telas 11 e 12): linha do tempo somente leitura, blocos e métrica do relatório */
+.linha-tempo {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.linha-tempo__item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: 0 0 var(--space-6) var(--space-8);
+}
+
+.linha-tempo__item:last-child {
+  padding-bottom: 0;
+}
+
+.linha-tempo__item::before {
+  content: "";
+  position: absolute;
+  top: var(--space-1);
+  left: 0;
+  width: var(--space-3);
+  height: var(--space-3);
+  border-radius: var(--radius-full);
+  background: var(--color-border-input);
+}
+
+.linha-tempo__item::after {
+  content: "";
+  position: absolute;
+  top: var(--space-5);
+  bottom: 0;
+  left: calc(var(--space-3) / 2);
+  width: var(--border-width-default);
+  background: var(--color-border-default);
+}
+
+.linha-tempo__item:last-child::after {
+  content: none;
+}
+
+.linha-tempo__data {
+  color: var(--color-text-secondary);
+  font: var(--font-label-default);
+}
+
+.linha-tempo__troca {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+}
+
+.linha-tempo__ponte {
+  color: var(--color-text-secondary);
+  font: var(--font-body-small);
+}
+
+.linha-tempo__corpo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.bloco {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.metrica {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: 0;
+}
+
+.metrica__valor {
+  font: var(--font-heading-h1);
+}
+
+.metrica__rotulo {
+  color: var(--color-text-secondary);
+}
+
+@media (min-width: 768px) {
+  .linha-tempo__item {
+    display: grid;
+    grid-template-columns: calc(var(--space-16) * 3) minmax(0, 1fr);
+    gap: var(--space-6);
+  }
+
+  .tabela .tabela__num {
+    text-align: right;
+  }
+}
+
+/* Login (tela 1): botão Entrar em envio. .botao:disabled e .alerta--aviso já existem acima. */
+.botao--carregando {
+  gap: var(--space-2);
+}
+
+.carregando {
+  display: inline-block;
+  width: var(--size-icon);
+  height: var(--size-icon);
+  border: var(--border-width-focus) solid var(--color-text-secondary);
+  border-top-color: transparent;
+  border-radius: var(--radius-full);
+}
+
 /* Cadastro de recursos e bloqueio por manutenção (telas 13 a 15) */
 .pagina__cabecalho--acao {
   gap: var(--space-4);
