@@ -11,3 +11,4 @@
 - Tela de login em Thymeleaf (`GET /login`): formulário acessível e aviso de falha (`/login?erro`); a autenticação continua com o back-end.
 - Telas de busca e resultados em Thymeleaf (`GET /recursos/disponiveis`): filtros, tabela no desktop e cards no mobile, estado vazio e idioma pt-BR; a consulta de disponibilidade continua com o back-end.
 - Tela de nova reserva em Thymeleaf (`GET /reservas/nova`): formulário preenchido pela busca, aviso de recurso restrito, erros de campo com resumo no topo, conflito e manutenção (409) e envio sem duplicar; a gravação continua com o back-end.
+- Telas de histórico da reserva (`GET /reservas/{id}/historico`) e de relatório de utilização (`GET /relatorios/utilizacao`) em Thymeleaf: linha do tempo somente leitura, filtro de período com bloqueio de fim anterior ao início, blocos de horas por recurso, carga por professor e conflitos evitados; o histórico e o cálculo continuam com o back-end.
