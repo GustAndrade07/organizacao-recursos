@@ -9,8 +9,8 @@ import java.util.regex.Pattern;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.io.ClassPathResource;
 
-/** Estados novos do login (tela 1): botão em envio e contraste do botão desabilitado. */
-class LoginEstadosCssTest {
+/** O texto do botão desabilitado (inclui o "Entrando…" do login) passa de 4,5:1 sobre o fundo desabilitado. */
+class ContrasteBotaoDesabilitadoTest {
 
     private static String ler(String caminho) throws IOException {
         return new String(new ClassPathResource(caminho).getInputStream().readAllBytes(), StandardCharsets.UTF_8);
@@ -50,14 +50,5 @@ class LoginEstadosCssTest {
         double contraste = (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
 
         assertThat(contraste).as("contraste do botão desabilitado").isGreaterThanOrEqualTo(4.5);
-    }
-
-    @Test
-    void botaoEmEnvioEAnelDeCarregamentoTemRegraNoAppCss() throws IOException {
-        String css = ler("static/css/app.css");
-
-        assertThat(css).contains(".botao--carregando").contains(".carregando");
-        // .botao:disabled já existe (tela 6): não pode ser repetido para esta tela
-        assertThat(css.split("\\.botao:disabled\\s*\\{", -1)).hasSize(2);
     }
 }

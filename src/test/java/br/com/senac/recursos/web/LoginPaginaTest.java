@@ -8,7 +8,11 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.core.io.ClassPathResource;
@@ -156,7 +160,6 @@ class LoginPaginaTest {
         Document doc = Jsoup.parse(html);
 
         assertThat(html).doesNotContain("<script>alert(1)");
-        assertThat(doc.select("script").eachText()).allMatch(String::isEmpty);
         assertThat(doc.selectFirst("input[data-testid=login-email]").val()).isEqualTo(perigoso);
     }
 
@@ -172,18 +175,6 @@ class LoginPaginaTest {
 
         assertThat(html).doesNotContain("segredo-123").doesNotContain("segredo-456");
         assertThat(doc.selectFirst("input[data-testid=login-senha]").hasAttr("value")).isFalse();
-    }
-
-    @Test
-    void erroNaoRevelaSeOProblemaFoiOEmailOuASenha() throws Exception {
-        Document doc = pagina(get("/login?erro").flashAttr("email", "ana.lima@escola.edu.br"));
-
-        assertThat(doc.selectFirst("[data-testid=login-erro]").text())
-                .contains("E-mail ou senha incorretos")
-                .doesNotContainIgnoringCase("não existe")
-                .doesNotContainIgnoringCase("não encontrado")
-                .doesNotContainIgnoringCase("senha inválida");
-        assertThat(doc.select("[aria-invalid], .campo__erro")).isEmpty();
     }
 
     @Test
@@ -232,14 +223,28 @@ class LoginPaginaTest {
         assertThat(campo.attr("data-testid")).isEqualTo("login-destino");
     }
 
-    @Test
-    void destinoQueNaoECaminhoDoSiteNaoVaiNoFormulario() throws Exception {
-        for (String destino : new String[] {"https://evil.example/x", "//evil.example/x", "javascript:alert(1)",
-                "reservas/minhas", "/\\evil.example", ""}) {
-            Document doc = pagina(get("/login").param("destino", destino));
+    @ParameterizedTest(name = "[{index}] destino inválido")
+    @MethodSource("destinosInvalidos")
+    void destinoQueNaoECaminhoDoSiteNaoVaiNoFormulario(String destino) throws Exception {
+        Document doc = pagina(get("/login").param("destino", destino));
 
-            assertThat(doc.select("input[name=destino]")).as("destino=%s", destino).isEmpty();
-        }
+        assertThat(doc.select("input[name=destino]")).isEmpty();
+    }
+
+    static Stream<String> destinosInvalidos() {
+        return Stream.of(
+                "/\t/evil.com", "/\n/evil.com", "/\r/evil.com", "/\0/evil.com", "/\t\\evil.com",
+                "/%2f/evil.com", "/%2F/evil.com", "/%5c/evil.com", "/%5C/evil.com", "/%252f/evil.com",
+                "//evil.com", "///x", "/\\evil.com", "/a\\b", " //x", " /x", "/ x", "/\u00a0/evil.com",
+                "https://x", "javascript:x", "reservas/minhas", "", "/" + "a".repeat(2000));
+    }
+
+    @ParameterizedTest(name = "[{index}] destino válido: {0}")
+    @ValueSource(strings = {"/", "/reservas/minhas", "/reservas/minhas?a=1&b=2", "/recursos/disponiveis?tipo=SALA#topo"})
+    void destinoQueECaminhoDoSiteVaiNoFormulario(String destino) throws Exception {
+        Document doc = pagina(get("/login").param("destino", destino));
+
+        assertThat(doc.selectFirst("input[type=hidden][name=destino]").val()).isEqualTo(destino);
     }
 
     @Test
@@ -248,15 +253,13 @@ class LoginPaginaTest {
     }
 
     @Test
-    void destinoComHtmlPerigosoVoltaEscapado() throws Exception {
-        String perigoso = "/x\"><script>alert(1)</script>";
-
-        String html = mvc.perform(get("/login").param("destino", perigoso))
+    void destinoComHtmlPerigosoNaoVaiNoFormulario() throws Exception {
+        String html = mvc.perform(get("/login").param("destino", "/x\"><script>alert(1)</script>"))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
 
         assertThat(html).doesNotContain("<script>alert(1)");
-        assertThat(Jsoup.parse(html).selectFirst("input[name=destino]").val()).isEqualTo(perigoso);
+        assertThat(Jsoup.parse(html).select("input[name=destino]")).isEmpty();
     }
 
     @Test

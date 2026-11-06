@@ -8,6 +8,7 @@ import org.jsoup.nodes.Document;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.web.WebProperties;
 import org.springframework.boot.autoconfigure.web.servlet.error.DefaultErrorViewResolver;
@@ -56,7 +57,7 @@ class PaginasDeErroTest {
 
     @ParameterizedTest(name = "{0}")
     @CsvSource(delimiter = '|', textBlock = """
-            401 | Você precisa entrar                                | Sua sessão expirou ou você ainda não entrou. Entre com seu e-mail e senha para continuar.        | Entrar           | /login | aviso
+            401 | Você precisa entrar                                | Sua sessão expirou ou você ainda não entrou. Entre com seu e-mail e senha para continuar.        | Entrar           | /login?expirou | aviso
             403 | Você não tem permissão para acessar esta página    | Seu perfil não permite esta ação. Se você precisa deste acesso, fale com o administrador.        | Voltar ao início | /      | aviso
             404 | Página não encontrada                              | O endereço não existe ou foi movido. Confira o link ou volte ao início.                          | Voltar ao início | /      | info
             """)
@@ -95,6 +96,22 @@ class PaginasDeErroTest {
         Document doc = pagina(500, "//outro-site.example/x");
 
         assertThat(doc.selectFirst("[data-testid=erro-acao-principal]").attr("href")).isEqualTo("/");
+    }
+
+    @ParameterizedTest(name = "[{index}] url original inválida")
+    @ValueSource(strings = {"/\\evil.com", "/\t/evil.com", "/\n/evil.com", "/\r/evil.com", "/\0/evil.com", "/\t\\evil.com",
+            "/%2f/evil.com", "/%5c/evil.com", "/%252f/evil.com", "///x", "https://x", ""})
+    void tentarNovamenteSoAceitaCaminhoCompletoDoSite(String urlOriginal) throws Exception {
+        Document doc = pagina(500, urlOriginal);
+
+        assertThat(doc.selectFirst("[data-testid=erro-acao-principal]").attr("href")).isEqualTo("/");
+    }
+
+    @Test
+    void tentarNovamenteMantemCaminhoComParametros() throws Exception {
+        Document doc = pagina(500, "/reservas/99?a=1");
+
+        assertThat(doc.selectFirst("[data-testid=erro-acao-principal]").attr("href")).isEqualTo("/reservas/99?a=1");
     }
 
     @Test
