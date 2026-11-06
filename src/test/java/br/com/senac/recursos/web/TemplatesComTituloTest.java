@@ -17,7 +17,8 @@ class TemplatesComTituloTest {
 
     private static final List<String> TEMPLATES_DE_TELA = List.of("busca", "reserva-nova", "fragments/estado", "historico", "relatorio", "login", "error/401",
             "recursos", "recurso-form", "manutencao", "fragments/campo",
-            "aprovacoes", "retirada-devolucao", "fragments/confirmacao");
+            "aprovacoes", "retirada-devolucao", "fragments/confirmacao",
+            "error/403", "error/404", "error/4xx", "error/500", "error/5xx", "fragments/erro");
 
     @Test
     void todoTemplateDeTelaDeclaraUmTitleNoHead() throws Exception {
