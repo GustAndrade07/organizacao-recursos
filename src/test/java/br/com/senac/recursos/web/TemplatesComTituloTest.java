@@ -15,21 +15,8 @@ import org.springframework.core.io.ClassPathResource;
  */
 class TemplatesComTituloTest {
 
-    private static final List<String> TEMPLATES_DE_TELA = List.of("busca", "reserva-nova", "aprovacoes", "retirada-devolucao");
-
-    /** Fragmentos próprios das telas 9 e 10: o Sonar também os analisa como página (title e lang). */
-    private static final List<String> FRAGMENTOS_DAS_TELAS_9_E_10 = List.of("fragments/confirmacao");
-
-    @Test
-    void fragmentosDasTelas9E10DeclaramTitleNoHeadELangNoHtml() throws Exception {
-        for (String nome : FRAGMENTOS_DAS_TELAS_9_E_10) {
-            String html = new String(new ClassPathResource("templates/" + nome + ".html").getInputStream().readAllBytes(),
-                    StandardCharsets.UTF_8);
-            var doc = Jsoup.parse(html);
-            assertThat(doc.select("html > head > title")).as(nome).hasSize(1);
-            assertThat(doc.selectFirst("html").attr("lang")).as(nome).isEqualTo("pt-BR");
-        }
-    }
+    private static final List<String> TEMPLATES_DE_TELA = List.of("busca", "reserva-nova", "fragments/estado",
+            "aprovacoes", "retirada-devolucao", "fragments/confirmacao");
 
     @Test
     void todoTemplateDeTelaDeclaraUmTitleNoHead() throws Exception {
@@ -39,6 +26,8 @@ class TemplatesComTituloTest {
             var titulos = Jsoup.parse(html).select("html > head > title");
             assertThat(titulos).as(nome).hasSize(1);
             assertThat(titulos.first().text()).as(nome).isNotBlank();
+            // Sonar Web:S5254: o elemento html declara o idioma da página
+            assertThat(Jsoup.parse(html).select("html[lang]")).as(nome + " declara lang no html").hasSize(1);
         }
     }
 }
