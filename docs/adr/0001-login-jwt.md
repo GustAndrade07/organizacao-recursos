@@ -2,4 +2,21 @@
 - **Status:** aceito
 - **Contexto:** os roteiros do professor para JMeter e testes de permissão supõem token por perfil.
 - **Decisão:** login devolve JWT temporário enviado em cada requisição.
-- **Consequências:** (preencher)
+- **Consequências:**
+  - **Ganhamos:**
+    - Casa com os roteiros do professor: o JMeter extrai o token do login e os testes de API usam "token de cada perfil" (Solicitante, Responsável, Administrador), sem depender de sessão no servidor.
+    - O perfil viaja no token, então a matriz perfil × operação (`docs/seguranca/matriz-autorizacao.md`, ainda a criar na Etapa 5) é testável célula a célula com 401 (sem token) e 403 (perfil não permitido).
+    - Uma só forma de autenticar para a API REST, para os testes caixa-preta e para a carga.
+  - **Perdemos:**
+    - **Revogação imediata não existe** (já registrado em [arquitetura.md](../arquitetura.md), seção 8): token roubado ou perfil alterado vale até o token expirar.
+    - O **tempo de vida do token não está definido**; fica "a definir" até o Pedro escolher, e nenhum número entra em documento antes disso.
+    - O segredo de assinatura vira ponto de risco: só pode existir como variável de ambiente, nunca no repositório (AGENTS.md, seção 7).
+    - Como o navegador guarda e envia o token nas telas Thymeleaf (cookie ou header) é **decisão do back-end ainda aberta** ([docs/frontend/README.md](../frontend/README.md), seção "Login"); o `POST /login` atual da tela ainda não autentica.
+  - **Exige de testes:**
+    - Matriz de autorização como `@ParameterizedTest` lendo a matriz: sem token → 401; token de perfil sem permissão → 403; posse (Solicitante mexendo na reserva de outro → 403, reserva intacta).
+    - Token expirado, token adulterado (assinatura inválida) e token ausente recusados, com `Clock` injetado para controlar a expiração (nada de `Thread.sleep`).
+    - Resposta de erro de autenticação e de autorização em `ProblemDetail`, sem stack trace nem detalhe do token.
+    - Token nunca aparece em log nem em resposta de erro.
+    - Carga: o roteiro do JMeter faz login e reaproveita o token (sem token fixo no plano, `perf/README.md`).
+- **Pendências:** nenhuma decisão do grupo (D1 a D4) depende deste ADR. Abertos de implementação, com o Pedro: tempo de vida do token e transporte do token nas telas (cookie ou header).
+- **Fonte:** `docs/arquitetura.md` (seções 3 e 8), `docs/prd.md` (RF-01), `docs/frontend/README.md` (Login), `AGENTS.md` (seções 5 e 7).
