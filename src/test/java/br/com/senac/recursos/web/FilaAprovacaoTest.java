@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RequestParam;
  * {@code motivo}), {@code confirmacao} (titulo, reserva, estado) e {@code erroAprovacao} (403 da API).
  * A tela só mostra o que recebe; quem aprova e rejeita é o back-end, por POST.
  */
-@WebMvcTest
+@WebMvcTest({AprovacaoController.class, FilaAprovacaoTest.PaginasDeTeste.class})
 @Import(FilaAprovacaoTest.PaginasDeTeste.class)
 class FilaAprovacaoTest {
 
@@ -189,6 +189,28 @@ class FilaAprovacaoTest {
     }
 
     @Test
+    void soOsFormulariosDeAcaoEnviamUmaVezSo() throws Exception {
+        Document doc = pagina("/teste/aprovacoes/rejeitando");
+
+        var forms = doc.select("main form");
+        assertThat(forms).hasSize(4);
+        for (var form : forms) {
+            assertThat(form.hasAttr("data-envio-unico")).as("form %s", form.attr("action")).isTrue();
+            assertThat(form.select("button[type=submit]")).as("botão de envio de %s", form.attr("action")).hasSize(1);
+        }
+    }
+
+    @Test
+    void dialogoReaproveitaAsClassesComunsEmVezDeRegrasProprias() throws Exception {
+        Document doc = pagina("/teste/aprovacoes/rejeitando");
+
+        assertThat(doc.selectFirst("#aprovacao-rejeitar-titulo").hasClass("cartao__titulo")).isTrue();
+        assertThat(doc.selectFirst("#aprovacao-rejeitar-texto").hasClass("pagina__descricao")).isTrue();
+        assertThat(doc.selectFirst("dialog form > div:has(a[data-fechar])").hasClass("formulario__acoes")).isTrue();
+        assertThat(doc.select("[class*=dialogo__], .tabela__detalhe")).isEmpty();
+    }
+
+    @Test
     void rejeitarEhUmLinkParaODialogoDirigidoPeloServidor() throws Exception {
         Document doc = pagina("/teste/aprovacoes/fila");
 
@@ -216,7 +238,7 @@ class FilaAprovacaoTest {
         assertThat(doc.select("button[data-testid^=aprovacao-aprovar-]")).hasSize(3);
         assertThat(doc.select("a[data-testid^=aprovacao-rejeitar-]")).hasSize(3);
         assertThat(doc.select("[data-testid^=aprovacao-propria-]")).hasSize(1);
-        assertThat(doc.select("th[scope=row] .tabela__detalhe").eachText()).containsExactly("(você)");
+        assertThat(doc.select("th[scope=row] .tabela__nota").eachText()).containsExactly("(você)");
     }
 
     @Test

@@ -41,4 +41,13 @@ class DialogoCssTest {
     void fundoDoModalEscureceAPaginaComToken() throws IOException {
         assertThat(regra(".dialogo::backdrop")).contains("var(--color-text-primary)");
     }
+
+    @Test
+    void naoRepeteRegrasQueJaExistemNasClassesComuns() throws IOException {
+        assertThat(css())
+                .doesNotContain(".dialogo__titulo")
+                .doesNotContain(".dialogo__texto")
+                .doesNotContain(".dialogo__acoes")
+                .doesNotContain(".tabela__detalhe");
+    }
 }

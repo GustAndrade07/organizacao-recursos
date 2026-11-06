@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.jsoup.Jsoup;
@@ -27,7 +28,7 @@ import org.springframework.web.bind.annotation.RequestParam;
  * {@code confirmacao} (titulo, reserva, estado). O controller preenche {@code filtro}. A tela só oferece a
  * ação que o estado permite: Aprovada retira, Em uso devolve, qualquer outro estado fica sem ação.
  */
-@WebMvcTest
+@WebMvcTest({RetiradaDevolucaoController.class, RetiradaDevolucaoTest.PaginasDeTeste.class})
 @Import(RetiradaDevolucaoTest.PaginasDeTeste.class)
 class RetiradaDevolucaoTest {
 
@@ -72,6 +73,19 @@ class RetiradaDevolucaoTest {
                     reserva("5", "Sala 203", "Ana Lima", "06/11/2026", "10:00 às 12:00", "Rejeitada", true),
                     reserva("6", "Sala 203", "Ana Lima", "06/11/2026", "10:00 às 12:00", "Cancelada", true),
                     reserva("7", "Sala 203", "Ana Lima", "06/11/2026", "10:00 às 12:00", "Não compareceu", true)));
+            return "retirada-devolucao";
+        }
+
+        @GetMapping("/teste/retirada-devolucao/estado-desconhecido")
+        String estadoDesconhecido(Model model) {
+            filtro(model);
+            Map<String, Object> semEstado = new HashMap<>(reserva("2", "Sala 203", "Ana Lima", "06/11/2026", "10:00 às 12:00", "x", true));
+            semEstado.put("estado", null);
+            model.addAttribute("reservas", List.of(
+                    reserva("1", "Sala 203", "Ana Lima", "06/11/2026", "10:00 às 12:00", "Em análise", true),
+                    semEstado,
+                    reserva("3", "Sala 203", "Ana Lima", "06/11/2026", "10:00 às 12:00", "aprovada", true),
+                    reserva("4", "Sala 203", "Ana Lima", "06/11/2026", "10:00 às 12:00", "EM USO", true)));
             return "retirada-devolucao";
         }
 
@@ -293,6 +307,53 @@ class RetiradaDevolucaoTest {
         assertThat(linha.select(".etiqueta")).as("etiqueta no estado %s", estado).isEmpty();
         assertThat(linha.select("[data-testid^=retirada-devolucao-nao-compareceu-], [data-testid^=retirada-devolucao-vencida-]"))
                 .as("não compareceu no estado %s", estado).isEmpty();
+    }
+
+    @Test
+    void estadoDesconhecidoOuNuloNaoOfereceAcaoENemEtiquetaEOBadgeFicaNeutro() throws Exception {
+        Document doc = pagina("/teste/retirada-devolucao/estado-desconhecido");
+
+        var desconhecido = doc.selectFirst("tr[data-testid=retirada-devolucao-linha-1]");
+        assertThat(desconhecido.selectFirst("[data-testid=retirada-devolucao-sem-acao-1]").text()).isEqualTo("Sem ação disponível");
+        var badge = desconhecido.selectFirst("[data-testid=retirada-devolucao-estado-1]");
+        assertThat(badge.text()).isEqualTo("Em análise");
+        assertThat(badge.classNames()).containsExactly("estado");
+        var nulo = doc.selectFirst("tr[data-testid=retirada-devolucao-linha-2]");
+        assertThat(nulo.selectFirst("[data-testid=retirada-devolucao-sem-acao-2]").text()).isEqualTo("Sem ação disponível");
+        assertThat(nulo.select(".estado")).isEmpty();
+        assertThat(doc.select("table button, [data-testid^=retirada-devolucao-nao-compareceu-], .etiqueta")).isEmpty();
+    }
+
+    @Test
+    void decisaoDeAcaoComparaONomeExatoEDiferenciaMaiusculas() throws Exception {
+        Document doc = pagina("/teste/retirada-devolucao/estado-desconhecido");
+
+        assertThat(doc.select("[data-testid=retirada-devolucao-retirar-3], [data-testid=retirada-devolucao-devolver-4]")).isEmpty();
+        assertThat(doc.selectFirst("[data-testid=retirada-devolucao-sem-acao-3]").text()).isEqualTo("Sem ação disponível");
+        assertThat(doc.selectFirst("[data-testid=retirada-devolucao-sem-acao-4]").text()).isEqualTo("Sem ação disponível");
+    }
+
+    @Test
+    void soOsFormulariosDeAcaoEnviamUmaVezSo() throws Exception {
+        Document doc = pagina("/teste/retirada-devolucao/confirmando-nc");
+
+        var forms = doc.select("main form[method=post]");
+        assertThat(forms).hasSize(5);
+        for (var form : forms) {
+            assertThat(form.hasAttr("data-envio-unico")).as("form %s", form.attr("action")).isTrue();
+            assertThat(form.select("button[type=submit]")).as("botão de envio de %s", form.attr("action")).hasSize(1);
+        }
+        assertThat(doc.selectFirst("form[data-testid=retirada-devolucao-filtros]").hasAttr("data-envio-unico")).isFalse();
+    }
+
+    @Test
+    void dialogoReaproveitaAsClassesComunsEmVezDeRegrasProprias() throws Exception {
+        Document doc = pagina("/teste/retirada-devolucao/confirmando-nc");
+
+        assertThat(doc.selectFirst("#retirada-devolucao-nc-titulo").hasClass("cartao__titulo")).isTrue();
+        assertThat(doc.selectFirst("#retirada-devolucao-nc-texto").hasClass("pagina__descricao")).isTrue();
+        assertThat(doc.selectFirst("dialog form > div:has(a[data-fechar])").hasClass("formulario__acoes")).isTrue();
+        assertThat(doc.select("[class*=dialogo__]")).isEmpty();
     }
 
     // Horário já passou (RN-08)
