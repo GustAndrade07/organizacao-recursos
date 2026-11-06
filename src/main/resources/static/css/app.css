@@ -444,6 +444,12 @@ a {
   color: var(--color-text-secondary);
 }
 
+.pagina__descricao a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--size-control-md);
+}
+
 .campo__ajuda {
   margin: 0;
   color: var(--color-text-secondary);
