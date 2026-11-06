@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="pt-BR" class="js">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Relatório · período inválido · 1280</title>
+<link rel="stylesheet" href="../../../../src/main/resources/static/css/tokens.css">
+<link rel="stylesheet" href="../../../../src/main/resources/static/css/app.css">
+<link rel="stylesheet" href="secao02.css">
+<link rel="stylesheet" href="secao04.css">
+</head>
+<body>
+<a class="pular-conteudo" href="#conteudo" data-testid="menu-pular">Pular para o conteúdo</a>
+<header class="barra" data-aberto="false" data-menu>
+<div class="barra__linha">
+<a class="barra__marca" href="#" data-testid="menu-marca">Organização de Recursos</a>
+<button type="button" class="menu__botao" data-testid="menu-abrir" aria-label="Abrir menu" aria-expanded="false" aria-controls="menu-painel"><span class="menu__barra"></span><span class="menu__barra"></span><span class="menu__barra"></span></button>
+<nav class="menu__painel" id="menu-painel" aria-label="Principal">
+<ul class="menu__lista">
+<li><a class="menu__item" href="#" data-testid="menu-item-aprovacoes">Aprovações</a></li>
+<li><a class="menu__item" href="#" data-testid="menu-item-retirada-devolucao">Retirada e devolução</a></li>
+<li><a class="menu__item" href="#" data-testid="menu-item-relatorios" aria-current="page">Relatórios</a></li>
+</ul>
+<div class="menu__rodape">
+<p class="menu__usuario"><span class="menu__nome" data-testid="menu-usuario">Carlos Souza</span><span class="menu__perfil" data-testid="menu-perfil">Responsável</span></p>
+<form action="#" method="post"><button type="submit" class="botao botao--secundario" data-testid="menu-sair">Sair</button></form>
+</div>
+</nav>
+</div>
+</header>
+<main class="conteudo" id="conteudo" tabindex="-1">
+<div class="secao">
+<header class="pagina__cabecalho">
+<h1 data-testid="relatorio-titulo">Relatório de utilização</h1>
+<p class="pagina__descricao">Escolha o período para ver horas por recurso, carga por professor e conflitos evitados.</p>
+</header>
+<form class="cartao formulario" data-testid="relatorio-filtros">
+<div class="grade-campos">
+<div class="campo">
+<label class="campo__rotulo" for="relatorio-inicio">Data de início</label>
+<input class="campo__entrada" id="relatorio-inicio" name="inicio" type="date" value="2026-10-31" data-testid="relatorio-inicio">
+</div>
+<div class="campo">
+<label class="campo__rotulo" for="relatorio-fim">Data de fim</label>
+<input class="campo__entrada campo__entrada--erro" id="relatorio-fim" name="fim" type="date" value="2026-10-01" aria-invalid="true" aria-describedby="relatorio-erro-periodo" data-testid="relatorio-fim">
+<p class="campo__erro" id="relatorio-erro-periodo" role="alert" data-testid="relatorio-erro-periodo">A data de fim não pode ser anterior à data de início.</p>
+</div>
+</div>
+<div class="formulario__acoes">
+<button type="submit" class="botao botao--primario" data-testid="relatorio-gerar">Gerar relatório</button>
+</div>
+</form>
+<div class="alerta alerta--info" role="note" data-testid="relatorio-nota-canceladas">
+<strong class="alerta__titulo">Reservas canceladas não contam como uso</strong>
+<p class="alerta__texto">Elas ficam de fora das horas e das reservas deste relatório.</p>
+</div>
+</div>
+</main>
+<script src="../../../../src/main/resources/static/js/menu.js" defer></script>
+</body>
+</html>

@@ -40,7 +40,7 @@ O menu é montado a partir de dois atributos de modelo, que o back-end (RF-01) p
 | `usuario` | `nome`, `perfil` | Visitante: só a marca (login e erros 401) |
 | `menu` | lista de `id`, `rotulo`, `href`, `ativo` | Sem itens |
 
-Itens propostos por perfil (a confirmar com o Pedro): Solicitante: Buscar recursos e Minhas reservas. Responsável: Aprovações, Empréstimos e Relatórios. Administrador: Recursos e Relatórios.
+Itens propostos por perfil (a confirmar com o Pedro): Solicitante: Buscar recursos e Minhas reservas. Responsável: Aprovações, Retirada e devolução e Relatórios. Administrador: Recursos e Relatórios.
 
 `Sair` é um formulário `POST /logout` (proposta, depende da decisão de autenticação). Detalhes de acessibilidade: link "Pular para o conteúdo", botão do menu com `aria-expanded`, item atual com `aria-current="page"`.
 
