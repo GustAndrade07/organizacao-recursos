@@ -135,6 +135,7 @@ class FilaAprovacaoTest {
         Document doc = pagina("/aprovacoes");
 
         assertThat(doc.title()).isEqualTo("Fila de aprovação · Organização de Recursos");
+        assertThat(doc.select("title")).as("um só title, o do layout").hasSize(1);
         assertThat(doc.select("h1")).hasSize(1);
         assertThat(doc.selectFirst("main#conteudo h1[data-testid=aprovacao-titulo]").text()).isEqualTo("Fila de aprovação");
     }

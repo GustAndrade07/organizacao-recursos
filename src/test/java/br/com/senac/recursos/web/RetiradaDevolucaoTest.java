@@ -169,6 +169,7 @@ class RetiradaDevolucaoTest {
         Document doc = pagina("/retirada-devolucao");
 
         assertThat(doc.title()).isEqualTo("Retirada e devolução · Organização de Recursos");
+        assertThat(doc.select("title")).as("um só title, o do layout").hasSize(1);
         assertThat(doc.select("h1")).hasSize(1);
         assertThat(doc.selectFirst("main#conteudo h1[data-testid=retirada-devolucao-titulo]").text()).isEqualTo("Retirada e devolução");
         assertThat(doc.selectFirst("[data-testid=retirada-devolucao-vazio] h2").text())
