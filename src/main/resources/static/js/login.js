@@ -12,7 +12,7 @@
     return;
   }
   var textoOriginal = botao.textContent;
-  var enviando = false;
+  var tempoLimite = null;
 
   function mostrarEnvio() {
     var anel = document.createElement('span');
@@ -27,24 +27,28 @@
     botao.disabled = true;
   }
 
+  // Volta ao estado normal e leva o foco ao botão (o navegador o tirou dele ao desabilitar)
   function restaurar() {
-    enviando = false;
+    window.clearTimeout(tempoLimite);
     botao.textContent = textoOriginal;
     botao.classList.remove('botao--carregando');
     botao.removeAttribute('aria-busy');
     botao.removeAttribute('aria-disabled');
     botao.disabled = false;
+    botao.focus();
   }
 
   // O botão não tem name/value: desabilitá-lo aqui não tira nada do que o formulário envia
   form.addEventListener('submit', function () {
-    enviando = true;
     mostrarEnvio();
+    // Esc/Parar, rede caída ou resposta sem navegação (204, download) não podem deixar o botão preso
+    window.clearTimeout(tempoLimite);
+    tempoLimite = window.setTimeout(restaurar, 30000);
   });
 
-  // Voltar pelo histórico do navegador não pode deixar o botão travado
-  window.addEventListener('pageshow', function (evento) {
-    if (evento.persisted && enviando) {
+  // Voltar pelo histórico do navegador (ou qualquer volta a esta página) não pode deixar o botão travado
+  window.addEventListener('pageshow', function () {
+    if (botao.disabled) {
       restaurar();
     }
   });
