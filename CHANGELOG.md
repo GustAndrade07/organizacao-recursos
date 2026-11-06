@@ -4,6 +4,8 @@
 - Estrutura inicial do repositório e documentação base.
 - Pranchas da seção 01 (login, menu por perfil e páginas de erro) em `docs/frontend/pranchas/secao-01/`, em 375 px e 1280 px, para aprovação antes da implementação dos estados novos.
 - Esqueleto Spring Boot 3.5 (Java 21, Maven Wrapper), PostgreSQL + Flyway, JaCoCo com gate de 80% de linhas / 70% de branches e teste de fumaça com Testcontainers.
+- CSS compartilhado das telas de Responsável e Administrador (`app.css`): sete estados da reserva (RN-05), botão de perigo, avisos de sucesso e de informação, ações em linha na tabela e área de texto, com teste dos estados.
+- Fragmento `fragments/estado :: badge(estado, testid)` (nome por extenso do estado da reserva vira classe por tabela fechada; desconhecido em cinza) e `envio-unico.js` (`form[data-envio-unico]` não envia duas vezes).
 - Design tokens do front-end (`src/main/resources/static/css/tokens.css`), espelhando o arquivo Figma do Design System.
 - Pranchas da seção 03 (fila de aprovação e retirada e devolução) em `docs/frontend/pranchas/secao-03/`, em 375 px e 1280 px, para aprovação antes da implementação.
 - Documentação do front-end em `docs/frontend/` (tokens e inventário de telas).
