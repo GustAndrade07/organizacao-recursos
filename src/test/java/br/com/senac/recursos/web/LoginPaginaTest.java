@@ -135,7 +135,7 @@ class LoginPaginaTest {
     void semAtributoEmailOCampoVemVazio() throws Exception {
         Document doc = pagina("/login?erro");
 
-        assertThat(doc.selectFirst("input[data-testid=login-email]").hasAttr("value")).isFalse();
+        assertThat(doc.selectFirst("input[data-testid=login-email]").val()).isEmpty();
     }
 
     @Test
