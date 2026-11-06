@@ -40,7 +40,7 @@ Relatório de cobertura: `target/site/jacoco/index.html`.
 - Nenhum token ou senha no repositório (SonarCloud usa o secret `SONAR_TOKEN`).
 
 ## Documentação
-`docs/prd.md` · `docs/frontend/` (design system, tokens e inventário de telas) · `docs/rtm.md` · `docs/status-requisitos.md` · `docs/adr/` · `docs/defeitos/` · `docs/testes/` · `docs/performance/` · `perf/` (plano JMeter) · `docs/entrega/checklist.md` · `docs/prova-oral/`
+`AGENTS.md` (regras do grupo e da IA; todo PR atualiza o plano) · `docs/plano-execucao.md` · `docs/prd.md` · `docs/frontend/` (design system, tokens e inventário de telas) · `docs/rtm.md` · `docs/status-requisitos.md` · `docs/adr/` · `docs/defeitos/` · `docs/testes/` · `docs/performance/` · `perf/` (plano JMeter) · `docs/entrega/checklist.md` · `docs/prova-oral/`
 
 ## Qualidade e CI
 - **CI:** GitHub Actions (`.github/workflows/ci.yml`) roda `./mvnw -B verify` em todo pull request e em push na `main`; os relatórios do Surefire e do JaCoCo ficam como artifact.

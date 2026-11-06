@@ -2,4 +2,26 @@
 - **Status:** aceito
 - **Contexto:** pedidos simultâneos não podem gerar reserva dupla.
 - **Decisão:** constraint de exclusão no PostgreSQL sobre tstzrange por recurso.
-- **Consequências:** (preencher)
+- **Consequências:**
+  - **Ganhamos:**
+    - A garantia vive **no banco**: vale para qualquer número de instâncias da aplicação e não depende de o serviço lembrar de travar nada. É a primeira opção citada pela Aula 10 e a prova mais forte para a banca (RN-02, RN-03, RF-06).
+    - O teste de concorrência pode **contar no banco** (uma linha para o intervalo disputado), não só olhar as respostas HTTP.
+    - Tirar a constraint deixa o teste vermelho, o que é exatamente a "checagem na mesa" do professor ([plano](../plano-execucao.md), seção 2.7).
+  - **Perdemos:**
+    - Dependência de recurso específico do PostgreSQL: exige a extensão `btree_gist` (criada pela migração, ver [ADR-0006](0006-flyway-dono-do-esquema.md)) e impede H2, que não é opção neste projeto.
+    - A violação da constraint sai do banco como erro de SQL: o serviço precisa **traduzi-la para 409** (`ProblemDetail`, sem SQL na resposta), e a transação que sofreu a violação não pode ser reaproveitada.
+    - A constraint precisa cobrir recurso **e** professor (RN-02, RF-05): são duas garantias a modelar na migração, não uma.
+    - Índice GiST encarece a escrita; o efeito sobre RNF-01 e RNF-03 está **não medido**.
+  - **Exige de testes:**
+    - Repositório com **Testcontainers** (PostgreSQL 16 real): inserção sobreposta recusada pelo banco, para recurso e para professor; tabela de fronteiras conforme a D1 (semiaberto): termina exatamente no início → aceita; começa exatamente no fim → aceita; cruza 1 segundo → recusada.
+    - Estados (D5): reserva `CANCELADA`, `REJEITADA` ou `NAO_COMPARECEU` libera o horário (nova reserva no mesmo intervalo é aceita); `SOLICITADA`, `APROVADA`, `EM_USO` e `CONCLUIDA` bloqueiam. Teste de que a transição de estado ativo para liberador (cancelar) não viola a constraint.
+    - Tentativa recusada (D2): depois da violação, a tentativa fica gravada mesmo com o rollback do pedido; no teste das 20 requisições, 19 tentativas gravadas, **contadas no banco**.
+    - Concorrência: 20 pedidos simultâneos (`ExecutorService` + `CountDownLatch`) → 1 aceito, 19 × 409, contagem **no banco**; repetir para a agenda do professor; rodar 5 vezes.
+    - Mutação manual registrada em `docs/testes/mutacao-manual.md`: remover a constraint, ver o teste de concorrência falhar, restaurar.
+    - A API nunca devolve SQL, nome de constraint nem stack trace no 409.
+- **Decisões registradas** (Gustavo, 05/11/2026; D1 e D3 a confirmar com Pedro e Leandro na revisão do PR; detalhes na seção 9 do [plano](../plano-execucao.md)):
+  - **D1:** o intervalo é **semiaberto `[início, fim)`**. A constraint usa `tstzrange` com limite inferior fechado e superior aberto. Conferido em 05/11/2026 num PostgreSQL 16.15 descartável: `[10:00, 12:00)` e `[12:00, 13:00)` convivem; `[11:00, 13:00)` é recusado.
+  - **D2:** a tentativa recusada por sobreposição é gravada **em transação própria**, fora da transação que sofreu a violação, para o "conflitos evitados" do RF-12 não perder dado.
+  - **D5:** só `SOLICITADA`, `APROVADA`, `EM_USO` e `CONCLUIDA` ocupam o horário; `CANCELADA`, `REJEITADA` e `NAO_COMPARECEU` liberam (constraint parcial, `WHERE` sobre o estado). O RN-05 não prevê volta de um estado final para ativo; se um dia previr, a transição passa a poder violar a constraint e precisa de teste.
+- **Pendências:** a migração V1, que materializa estas decisões, **não está neste PR**; sai depois, a pedido do Gustavo. A constraint cobre recurso **e** professor (RN-02); como as duas garantias são modeladas fica para a V1.
+- **Fonte:** `docs/arquitetura.md` (seções 5.1, 8 e 9), `docs/prd.md` (RN-02, RN-03, RN-05), `docs/plano-execucao.md` (seções 2.3, 5 e 9), `AGENTS.md` (seção 5).
