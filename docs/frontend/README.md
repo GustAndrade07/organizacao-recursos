@@ -50,7 +50,7 @@ O teste `CssSemValoresSoltosTest` reprova cor, medida ou fonte solta em qualquer
 
 O Spring escolhe o template pelo status: `templates/error/401.html`, `403.html`, `404.html` e `500.html`. Status sem página própria usam `4xx.html` ou `5xx.html` (modelo genérico, em português). O corpo é o fragmento `fragments/erro.html`: código com tom (`aviso`, `info`, `perigo`), título, mensagem e um caminho para continuar.
 
-- 401 leva a `/login`; 403 e 404 levam ao início; 500 oferece "Tentar novamente" na URL original e "Voltar ao início". O destino só é aceito se for um caminho deste site.
+- 401 leva a `/login?expirou` (a tela de login mostra "Sua sessão expirou. Entre novamente."); 403 e 404 levam ao início; 500 oferece "Tentar novamente" na URL original e "Voltar ao início". O destino só é aceito se for um caminho deste site (regra `CaminhoDoSite`, descrita em "Login"); qualquer outro vira o início.
 - A página usa o layout base. Para mostrar o menu a quem está logado (403, 404, 500), o back-end precisa colocar `usuario` e `menu` no modelo de **todas** as telas, inclusive `/error`, por exemplo com um `@ControllerAdvice` com `@ModelAttribute`. Sem isso, a página mostra só a marca.
 - Se o back-end passar a responder erros de API com `ProblemDetail`, a negociação por `Accept: text/html` precisa continuar levando às páginas acima.
 
@@ -60,11 +60,25 @@ O Spring escolhe o template pelo status: `templates/error/401.html`, `403.html`,
 
 | O quê | Valor |
 |---|---|
-| Envio | `POST /login` com os campos `email` e `senha` |
-| Falha | O back-end redireciona para `/login?erro` (basta o parâmetro existir) e a tela mostra o aviso |
+| Envio | `POST /login` com os campos `email` e `senha` (e `destino`, se houver) |
+| Falha | O back-end redireciona para `/login?erro` (basta o parâmetro existir) e a tela mostra "E-mail ou senha incorretos", sem dizer qual dos dois errou |
+| Sessão expirada (401) | O back-end leva a `/login?expirou` (basta o parâmetro existir); a tela mostra "Sua sessão expirou. Entre novamente." Se vierem `erro` e `expirou` juntos, só o aviso de credencial aparece |
 | Sucesso | Decisão do back-end (cookie ou header com o JWT e para onde redirecionar) |
 
-Acessibilidade: rótulos visíveis, `autocomplete="username"` e `"current-password"`, colar liberado, aviso com `role="alert"` que não diz qual campo errou, e `login.js` leva o foco ao aviso depois de uma falha.
+| Atributo de modelo / parâmetro | Conteúdo | Sem ele |
+|---|---|---|
+| `email` (atributo de modelo) | E-mail digitado, que o back-end devolve depois de uma falha **por atributo flash** do redirect para `/login?erro` (nunca na URL, para não ir a logs e histórico). O Thymeleaf escapa o valor. A senha **nunca** volta | Campo vazio |
+| `?destino=` (parâmetro de **URL**) | Página anterior, por exemplo `/login?expirou&destino=/reservas/minhas`. O `LoginController` só põe no modelo o valor que passa em `CaminhoDoSite`; a tela o repassa no `POST /login` num campo oculto `destino`. **Quem decide o redirecionamento é o back-end** | Sem campo oculto |
+
+**`destino` vai SÓ pela URL** (`/login?...&destino=...`); **`email` vai só por flash**. Se o back-end redirecionar de volta a `/login?erro`, deve repetir o `destino` na URL, senão o usuário o perde na segunda tentativa.
+
+**O back-end DEVE revalidar o `destino` recebido no `POST /login`** com a mesma regra: o campo oculto é editável pelo cliente, então a tela não é uma barreira. Se for inválido, redirecionar para `/`.
+
+Regra de `CaminhoDoSite` (`br.com.senac.recursos.web`, usada no login e nas páginas de erro): começa com `/`; o segundo caractere não é `/` nem `\`; não tem `\` em posição nenhuma; não tem caractere de controle (TAB, LF, CR, NUL...), espaço (inclusive Unicode) nem caractere invisível; não tem `%2f`, `%5c` nem `%25` (sem diferenciar maiúsculas); no máximo 2000 caracteres; é uma URI válida, sem esquema nem autoridade. Isso fecha `/<TAB>/evil.com` (o navegador remove TAB, LF e CR e lê `//evil.com`) e `/\evil.com`. Um valor que não passa não vai ao formulário (login) nem vira link (páginas de erro, que caem em `/`). Os templates chamam a regra por `${caminhoDoSite.valido(x)}`, atributo que um `@ControllerAdvice` (`AtributosDasTelas`) põe no modelo de todas as telas, inclusive `/error`.
+
+Acessibilidade: rótulos visíveis, `autocomplete="username"` e `"current-password"`, colar liberado, avisos com `role="alert"` e `tabindex="-1"` (o `login.js` leva o foco ao aviso de erro ou de sessão expirada) e o erro não diz qual campo errou.
+
+Envio: no evento `submit`, o `login.js` desabilita o botão Entrar, mostra "Entrando…" com um anel (`aria-hidden`) e marca `aria-busy="true"` e `aria-disabled="true"`, sem cancelar o envio (o botão não tem `name`, então nada some do formulário). O botão também volta ao normal (com o foco nele) em qualquer `pageshow` e por um temporizador de segurança de 30 s, para não ficar preso em "Entrando…" se a navegação não terminar (Esc/Parar, rede caída, resposta 204 ou download). Sem JavaScript o formulário envia normalmente. O texto do botão desabilitado (`--color-text-secondary` sobre `--color-bg-disabled`) tem contraste de 6,1:1.
 
 
 ## Busca e resultados
@@ -182,3 +196,38 @@ A classe sai de uma tabela fechada (`em uso` → `estado--em-uso`, `concluída` 
 Use em formulários que mudam estado no servidor e não têm script próprio: aprovar, rejeitar, cancelar, registrar retirada e devolução, bloquear e liberar recurso. O formulário precisa ter um botão de envio (`type="submit"`); sem ele o Enter nos campos não é barrado.
 
 **Risco aberto:** o comportamento no navegador (um único POST, restauração no `pageshow` e nos 30 s) foi conferido à mão com Playwright em página de teste, mas não está no repositório. Os testes de servidor só provam que o layout carrega o script e que a página marcada o referencia; o E2E de cada tela deve provar o POST único.
+
+## Histórico da reserva
+
+`GET /reservas/{id}/historico` (`HistoricoController`, template `historico.html`) é a tela 11, só leitura (RF-10, RN-09, RN-10). **Não lê a auditoria**; contrato com o back-end, a confirmar com o Pedro:
+
+| Atributo de modelo | Conteúdo | Sem ele |
+|---|---|---|
+| `reserva` | `recurso`, `solicitante`, `data` (`LocalDate`, formatada na tela), `horario` (texto já formatado, ex. "14:00 às 15:30") e `estado` (nome escrito do estado atual, ex. "Em uso") | A página mostra só o título e o link Voltar |
+| `eventos` | Lista **do mais antigo ao mais recente** (a tela não reordena). Cada item: `instante` (`LocalDateTime`, formatado na tela), `de` (nulo na criação da reserva, senão o nome do estado anterior), `para` (nome do estado novo; nulo mostra "Estado novo não informado"), `usuario` (nome) e `motivo` (nulo, vazio ou só espaços mostra "Não informado") | Linha do tempo vazia mostra "Nenhuma mudança registrada." |
+| `voltar` | Endereço do link "Voltar" (opcional). Só pode vir de uma **lista fixa do back-end**, nunca de parâmetro de requisição: o valor vai direto para o `href` e `javascript:` seria executado | O link vai para `/` |
+
+- O badge de estado (resumo e linha do tempo) usa o fragmento `fragments/estado :: badge` (seção "Estado da reserva (RN-05)"): `estado` nulo ou em branco não renderiza badge e nome desconhecido aparece escrito em cinza, sem erro de página.
+- Formatos: `reserva.data` e `evento.instante` chegam como tipos temporais e a tela formata (`dd/MM/yyyy`, `HH:mm`, `<time datetime>`); `horario` e `horas` chegam como texto pronto.
+- A rota exige `{id}` numérico: outro valor responde 400. Reserva inexistente (404) é do back-end.
+- Acesso (RN-11): Responsável e Administrador veem; para o Solicitante o back-end deve responder **403**, que é a página de erro 403 que já existe (não há tela própria). A rota exige `{id}` de uma reserva existente; o 404 também é do back-end.
+- Somente leitura: a tela não tem formulário, botão nem link de editar ou apagar, e diz "Os registros são somente leitura: não podem ser alterados nem apagados." O motivo da rejeição (RN-09) aparece na linha da mudança para Rejeitada.
+- Onde fica o link "Ver histórico" ainda é decisão do back-end (sugestão: uma ligação em cada linha da retirada e devolução e no detalhe da reserva para esses perfis).
+- Acessibilidade: lista ordenada (`<ol>`), data e hora em `<time datetime>`, estado sempre escrito além da cor e um único `<h1>`.
+
+## Relatório de utilização
+
+`GET /relatorios/utilizacao?inicio=&fim=` (`RelatorioController`, template `relatorio.html`) é a tela 12 (RF-12, RN-13; a rota já está no [PRD](../prd.md)). O controller devolve o período ao filtro e recusa fim anterior ao início. **Não calcula o relatório**; contrato com o back-end, a confirmar com o Pedro:
+
+| Atributo de modelo | Conteúdo | Sem ele |
+|---|---|---|
+| `filtro` | `inicio` e `fim` (`LocalDate`; o controller já preenche com os parâmetros `AAAA-MM-DD`) | — |
+| `erros` | Mapa com a chave `fim` para o texto do erro; o controller já preenche quando `fim` é anterior a `inicio` | Sem erro |
+| `relatorio` | `recursos` e `professores` (listas de `nome`, `reservas` e `horas`, esta já formatada como "18 h" ou "12 h 30 min"), `totalReservas` (número), `totalHoras` (texto pronto, como `horas`) e `conflitos` (número) | A página mostra só o filtro e a nota |
+
+- Com `erros` a tela não mostra o relatório, mesmo que `relatorio` exista; o back-end deve ignorar `fim` anterior a `inicio` antes de calcular. `totalReservas` igual a 0 mostra só "Nenhuma reserva no período", sem tabelas.
+- "Professor" é quem pediu a reserva (o solicitante). Os totais valem para os dois blocos de tabela; reserva cancelada não conta como uso (nota fixa na tela). Como o relatório conta a reserva que cruza a borda do período é decisão do back-end (caso obrigatório do PRD).
+- Acesso (RN-13): Responsável e Administrador; o Solicitante recebe 403 do back-end.
+- `relatorio-form.js` bloqueia fim anterior ao início antes do envio, com o mesmo texto do servidor (`#relatorio-fim-erro`, sempre presente no HTML e escondido quando não há erro), e leva o foco ao campo. Sem JavaScript o servidor devolve o erro. Parâmetros vazios ou só o início não são erro.
+- Tabelas no desktop e cartões no mobile com o mesmo HTML (cada célula traz o rótulo em `data-rotulo`).
+- Acessibilidade: rótulos visíveis ligados por `for`, erro em texto junto ao campo (`role="alert"`, `aria-invalid`, `aria-describedby`), `<caption>` em cada tabela e um único `<h1>`.

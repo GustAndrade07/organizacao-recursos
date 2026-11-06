@@ -1,5 +1,8 @@
 <!DOCTYPE html>
 <html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"
-      th:replace="~{layout :: pagina(titulo='Você precisa entrar', conteudo=~{fragments/erro :: erro(401, 'aviso', 'Você precisa entrar', 'Sua sessão expirou ou você ainda não entrou. Entre com seu e-mail e senha para continuar.', 'Entrar', @{/login}, null, null)})}">
+      th:replace="~{layout :: pagina(titulo='Você precisa entrar', conteudo=~{fragments/erro :: erro(401, 'aviso', 'Você precisa entrar', 'Sua sessão expirou ou você ainda não entrou. Entre com seu e-mail e senha para continuar.', 'Entrar', @{/login?expirou}, null, null)})}">
+<head>
+    <title>Você precisa entrar</title>
+</head>
 <body></body>
 </html>
