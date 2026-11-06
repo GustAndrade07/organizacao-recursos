@@ -791,3 +791,101 @@ a {
     justify-content: space-between;
   }
 }
+
+/* Componentes compartilhados das telas de Responsável e Administrador (seções 03 a 05) */
+.campo__entrada:disabled {
+  background: var(--color-bg-disabled);
+  color: var(--color-text-disabled);
+  cursor: not-allowed;
+}
+
+.campo__entrada--area {
+  min-height: calc(var(--size-control-md) * 2);
+  padding: var(--space-3);
+  resize: vertical;
+}
+
+.botao--perigo {
+  border: var(--border-width-default) solid transparent;
+  background: var(--color-bg-danger);
+  color: var(--color-text-on-brand);
+}
+
+.botao--perigo:hover {
+  background: var(--color-bg-danger-hover);
+}
+
+.alerta--info {
+  background: var(--color-bg-info-subtle);
+  border-color: var(--color-border-info);
+  color: var(--color-text-info);
+}
+
+.alerta--sucesso {
+  background: var(--color-bg-success-subtle);
+  border-color: var(--color-border-success);
+  color: var(--color-text-success);
+}
+
+/* Estados da reserva (RN-05): os demais estados, além de SOLICITADA; o nome sempre aparece escrito */
+.estado--aprovada {
+  background: var(--color-status-aprovada-bg);
+  color: var(--color-status-aprovada-fg);
+}
+
+.estado--em-uso {
+  background: var(--color-status-em-uso-bg);
+  color: var(--color-status-em-uso-fg);
+}
+
+.estado--concluida {
+  background: var(--color-status-concluida-bg);
+  color: var(--color-status-concluida-fg);
+}
+
+.estado--rejeitada {
+  background: var(--color-status-rejeitada-bg);
+  color: var(--color-status-rejeitada-fg);
+}
+
+.estado--cancelada {
+  background: var(--color-status-cancelada-bg);
+  color: var(--color-status-cancelada-fg);
+}
+
+.estado--nao-compareceu {
+  background: var(--color-status-nao-compareceu-bg);
+  color: var(--color-status-nao-compareceu-fg);
+}
+
+/* O badge não estica na largura do cartão no mobile */
+.cartao__linha .estado {
+  align-self: flex-start;
+}
+
+/* Várias ações na mesma linha da tabela: empilhadas até 1023 px, lado a lado no desktop */
+.botoes-linha {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.tabela__nota {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font: var(--font-body-small);
+}
+
+@media (min-width: 768px) {
+  .botoes-linha {
+    align-items: stretch;
+  }
+}
+
+@media (min-width: 1024px) {
+  .botoes-linha {
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+}
