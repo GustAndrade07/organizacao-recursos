@@ -4,6 +4,7 @@
 - Estrutura inicial do repositório e documentação base.
 - Esqueleto Spring Boot 3.5 (Java 21, Maven Wrapper), PostgreSQL + Flyway, JaCoCo com gate de 80% de linhas / 70% de branches e teste de fumaça com Testcontainers.
 - Design tokens do front-end (`src/main/resources/static/css/tokens.css`), espelhando o arquivo Figma do Design System.
+- Pranchas da seção 03 (fila de aprovação e retirada e devolução) em `docs/frontend/pranchas/secao-03/`, em 375 px e 1280 px, para aprovação antes da implementação.
 - Documentação do front-end em `docs/frontend/` (tokens e inventário de telas).
 - Layout base e menu em Thymeleaf (`layout.html`, `app.css`, `menu.js`), com teste que impede valor solto fora dos tokens.
 - Páginas de erro 401, 403, 404 e 500 em Thymeleaf (mais modelo genérico 4xx/5xx), com caminho para continuar e teste de servidor que prova a 404 real.
