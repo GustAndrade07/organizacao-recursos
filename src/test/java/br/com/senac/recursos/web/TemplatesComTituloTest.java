@@ -25,6 +25,8 @@ class TemplatesComTituloTest {
             var titulos = Jsoup.parse(html).select("html > head > title");
             assertThat(titulos).as(nome).hasSize(1);
             assertThat(titulos.first().text()).as(nome).isNotBlank();
+            // Sonar Web:S5254: o elemento html declara o idioma da página
+            assertThat(Jsoup.parse(html).select("html[lang]")).as(nome + " declara lang no html").hasSize(1);
         }
     }
 }
