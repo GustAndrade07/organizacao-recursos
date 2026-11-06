@@ -14,7 +14,7 @@
   var erroDoScript = false;
 
   function fimAntesDoInicio() {
-    return inicio.value && fim.value && new Date(fim.value) <= new Date(inicio.value);
+    return Boolean(inicio.value && fim.value) && new Date(fim.value) <= new Date(inicio.value);
   }
 
   function limparErro() {
