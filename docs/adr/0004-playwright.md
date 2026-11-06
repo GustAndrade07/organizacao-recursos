@@ -2,4 +2,20 @@
 - **Status:** aceito
 - **Contexto:** precisa rodar sem tela no CI e gerar prints de evidência.
 - **Decisão:** Playwright para Java.
-- **Consequências:** (preencher)
+- **Consequências:**
+  - **Ganhamos:**
+    - Roda sem tela no CI (Ubuntu) e na mesma linguagem e no mesmo `verify` dos demais testes (JUnit 5, Java 21), sem segundo ecossistema de teste.
+    - Gera prints e traces como evidência para a RTM e para o relatório; emulação de viewport de 375 px cobre a responsividade (RF-13).
+    - Seletores por `data-testid`, que as telas já trazem, deixam o teste estável diante de mudança visual.
+  - **Perdemos:**
+    - Dependência nova (ainda **não está no `pom.xml`**) e o download dos navegadores no CI; o tempo extra do job está **não medido**.
+    - Teste E2E é o mais lento e o mais sujeito a flakiness; sem controle disciplinado de espera e de tempo ele pode ficar intermitente, e teste intermitente derruba a confiança no CI.
+    - O E2E não substitui teste de regra: reserva dupla e autorização continuam provadas no banco e na API.
+  - **Exige de testes:**
+    - E2E sobem a aplicação real contra PostgreSQL em Testcontainers (nunca H2), com massa semeada pelo próprio teste.
+    - Esperas pelo recurso do Playwright (auto-wait e asserções), nunca `Thread.sleep`; tempo das regras via `Clock`.
+    - Fluxos mínimos: login, criação de reserva, conflito de horário com mensagem clara, 401 e 403 nas telas, tudo também em 375 px.
+    - No CI, prints e traces como artifact com `if: always()` (como o `ci.yml` já faz com os relatórios); sem tela (headless).
+    - Os E2E contam como `Skipped: 0`: não pode haver `disabledWithoutDocker` neles.
+- **Pendências:** nenhuma decisão do grupo (D1 a D4) depende deste ADR. A inclusão da dependência e do passo de instalação dos navegadores no CI é do Leandro (dono do E2E).
+- **Fonte:** `docs/plano-de-teste.md` (seções 2, 3 e 6), `.github/workflows/ci.yml`, `pom.xml`, `docs/prd.md` (RF-13).
