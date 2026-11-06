@@ -2,7 +2,8 @@
 <!--/*
   Tela 9 do inventário (prefixo "aprovacao-"), RF-07 e RN-06. Atributos de modelo (o back-end preenche; docs/frontend/README.md):
     pedidos       : lista de id, solicitante, recurso, data, horario (já formatados), estado (texto) e proprio   (vazia ou ausente = fila vazia)
-    rejeitando    : o pedido que está sendo rejeitado (mesmos campos); abre o diálogo de rejeição
+    rejeitando    : o pedido que está sendo rejeitado (mesmos campos); abre o diálogo de rejeição, mas só se for
+                    Solicitado e não for do próprio Responsável (o back-end deve responder 404 ou ignorar o parâmetro nos outros casos)
     erros         : mapa; a chave motivo mostra o erro junto ao campo do diálogo
     confirmacao   : titulo, reserva e estado da decisão que acabou de ser registrada
     erroAprovacao : verdadeiro quando a API respondeu 403 à aprovação
@@ -11,12 +12,11 @@
       th:replace="~{layout :: pagina(titulo='Fila de aprovação', conteudo=~{::#conteudo-pagina})}">
 <body>
 <div id="conteudo-pagina">
-    <div class="secao">
-        <th:block th:if="${confirmacao != null}">
-            <div th:replace="~{fragments/estado :: confirmacao(${confirmacao}, 'aprovacao-sucesso')}"></div>
-        </th:block>
+    <div class="secao"
+         th:with="dialogoAberto=${rejeitando != null and !rejeitando.proprio and rejeitando.estado == 'Solicitada'}">
+        <div th:replace="${confirmacao != null} ? ~{fragments/estado :: confirmacao(${confirmacao}, 'aprovacao-sucesso')} : ~{}"></div>
 
-        <div class="alerta alerta--perigo" role="alert" tabindex="-1" data-testid="aprovacao-erro-403" th:if="${erroAprovacao}">
+        <div class="alerta alerta--perigo" role="alert" data-testid="aprovacao-erro-403" th:if="${erroAprovacao}">
             <strong class="alerta__titulo">Você não pode aprovar esta reserva</strong>
             <p class="alerta__texto">O estado da reserva não mudou. Se você precisa decidir este pedido, fale com o administrador.</p>
         </div>
@@ -71,7 +71,8 @@
         </table>
 
         <dialog class="dialogo" open aria-labelledby="aprovacao-rejeitar-titulo" aria-describedby="aprovacao-rejeitar-texto"
-                data-testid="aprovacao-rejeitar-dialogo" th:if="${rejeitando != null}"
+                data-testid="aprovacao-rejeitar-dialogo" th:if="${dialogoAberto}"
+                th:attr="data-origem='aprovacao-rejeitar-' + ${rejeitando.id}"
                 th:with="erroMotivo=${erros != null and erros.containsKey('motivo')}">
             <form method="post" th:action="@{/aprovacoes/{id}/rejeitar(id=${rejeitando.id})}">
                 <h2 class="dialogo__titulo" id="aprovacao-rejeitar-titulo"
@@ -94,8 +95,8 @@
                 </div>
             </form>
         </dialog>
+        <script th:if="${dialogoAberto}" th:src="@{/js/dialogo.js}" defer></script>
     </div>
-    <script th:if="${rejeitando != null}" th:src="@{/js/dialogo.js}" defer></script>
 </div>
 </body>
 </html>

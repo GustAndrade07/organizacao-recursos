@@ -4,17 +4,17 @@
     filtro         : ativas | aprovada | em-uso | todos                (o controller preenche)
     reservas       : lista de id, recurso, solicitante, data, horario (já formatados), estado (texto) e horarioPassou
                      (o back-end preenche; vazia ou ausente = estado vazio)
-    naoCompareceu  : a reserva em confirmação (mesmos campos); abre o diálogo
+    naoCompareceu  : a reserva em confirmação (mesmos campos); abre o diálogo, mas só se for Aprovada com horarioPassou
+                     (o back-end deve responder 404 ou ignorar o parâmetro nos outros casos)
     confirmacao    : titulo, reserva e estado da ação que acabou de ser registrada
 */-->
 <html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"
       th:replace="~{layout :: pagina(titulo='Retirada e devolução', conteudo=~{::#conteudo-pagina})}">
 <body>
 <div id="conteudo-pagina">
-    <div class="secao">
-        <th:block th:if="${confirmacao != null}">
-            <div th:replace="~{fragments/estado :: confirmacao(${confirmacao}, 'retirada-devolucao-sucesso')}"></div>
-        </th:block>
+    <div class="secao"
+         th:with="dialogoAberto=${naoCompareceu != null and naoCompareceu.estado == 'Aprovada' and naoCompareceu.horarioPassou}">
+        <div th:replace="${confirmacao != null} ? ~{fragments/estado :: confirmacao(${confirmacao}, 'retirada-devolucao-sucesso')} : ~{}"></div>
 
         <header class="pagina__cabecalho">
             <h1 data-testid="retirada-devolucao-titulo">Retirada e devolução</h1>
@@ -89,7 +89,8 @@
         </table>
 
         <dialog class="dialogo" open role="alertdialog" aria-labelledby="retirada-devolucao-nc-titulo" aria-describedby="retirada-devolucao-nc-texto"
-                data-testid="retirada-devolucao-nc-dialogo" th:if="${naoCompareceu != null}">
+                data-testid="retirada-devolucao-nc-dialogo" th:if="${dialogoAberto}"
+                th:attr="data-origem='retirada-devolucao-nao-compareceu-' + ${naoCompareceu.id}">
             <form method="post" th:action="@{/retirada-devolucao/{id}/nao-compareceu(id=${naoCompareceu.id})}">
                 <h2 class="dialogo__titulo" id="retirada-devolucao-nc-titulo">Marcar como não compareceu?</h2>
                 <p class="dialogo__texto" id="retirada-devolucao-nc-texto"><th:block th:text="${naoCompareceu.recurso} + ', de ' + ${naoCompareceu.solicitante} + ', ' + ${naoCompareceu.data} + ', das ' + ${naoCompareceu.horario}">Kit de microscópio M-02, de Beatriz Nogueira, 05/11/2026, das 09:00 às 11:00</th:block>. A reserva passa para <span th:replace="~{fragments/estado :: badge('Não compareceu', null)}">Não compareceu</span> e a mudança fica registrada.</p>
@@ -100,8 +101,8 @@
                 </div>
             </form>
         </dialog>
+        <script th:if="${dialogoAberto}" th:src="@{/js/dialogo.js}" defer></script>
     </div>
-    <script th:if="${naoCompareceu != null}" th:src="@{/js/dialogo.js}" defer></script>
 </div>
 </body>
 </html>
