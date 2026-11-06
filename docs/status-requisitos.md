@@ -4,7 +4,7 @@
 > Situação: `feito` · `parcial` · `ausente`. Atualizar a cada PR e ao fim de cada etapa.
 > Ordem das pendências: primeiro o que zera a nota (aplicação não roda, CI ausente, falha de autorização, reserva dupla).
 
-Última atualização: 04/11/2026 (repositório ainda sem código; tudo `ausente`).
+Última atualização: 06/11/2026 (RF-13 `parcial` com as telas em Thymeleaf; os demais seguem `ausente`).
 
 | Requisito | Situação | Evidência (arquivo e nome do teste) | Risco se ficar de fora | Dono |
 |---|---|---|---|---|
@@ -20,7 +20,7 @@
 | RF-10 Histórico auditável | ausente | | | Gustavo |
 | RF-11 Notificação externa | ausente | | | Pedro |
 | RF-12 Relatório de utilização | ausente | | | Gustavo / Pedro / Leandro |
-| RF-13 Telas responsivas e erros claros | ausente | | | Leandro |
+| RF-13 Telas responsivas e erros claros | parcial | Telas em Thymeleaf com teste de contrato: `LayoutBaseTest`, `PaginasDeErroTest`, `LoginPaginaTest`, `BuscaPaginaTest`, `ResultadosBuscaTest`, `NovaReservaPaginaTest`, `NovaReservaEstadosTest`; nenhum valor solto no CSS: `CssSemValoresSoltosTest`. Falta o E2E Playwright em 375 px e as demais telas | | Leandro |
 | RF-14 Documentação da API | ausente | | | Pedro |
 
 ## Pendências e divisão
