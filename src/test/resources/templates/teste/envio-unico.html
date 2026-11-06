@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: pagina(titulo='Envio único de teste', conteudo=~{::#conteudo-pagina})}">
+<body>
+<div id="conteudo-pagina">
+    <form method="post" action="/teste/confirmar" data-envio-unico data-testid="teste-form">
+        <button type="submit" name="confirmar" value="true" data-testid="teste-confirmar">Confirmar</button>
+    </form>
+</div>
+</body>
+</html>

@@ -36,4 +36,14 @@ class EstadosDaReservaCssTest {
                     .contains("var(--color-status-" + estado + "-fg)");
         }
     }
+
+    @Test
+    void regraBaseDoBadgeTemCorNeutraParaEstadoDesconhecido() throws IOException {
+        Matcher regra = Pattern.compile("(?<![\\w-])\\.estado\\s*\\{([^}]*)\\}").matcher(css());
+
+        assertThat(regra.find()).as("regra base .estado").isTrue();
+        assertThat(regra.group(1))
+                .contains("background: var(--color-bg-subtle)")
+                .contains("color: var(--color-text-secondary)");
+    }
 }
