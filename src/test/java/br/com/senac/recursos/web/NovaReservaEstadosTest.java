@@ -179,7 +179,7 @@ class NovaReservaEstadosTest {
         assertThat(alerta.attr("role")).isEqualTo("alert");
         assertThat(alerta.selectFirst(".alerta__titulo").text()).isEqualTo("Recurso em manutenção");
         assertThat(alerta.selectFirst(".alerta__texto").text())
-                .isEqualTo("O Laboratório de Química está em manutenção de 12/11/2026, 08:00 até 14/11/2026, 18:00."
+                .isEqualTo("O recurso Laboratório de Química está em manutenção de 12/11/2026, 08:00 até 14/11/2026, 18:00."
                         + " Escolha outro período ou outro recurso.");
         assertThat(alerta.selectFirst("a[data-testid=reserva-form-erro-voltar]")).isNotNull();
         assertThat(doc.select("[data-testid=reserva-form-erro-conflito]")).isEmpty();

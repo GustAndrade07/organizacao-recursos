@@ -82,3 +82,20 @@ Acessibilidade: rótulos visíveis, `autocomplete="username"` e `"current-passwo
 - Resultados: tabela no desktop e cards no mobile com o mesmo HTML (cada célula traz o rótulo em `data-rotulo`).
 - O filtro de competência (professor) ficou de fora: depende de decidir se professor é recurso reservável.
 - O idioma fixo é pt-BR (`spring.web.locale`), para nomes de dia e datas.
+
+## Nova reserva
+
+`GET /reservas/nova` (`ReservaController`, template `reserva-nova.html`) mostra o formulário preenchido com o que veio da busca (`recursoId`, `data`, `inicio`, `termino`) e envia por `POST /reservas`. **Não grava a reserva**; contrato com o back-end (RF-04 a RF-06), a confirmar com o Pedro:
+
+| Atributo de modelo | Conteúdo | Sem ele |
+|---|---|---|
+| `reserva` | `recursoId`, `data`, `inicio`, `termino` (o controller já preenche) | — |
+| `recurso` | `nome`, `local`, `restrito` | A tela não mostra o recurso nem o aviso de restrição |
+| `erros` | mapa `data`/`inicio`/`termino` para a mensagem, após um POST recusado | Sem erros |
+| `conflito` | verdadeiro após o 409 de horário (RN-02, RN-03) | Sem aviso |
+| `manutencao` | `inicio` e `fim` (`LocalDateTime`) após o 409 de manutenção (RN-04) | Sem aviso |
+
+- Recurso restrito avisa, antes de confirmar, que a reserva ficará Solicitada até a aprovação.
+- Erro de campo aparece junto ao campo e num resumo no topo (`role="alert"`), com link para o campo.
+- `reserva-form.js` bloqueia término igual ou anterior ao início antes do envio (RN-01) e desabilita o botão Confirmar durante o envio. Sem JavaScript o back-end valida.
+- Sucesso leva ao detalhe da reserva (tela 8), decisão do back-end.

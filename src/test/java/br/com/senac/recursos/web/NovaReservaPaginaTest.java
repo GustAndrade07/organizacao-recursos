@@ -96,7 +96,7 @@ class NovaReservaPaginaTest {
 
         assertThat(doc.select("script[src]").eachAttr("src")).contains("/js/reserva-form.js");
         var form = doc.selectFirst("form[data-testid=reserva-form]");
-        assertThat(form.attr("novalidate")).isNotNull();
+        assertThat(form.hasAttr("novalidate")).isFalse();
         var resumo = doc.selectFirst("[data-testid=reserva-form-erro-resumo]");
         assertThat(resumo.attr("role")).isEqualTo("alert");
         assertThat(resumo.hasAttr("hidden")).isTrue();
