@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<!--/*
+  Tela 11 do inventário (prefixo "historico-"), RF-10, RN-09, RN-10. Somente leitura.
+  Atributos de modelo (o back-end preenche; docs/frontend/README.md):
+    reserva : recurso, solicitante, data (LocalDate), horario (texto), estado (nome do estado, texto;
+              nulo = sem badge; desconhecido = badge neutro; ver fragments/estado.html) (ausente = só o título)
+    eventos : do mais antigo ao mais recente (a tela não reordena); cada um com instante (LocalDateTime),
+              de (nulo na criação), para (nulo = "Estado novo não informado"), usuario,
+              motivo (nulo ou vazio = "Não informado"); lista vazia = "Nenhuma mudança registrada."
+    voltar  : endereço do link Voltar, de uma lista fixa do back-end (opcional; padrão "/")
+*/-->
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: pagina(titulo='Histórico da reserva', conteudo=~{::#conteudo-pagina})}">
+<head>
+    <title>Histórico da reserva</title>
+</head>
+<body>
+<div id="conteudo-pagina">
+    <div class="secao">
+        <header class="pagina__cabecalho">
+            <h1 data-testid="historico-titulo">Histórico da reserva</h1>
+            <p class="pagina__descricao"><a th:href="@{${voltar != null ? voltar : '/'}}" data-testid="historico-voltar">Voltar</a></p>
+        </header>
+
+        <th:block th:if="${reserva != null}">
+            <section class="cartao" aria-labelledby="historico-resumo-titulo" data-testid="historico-resumo">
+                <div class="cartao__linha">
+                    <h2 class="cartao__titulo" id="historico-resumo-titulo" th:text="${reserva.recurso}">Laboratório de Química</h2>
+                    <span th:replace="~{fragments/estado :: badge(${reserva.estado}, 'historico-estado-atual')}">Concluída</span>
+                </div>
+                <dl class="lista-dados">
+                    <dt>Solicitante</dt>
+                    <dd th:text="${reserva.solicitante}">Ana Lima</dd>
+                    <dt>Data</dt>
+                    <dd th:text="${#temporals.format(reserva.data, 'dd/MM/yyyy')}">12/11/2026</dd>
+                    <dt>Horário</dt>
+                    <dd th:text="${reserva.horario}">14:00 às 15:30</dd>
+                </dl>
+            </section>
+
+            <section class="cartao" aria-labelledby="historico-linha-titulo">
+                <h2 class="cartao__titulo" id="historico-linha-titulo">Mudanças de estado</h2>
+                <p class="pagina__descricao" data-testid="historico-sem-eventos" th:if="${#lists.isEmpty(eventos)}">Nenhuma mudança registrada.</p>
+                <ol class="linha-tempo" data-testid="historico-linha-tempo" th:unless="${#lists.isEmpty(eventos)}">
+                    <li class="linha-tempo__item" th:each="evento, linha : ${eventos}"
+                        th:attr="data-testid='historico-evento-' + ${linha.count}">
+                        <time class="linha-tempo__data"
+                              th:datetime="${#temporals.format(evento.instante, 'yyyy-MM-dd') + 'T' + #temporals.format(evento.instante, 'HH:mm')}"
+                              th:attr="data-testid='historico-evento-' + ${linha.count} + '-data'"
+                              th:text="${#temporals.format(evento.instante, 'dd/MM/yyyy') + ' às ' + #temporals.format(evento.instante, 'HH:mm')}">06/11/2026 às 09:12</time>
+                        <div class="linha-tempo__corpo">
+                            <p class="linha-tempo__troca">
+                                <span class="linha-tempo__ponte" th:if="${#strings.isEmpty(#strings.trim(evento.de))}"
+                                      th:attr="data-testid='historico-evento-' + ${linha.count} + '-de'">Sem estado anterior</span>
+                                <th:block th:unless="${#strings.isEmpty(#strings.trim(evento.de))}">
+                                    <span class="linha-tempo__ponte">de</span>
+                                    <span th:replace="~{fragments/estado :: badge(${evento.de}, |historico-evento-${linha.count}-de|)}">Solicitada</span>
+                                </th:block>
+                                <th:block th:unless="${#strings.isEmpty(#strings.trim(evento.para))}">
+                                    <span class="linha-tempo__ponte">para</span>
+                                    <span th:replace="~{fragments/estado :: badge(${evento.para}, |historico-evento-${linha.count}-para|)}">Aprovada</span>
+                                </th:block>
+                                <span class="linha-tempo__ponte" th:if="${#strings.isEmpty(#strings.trim(evento.para))}"
+                                      th:attr="data-testid='historico-evento-' + ${linha.count} + '-para'">Estado novo não informado</span>
+                            </p>
+                            <dl class="lista-dados">
+                                <dt>Usuário</dt>
+                                <dd th:attr="data-testid='historico-evento-' + ${linha.count} + '-usuario'" th:text="${evento.usuario}">Carlos Souza</dd>
+                                <dt>Motivo</dt>
+                                <dd th:attr="data-testid='historico-evento-' + ${linha.count} + '-motivo'"
+                                    th:text="${#strings.isEmpty(#strings.trim(evento.motivo)) ? 'Não informado' : evento.motivo}">Não informado</dd>
+                            </dl>
+                        </div>
+                    </li>
+                </ol>
+                <p class="tabela__nota" data-testid="historico-somente-leitura">Os registros são somente leitura: não podem ser alterados nem apagados.</p>
+            </section>
+        </th:block>
+    </div>
+</div>
+</body>
+</html>
