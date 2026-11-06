@@ -1,0 +1,30 @@
+package br.com.senac.recursos.web;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+import org.jsoup.Jsoup;
+import org.junit.jupiter.api.Test;
+import org.springframework.core.io.ClassPathResource;
+
+/**
+ * O SonarCloud analisa o arquivo do template, não a página renderizada, e reprova página sem
+ * {@code <title>} (regra Web:PageWithoutTitleCheck). O título final vem do layout; o template
+ * declara o mesmo título no {@code <head>} só para a análise estática enxergar.
+ */
+class TemplatesComTituloTest {
+
+    private static final List<String> TEMPLATES_DE_TELA = List.of("busca", "reserva-nova");
+
+    @Test
+    void todoTemplateDeTelaDeclaraUmTitleNoHead() throws Exception {
+        for (String nome : TEMPLATES_DE_TELA) {
+            String html = new String(new ClassPathResource("templates/" + nome + ".html").getInputStream().readAllBytes(),
+                    StandardCharsets.UTF_8);
+            var titulos = Jsoup.parse(html).select("html > head > title");
+            assertThat(titulos).as(nome).hasSize(1);
+            assertThat(titulos.first().text()).as(nome).isNotBlank();
+        }
+    }
+}

@@ -2,4 +2,19 @@
 - **Status:** aceito
 - **Contexto:** a especificação só pede tela responsiva e erro claro.
 - **Decisão:** Thymeleaf, sem front separado.
-- **Consequências:** (preencher)
+- **Consequências:**
+  - **Ganhamos:**
+    - **Um deploy só**: telas, API e regras no mesmo projeto Spring, sem segundo build nem CORS entre front e back.
+    - O HTML nasce no servidor, então a tela é testável por MockMvc com jsoup (já existe: layout, login, páginas de erro 401, 403, 404 e 500) e por E2E ([ADR-0004](0004-playwright.md)) sem depender de framework de JavaScript.
+    - Os design tokens ficam em CSS estático (`tokens.css`) e há teste que impede valor solto fora deles (`CssSemValoresSoltosTest`).
+  - **Perdemos:**
+    - Interações ricas ficam limitadas (JavaScript mínimo, sem SPA); o que o RF-13 pede (responsivo, erro claro) cabe, mas não mais que isso sem custo.
+    - A aplicação passa a ter **duas formas de responder erro**: páginas HTML (para o navegador) e `ProblemDetail` (para a API). A escolha por `Accept` precisa continuar funcionando quando o back-end adotar `ProblemDetail` ([docs/frontend/README.md](../frontend/README.md)).
+    - A autenticação das telas depende de como o token do [ADR-0001](0001-login-jwt.md) chega do navegador, ainda aberto.
+  - **Exige de testes:**
+    - Teste de view (MockMvc) por tela: elementos com `data-testid`, textos de erro, rótulos acessíveis.
+    - Página de erro nunca mostra stack trace, SQL nem nome de classe interna.
+    - E2E em 375 px sem rolagem horizontal e com a mensagem de conflito explicada em linguagem simples (cenário C5 de [arquitetura.md](../arquitetura.md)).
+    - O Thymeleaf escapa o texto por padrão (`th:text`); qualquer uso de texto sem escape (`th:utext`) precisa de justificativa na revisão, e dado vindo do usuário nunca entra assim.
+- **Pendências:** nenhuma decisão do grupo (D1 a D4) depende deste ADR.
+- **Fonte:** `docs/arquitetura.md` (seções 3, 7 e 8), `docs/frontend/README.md`, `docs/prd.md` (RF-13), `src/test/java/br/com/senac/recursos/web/`.
