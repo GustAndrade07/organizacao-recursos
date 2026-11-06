@@ -60,11 +60,21 @@ O Spring escolhe o template pelo status: `templates/error/401.html`, `403.html`,
 
 | O quê | Valor |
 |---|---|
-| Envio | `POST /login` com os campos `email` e `senha` |
-| Falha | O back-end redireciona para `/login?erro` (basta o parâmetro existir) e a tela mostra o aviso |
+| Envio | `POST /login` com os campos `email` e `senha` (e `destino`, se houver) |
+| Falha | O back-end redireciona para `/login?erro` (basta o parâmetro existir) e a tela mostra "E-mail ou senha incorretos", sem dizer qual dos dois errou |
+| Sessão expirada (401) | O back-end leva a `/login?expirou` (basta o parâmetro existir); a tela mostra "Sua sessão expirou. Entre novamente." Se vierem `erro` e `expirou` juntos, só o aviso de credencial aparece |
 | Sucesso | Decisão do back-end (cookie ou header com o JWT e para onde redirecionar) |
 
-Acessibilidade: rótulos visíveis, `autocomplete="username"` e `"current-password"`, colar liberado, aviso com `role="alert"` que não diz qual campo errou, e `login.js` leva o foco ao aviso depois de uma falha.
+| Atributo de modelo / parâmetro | Conteúdo | Sem ele |
+|---|---|---|
+| `email` (atributo de modelo) | E-mail digitado, que o back-end devolve depois de uma falha (por exemplo, atributo flash do redirect para `/login?erro`, para não ir na URL). O Thymeleaf escapa o valor. A senha **nunca** volta | Campo vazio |
+| `?destino=` (parâmetro) | Página anterior, por exemplo `/login?expirou&destino=/reservas/minhas`. A tela repassa o valor no `POST /login` num campo oculto `destino`; **quem decide o redirecionamento é o back-end**. Só vale caminho deste site: começa com `/` e não com `//` nem `/\` (a regra das páginas de erro, mais `/\`); qualquer outro valor é descartado | Sem campo oculto |
+
+Se o back-end redirecionar de volta a `/login?erro`, deve repetir o `destino` na URL para o usuário não perdê-lo na segunda tentativa.
+
+Acessibilidade: rótulos visíveis, `autocomplete="username"` e `"current-password"`, colar liberado, avisos com `role="alert"` e `tabindex="-1"` (o `login.js` leva o foco ao aviso de erro ou de sessão expirada) e o erro não diz qual campo errou.
+
+Envio: no evento `submit`, o `login.js` desabilita o botão Entrar, mostra "Entrando…" com um anel (`aria-hidden`) e marca `aria-busy="true"` e `aria-disabled="true"`, sem cancelar o envio (o botão não tem `name`, então nada some do formulário). Voltar pelo histórico restaura o botão. Sem JavaScript o formulário envia normalmente. O texto do botão desabilitado (`--color-text-secondary` sobre `--color-bg-disabled`) tem contraste de 6,1:1.
 
 
 ## Busca e resultados

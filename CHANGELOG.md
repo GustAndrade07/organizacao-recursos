@@ -11,3 +11,4 @@
 - Tela de login em Thymeleaf (`GET /login`): formulário acessível e aviso de falha (`/login?erro`); a autenticação continua com o back-end.
 - Telas de busca e resultados em Thymeleaf (`GET /recursos/disponiveis`): filtros, tabela no desktop e cards no mobile, estado vazio e idioma pt-BR; a consulta de disponibilidade continua com o back-end.
 - Tela de nova reserva em Thymeleaf (`GET /reservas/nova`): formulário preenchido pela busca, aviso de recurso restrito, erros de campo com resumo no topo, conflito e manutenção (409) e envio sem duplicar; a gravação continua com o back-end.
+- Login (`GET /login`): o e-mail digitado volta preenchido depois de uma falha (a senha nunca), aviso "Sua sessão expirou" em `/login?expirou`, campo oculto `destino` para voltar à página anterior e botão Entrar desabilitado com "Entrando…" durante o envio; a autenticação continua com o back-end.
