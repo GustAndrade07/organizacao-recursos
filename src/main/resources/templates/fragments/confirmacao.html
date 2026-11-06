@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<!--/*
+  Aviso de confirmação das telas 9 e 10 (role="status"): a ação que acabou de ser registrada e o novo estado.
+
+  confirmacao(dados, testid)
+    dados   : titulo, reserva (ex. "Sala 203, de Rafael Costa") e estado (nome por extenso, ex. "Em uso")
+    testid  : valor do data-testid do aviso
+
+  O badge do estado vem de fragments/estado :: badge, único ponto que converte o estado em classe.
+*/-->
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<div class="alerta alerta--sucesso" role="status" th:fragment="confirmacao(dados, testid)" th:attr="data-testid=${testid}">
+    <strong class="alerta__titulo" th:text="${dados.titulo}">Reserva aprovada</strong>
+    <p class="alerta__texto"><th:block th:text="${dados.reserva}">Sala 203, de Rafael Costa</th:block>, agora está <span th:replace="~{fragments/estado :: badge(${dados.estado}, null)}">Aprovada</span>. A mudança ficou registrada.</p>
+</div>
+</body>
+</html>

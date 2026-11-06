@@ -14,7 +14,7 @@
 <div id="conteudo-pagina">
     <div class="secao"
          th:with="dialogoAberto=${rejeitando != null and !rejeitando.proprio and rejeitando.estado == 'Solicitada'}">
-        <div th:replace="${confirmacao != null} ? ~{fragments/estado :: confirmacao(${confirmacao}, 'aprovacao-sucesso')} : ~{}"></div>
+        <div th:replace="${confirmacao != null} ? ~{fragments/confirmacao :: confirmacao(${confirmacao}, 'aprovacao-sucesso')} : ~{}"></div>
 
         <div class="alerta alerta--perigo" role="alert" data-testid="aprovacao-erro-403" th:if="${erroAprovacao}">
             <strong class="alerta__titulo">Você não pode aprovar esta reserva</strong>

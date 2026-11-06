@@ -14,7 +14,7 @@
 <div id="conteudo-pagina">
     <div class="secao"
          th:with="dialogoAberto=${naoCompareceu != null and naoCompareceu.estado == 'Aprovada' and naoCompareceu.horarioPassou}">
-        <div th:replace="${confirmacao != null} ? ~{fragments/estado :: confirmacao(${confirmacao}, 'retirada-devolucao-sucesso')} : ~{}"></div>
+        <div th:replace="${confirmacao != null} ? ~{fragments/confirmacao :: confirmacao(${confirmacao}, 'retirada-devolucao-sucesso')} : ~{}"></div>
 
         <header class="pagina__cabecalho">
             <h1 data-testid="retirada-devolucao-titulo">Retirada e devolução</h1>
