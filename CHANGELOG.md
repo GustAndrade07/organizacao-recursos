@@ -12,6 +12,7 @@
 - `AGENTS.md` (e `CLAUDE.md` apontando para ele): contexto e regras do grupo e da IA, incluindo a regra de que todo PR atualiza o plano; modelo de PR com as seções "Plano de execução", "Verificado" e "Não verificado".
 - Plano de execução atualizado (status de 04/11, SonarCloud feito) e ajustado com os pontos das Aulas 09 a 15 reconferidas no Hub do professor; item "Apresentação e demonstração" entra no checklist de entrega.
 - Páginas de erro 401, 403, 404 e 500 em Thymeleaf (mais modelo genérico 4xx/5xx), com caminho para continuar e teste de servidor que prova a 404 real.
+- Pranchas da seção 05 (lista e formulário de recurso e bloqueio por manutenção) em `docs/frontend/pranchas/secao-05/`, em 375 px e 1280 px, para aprovação antes da implementação.
 - Tela de login em Thymeleaf (`GET /login`): formulário acessível e aviso de falha (`/login?erro`); a autenticação continua com o back-end.
 - Menu do Responsável: o item "Empréstimos" passa a se chamar "Retirada e devolução", igual ao título da tela 10; rota proposta `/retirada-devolucao` e prefixo `retirada-devolucao-` no inventário de telas.
 - `docs/plano-execucao.md`: nova seção 9 "Decisões pendentes do grupo" (D1 intervalo semiaberto, D2 tentativa recusada em transação própria, D3 código HTTP de transição inválida, D4 critério de "0 vulnerabilidades críticas"), com quem decide, prazo, impacto e proposta.
