@@ -10,6 +10,8 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * Tela 9 do inventário (docs/frontend/telas.md): fila de aprovação, prefixo {@code aprovacao-}, RF-07 e RN-06.
@@ -61,6 +64,14 @@ class FilaAprovacaoTest {
         String rejeitando(Model model) {
             model.addAttribute("pedidos", fila());
             model.addAttribute("rejeitando", fila().get(0));
+            return "aprovacoes";
+        }
+
+        @GetMapping("/teste/aprovacoes/rejeitando-custom")
+        String rejeitandoCustom(@RequestParam String estado, @RequestParam boolean proprio, Model model) {
+            model.addAttribute("pedidos", fila());
+            model.addAttribute("rejeitando", Map.of("id", "1", "solicitante", "Laura Mendes", "recurso", "Laboratório de Química",
+                    "data", "09/11/2026", "horario", "08:00 às 10:00", "estado", estado, "proprio", proprio));
             return "aprovacoes";
         }
 
@@ -294,6 +305,36 @@ class FilaAprovacaoTest {
     }
 
     @Test
+    void dialogoGuardaOGatilhoQueOAbriuParaDevolverOFocoAoFechar() throws Exception {
+        Document doc = pagina("/teste/aprovacoes/rejeitando");
+
+        var dialogo = doc.selectFirst("dialog[data-testid=aprovacao-rejeitar-dialogo]");
+        assertThat(dialogo.attr("data-origem")).isEqualTo("aprovacao-rejeitar-1");
+        assertThat(doc.select("[data-testid=" + dialogo.attr("data-origem") + "]")).hasSize(1);
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "Solicitada, true",
+            "Aprovada, false",
+            "Rejeitada, false"
+    })
+    void soAbreODialogoParaPedidoSolicitadoQueNaoEDoProprioResponsavel(String estado, boolean proprio) throws Exception {
+        Document doc = pagina("/teste/aprovacoes/rejeitando-custom?estado=" + estado + "&proprio=" + proprio);
+
+        assertThat(doc.select("dialog")).as("diálogo com estado %s e proprio %s", estado, proprio).isEmpty();
+        assertThat(doc.select("script[src*=dialogo]")).isEmpty();
+    }
+
+    @Test
+    void pedidoSolicitadoDeOutraPessoaAbreODialogoECarregaOScript() throws Exception {
+        Document doc = pagina("/teste/aprovacoes/rejeitando-custom?estado=Solicitada&proprio=false");
+
+        assertThat(doc.select("dialog[data-testid=aprovacao-rejeitar-dialogo]")).hasSize(1);
+        assertThat(doc.select("script[src='/js/dialogo.js']")).hasSize(1);
+    }
+
+    @Test
     void comDialogoACarregaOJavaScriptQueAbreOModal() throws Exception {
         Document doc = pagina("/teste/aprovacoes/rejeitando");
 
@@ -342,7 +383,7 @@ class FilaAprovacaoTest {
 
         var erro = doc.selectFirst("div[data-testid=aprovacao-erro-403]");
         assertThat(erro.attr("role")).isEqualTo("alert");
-        assertThat(erro.attr("tabindex")).isEqualTo("-1");
+        assertThat(erro.hasAttr("tabindex")).as("nenhum script leva o foco ao aviso").isFalse();
         assertThat(erro.hasClass("alerta--perigo")).isTrue();
         assertThat(erro.selectFirst(".alerta__titulo").text()).isEqualTo("Você não pode aprovar esta reserva");
         assertThat(erro.selectFirst(".alerta__texto").text())
@@ -359,6 +400,10 @@ class FilaAprovacaoTest {
         Document doc = pagina("/teste/aprovacoes/perigoso");
 
         assertThat(doc.select("script:containsData(alert), img[onerror], b")).isEmpty();
+        assertThat(doc.selectFirst("button[data-testid=aprovacao-aprovar-1]").attr("aria-label"))
+                .isEqualTo("Aprovar reserva de <img src=x onerror=alert(1)> para <script>alert(2)</script>");
+        assertThat(doc.selectFirst("a[data-testid=aprovacao-rejeitar-1]").attr("aria-label"))
+                .isEqualTo("Rejeitar reserva de <img src=x onerror=alert(1)> para <script>alert(2)</script>");
         assertThat(doc.selectFirst("tr[data-testid=aprovacao-linha-1] th").text()).isEqualTo("<img src=x onerror=alert(1)>");
         assertThat(doc.selectFirst("[data-testid=aprovacao-linha-1] td[data-rotulo=Recurso]").text()).isEqualTo("<script>alert(2)</script>");
         assertThat(doc.selectFirst("#aprovacao-rejeitar-titulo").text()).isEqualTo("Rejeitar o pedido de <img src=x onerror=alert(1)>?");

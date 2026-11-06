@@ -18,6 +18,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * Tela 10 do inventário (docs/frontend/telas.md): retirada e devolução, prefixo {@code retirada-devolucao-},
@@ -62,14 +63,15 @@ class RetiradaDevolucaoTest {
         @GetMapping("/teste/retirada-devolucao/todos")
         String todos(Model model) {
             model.addAttribute("filtro", "todos");
+            // horarioPassou verdadeiro em todo estado sem retirada: a etiqueta e o botão não podem vazar
             model.addAttribute("reservas", List.of(
-                    reserva("1", "Sala 203", "Ana Lima", "06/11/2026", "10:00 às 12:00", "Solicitada", false),
+                    reserva("1", "Sala 203", "Ana Lima", "06/11/2026", "10:00 às 12:00", "Solicitada", true),
                     reserva("2", "Sala 203", "Ana Lima", "06/11/2026", "10:00 às 12:00", "Aprovada", false),
                     reserva("3", "Sala 203", "Ana Lima", "06/11/2026", "10:00 às 12:00", "Em uso", false),
-                    reserva("4", "Sala 203", "Ana Lima", "06/11/2026", "10:00 às 12:00", "Concluída", false),
-                    reserva("5", "Sala 203", "Ana Lima", "06/11/2026", "10:00 às 12:00", "Rejeitada", false),
-                    reserva("6", "Sala 203", "Ana Lima", "06/11/2026", "10:00 às 12:00", "Cancelada", false),
-                    reserva("7", "Sala 203", "Ana Lima", "06/11/2026", "10:00 às 12:00", "Não compareceu", false)));
+                    reserva("4", "Sala 203", "Ana Lima", "06/11/2026", "10:00 às 12:00", "Concluída", true),
+                    reserva("5", "Sala 203", "Ana Lima", "06/11/2026", "10:00 às 12:00", "Rejeitada", true),
+                    reserva("6", "Sala 203", "Ana Lima", "06/11/2026", "10:00 às 12:00", "Cancelada", true),
+                    reserva("7", "Sala 203", "Ana Lima", "06/11/2026", "10:00 às 12:00", "Não compareceu", true)));
             return "retirada-devolucao";
         }
 
@@ -93,6 +95,15 @@ class RetiradaDevolucaoTest {
             model.addAttribute("filtro", "aprovada");
             model.addAttribute("reservas", lista());
             model.addAttribute("naoCompareceu", lista().get(3));
+            return "retirada-devolucao";
+        }
+
+        @GetMapping("/teste/retirada-devolucao/confirmando-nc-custom")
+        String confirmandoNaoCompareceuCustom(@RequestParam String estado, @RequestParam boolean passou, Model model) {
+            filtro(model);
+            model.addAttribute("reservas", lista());
+            model.addAttribute("naoCompareceu", reserva("4", "Kit de microscópio M-02", "Beatriz Nogueira", "05/11/2026",
+                    "09:00 às 11:00", estado, passou));
             return "retirada-devolucao";
         }
 
@@ -279,6 +290,9 @@ class RetiradaDevolucaoTest {
         assertThat(linha.selectFirst("[data-testid=retirada-devolucao-estado-" + id + "]").text()).isEqualTo(estado);
         assertThat(linha.select("button, a, form")).as("ações do estado %s", estado).isEmpty();
         assertThat(linha.selectFirst(".tabela__nota").text()).isEqualTo("Sem ação disponível");
+        assertThat(linha.select(".etiqueta")).as("etiqueta no estado %s", estado).isEmpty();
+        assertThat(linha.select("[data-testid^=retirada-devolucao-nao-compareceu-], [data-testid^=retirada-devolucao-vencida-]"))
+                .as("não compareceu no estado %s", estado).isEmpty();
     }
 
     // Horário já passou (RN-08)
@@ -334,6 +348,38 @@ class RetiradaDevolucaoTest {
                 "Kit de microscópio M-02, de Beatriz Nogueira, 05/11/2026, das 09:00 às 11:00. A reserva passa para Não compareceu e a mudança fica registrada.");
         assertThat(descricao.selectFirst(".estado--nao-compareceu").text()).isEqualTo("Não compareceu");
         assertThat(doc.select("script[src='/js/dialogo.js'][defer]")).hasSize(1);
+    }
+
+    @Test
+    void dialogoGuardaOGatilhoQueOAbriuParaDevolverOFocoAoFechar() throws Exception {
+        Document doc = pagina("/teste/retirada-devolucao/confirmando-nc");
+
+        var dialogo = doc.selectFirst("dialog[data-testid=retirada-devolucao-nc-dialogo]");
+        assertThat(dialogo.attr("data-origem")).isEqualTo("retirada-devolucao-nao-compareceu-4");
+        assertThat(doc.select("[data-testid=" + dialogo.attr("data-origem") + "]")).hasSize(1);
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "Em uso, true",
+            "Concluída, true",
+            "Solicitada, true",
+            "Não compareceu, true",
+            "Aprovada, false"
+    })
+    void naoCompareceuSoAbreOdialogoParaAprovadaComHorarioPassado(String estado, boolean passou) throws Exception {
+        Document doc = pagina("/teste/retirada-devolucao/confirmando-nc-custom?estado=" + estado + "&passou=" + passou);
+
+        assertThat(doc.select("dialog, [role=alertdialog]")).as("diálogo com estado %s e horarioPassou %s", estado, passou).isEmpty();
+        assertThat(doc.select("script[src*=dialogo]")).isEmpty();
+    }
+
+    @Test
+    void naoCompareceuAprovadaComHorarioPassadoAbreODialogo() throws Exception {
+        Document doc = pagina("/teste/retirada-devolucao/confirmando-nc-custom?estado=Aprovada&passou=true");
+
+        assertThat(doc.select("dialog[data-testid=retirada-devolucao-nc-dialogo]")).hasSize(1);
+        assertThat(doc.select("script[src='/js/dialogo.js']")).hasSize(1);
     }
 
     @Test
@@ -410,6 +456,8 @@ class RetiradaDevolucaoTest {
         assertThat(doc.selectFirst("td[data-rotulo=Solicitante]").text()).isEqualTo("<img src=x onerror=alert(2)>");
         assertThat(doc.selectFirst("button[data-testid=retirada-devolucao-retirar-1]").attr("aria-label"))
                 .isEqualTo("Registrar retirada de <script>alert(1)</script> por <img src=x onerror=alert(2)>");
+        assertThat(doc.selectFirst("a[data-testid=retirada-devolucao-nao-compareceu-1]").attr("aria-label"))
+                .isEqualTo("Marcar como não compareceu a reserva de <script>alert(1)</script> por <img src=x onerror=alert(2)>");
         assertThat(doc.selectFirst("#retirada-devolucao-nc-texto").text()).startsWith("<script>alert(1)</script>, de <img src=x onerror=alert(2)>,");
         assertThat(doc.selectFirst("[data-testid=retirada-devolucao-sucesso] .alerta__titulo").text()).isEqualTo("<b>Retirada registrada</b>");
         assertThat(doc.selectFirst("[data-testid=retirada-devolucao-sucesso] .alerta__texto").text()).startsWith("<script>alert(3)</script>, agora está");
