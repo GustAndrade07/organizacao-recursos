@@ -16,6 +16,9 @@
   Nunca escreva <span class="estado ..."> à mão nas telas; use  th:replace="~{fragments/estado :: badge(${...}, 'x-estado')}".
 */-->
 <html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Estado da reserva</title>
+</head>
 <body>
 <span class="estado" th:fragment="badge(estado, testid)" th:if="${!#strings.isEmpty(#strings.trim(estado))}"
       th:with="classe=${ {'solicitada': 'estado--solicitada', 'aprovada': 'estado--aprovada',
