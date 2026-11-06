@@ -4,17 +4,23 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 /**
  * Tela 1 do inventário (docs/frontend/telas.md): login, prefixo {@code login-}, RF-01/RF-13.
  * Só a tela: o formulário envia {@code email} e {@code senha} por POST para {@code /login}; quem autentica é o
- * back-end (ADR-0001) e, se falhar, volta para {@code /login?erro}.
+ * back-end (ADR-0001) e, se falhar, volta para {@code /login?erro} com o atributo de modelo {@code email} (flash).
+ * Sessão expirada (401) chega em {@code /login?expirou}; {@code ?destino=} diz para onde voltar depois de entrar.
+ * O estado "Entrando…" do botão é do {@code login.js}: aqui só se confere o que o servidor renderiza.
  */
 @WebMvcTest(LoginController.class)
 class LoginPaginaTest {
@@ -23,10 +29,18 @@ class LoginPaginaTest {
     MockMvc mvc;
 
     private Document pagina(String caminho) throws Exception {
-        String html = mvc.perform(get(caminho))
+        return pagina(get(caminho));
+    }
+
+    private Document pagina(MockHttpServletRequestBuilder requisicao) throws Exception {
+        String html = mvc.perform(requisicao)
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
         return Jsoup.parse(html);
+    }
+
+    private String lerRecurso(String caminho) throws IOException {
+        return new String(new ClassPathResource(caminho).getInputStream().readAllBytes(), StandardCharsets.UTF_8);
     }
 
     @Test
@@ -115,5 +129,165 @@ class LoginPaginaTest {
 
         assertThat(doc.select("script[src]").eachAttr("src")).contains("/js/login.js");
         assertThat(doc.selectFirst("[data-testid=login-erro]").attr("tabindex")).isEqualTo("-1");
+    }
+
+    @Test
+    void semAtributoEmailOCampoVemVazio() throws Exception {
+        Document doc = pagina("/login?erro");
+
+        assertThat(doc.selectFirst("input[data-testid=login-email]").hasAttr("value")).isFalse();
+    }
+
+    @Test
+    void aposFalhaOEmailDigitadoVoltaPreenchido() throws Exception {
+        Document doc = pagina(get("/login?erro").flashAttr("email", "ana.lima@escola.edu.br"));
+
+        assertThat(doc.selectFirst("input[data-testid=login-email]").val()).isEqualTo("ana.lima@escola.edu.br");
+        assertThat(doc.selectFirst("[data-testid=login-erro]")).isNotNull();
+    }
+
+    @Test
+    void emailComHtmlPerigosoVoltaEscapadoNoCampo() throws Exception {
+        String perigoso = "\"><script>alert(1)</script>@x.com";
+
+        String html = mvc.perform(get("/login?erro").flashAttr("email", perigoso))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        Document doc = Jsoup.parse(html);
+
+        assertThat(html).doesNotContain("<script>alert(1)");
+        assertThat(doc.select("script").eachText()).allMatch(String::isEmpty);
+        assertThat(doc.selectFirst("input[data-testid=login-email]").val()).isEqualTo(perigoso);
+    }
+
+    @Test
+    void asenhaNuncaVoltaNoHtml() throws Exception {
+        String html = mvc.perform(get("/login?erro")
+                        .flashAttr("email", "ana.lima@escola.edu.br")
+                        .flashAttr("senha", "segredo-123")
+                        .param("senha", "segredo-456"))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        Document doc = Jsoup.parse(html);
+
+        assertThat(html).doesNotContain("segredo-123").doesNotContain("segredo-456");
+        assertThat(doc.selectFirst("input[data-testid=login-senha]").hasAttr("value")).isFalse();
+    }
+
+    @Test
+    void erroNaoRevelaSeOProblemaFoiOEmailOuASenha() throws Exception {
+        Document doc = pagina(get("/login?erro").flashAttr("email", "ana.lima@escola.edu.br"));
+
+        assertThat(doc.selectFirst("[data-testid=login-erro]").text())
+                .contains("E-mail ou senha incorretos")
+                .doesNotContainIgnoringCase("não existe")
+                .doesNotContainIgnoringCase("não encontrado")
+                .doesNotContainIgnoringCase("senha inválida");
+        assertThat(doc.select("[aria-invalid], .campo__erro")).isEmpty();
+    }
+
+    @Test
+    void sessaoExpiradaMostraAvisoAnunciadoEFocavel() throws Exception {
+        Document doc = pagina("/login?expirou");
+
+        var aviso = doc.selectFirst("[data-testid=login-sessao-expirada]");
+        assertThat(aviso).isNotNull();
+        assertThat(aviso.hasClass("alerta")).isTrue();
+        assertThat(aviso.hasClass("alerta--aviso")).isTrue();
+        assertThat(aviso.attr("role")).isEqualTo("alert");
+        assertThat(aviso.attr("tabindex")).isEqualTo("-1");
+        assertThat(aviso.text()).isEqualTo("Sua sessão expirou. Entre novamente.");
+        assertThat(doc.select("[data-testid=login-erro]")).isEmpty();
+    }
+
+    @Test
+    void semOParametroExpirouNaoMostraOAvisoDeSessao() throws Exception {
+        assertThat(pagina("/login").select("[data-testid=login-sessao-expirada]")).isEmpty();
+        assertThat(pagina("/login?erro").select("[data-testid=login-sessao-expirada]")).isEmpty();
+    }
+
+    @Test
+    void seVieremOsDoisAvisosSoOErroDeCredencialAparece() throws Exception {
+        Document doc = pagina("/login?erro&expirou");
+
+        assertThat(doc.select("[data-testid=login-erro]")).hasSize(1);
+        assertThat(doc.select("[data-testid=login-sessao-expirada]")).isEmpty();
+        assertThat(doc.select("main [role=alert]")).hasSize(1);
+    }
+
+    @Test
+    void sessaoExpiradaTambemMantemOEmailQuandoOBackEndPassa() throws Exception {
+        Document doc = pagina(get("/login?expirou").flashAttr("email", "ana.lima@escola.edu.br"));
+
+        assertThat(doc.selectFirst("input[data-testid=login-email]").val()).isEqualTo("ana.lima@escola.edu.br");
+    }
+
+    @Test
+    void destinoDeUmCaminhoDoSiteVaiNoFormularioComoCampoOculto() throws Exception {
+        Document doc = pagina("/login?expirou&destino=/reservas/minhas?pagina=2");
+
+        var campo = doc.selectFirst("form[data-testid=login-formulario] input[type=hidden][name=destino]");
+        assertThat(campo).isNotNull();
+        assertThat(campo.val()).isEqualTo("/reservas/minhas?pagina=2");
+        assertThat(campo.attr("data-testid")).isEqualTo("login-destino");
+    }
+
+    @Test
+    void destinoQueNaoECaminhoDoSiteNaoVaiNoFormulario() throws Exception {
+        for (String destino : new String[] {"https://evil.example/x", "//evil.example/x", "javascript:alert(1)",
+                "reservas/minhas", "/\\evil.example", ""}) {
+            Document doc = pagina(get("/login").param("destino", destino));
+
+            assertThat(doc.select("input[name=destino]")).as("destino=%s", destino).isEmpty();
+        }
+    }
+
+    @Test
+    void semDestinoNaoHaCampoOculto() throws Exception {
+        assertThat(pagina("/login").select("input[name=destino]")).isEmpty();
+    }
+
+    @Test
+    void destinoComHtmlPerigosoVoltaEscapado() throws Exception {
+        String perigoso = "/x\"><script>alert(1)</script>";
+
+        String html = mvc.perform(get("/login").param("destino", perigoso))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+
+        assertThat(html).doesNotContain("<script>alert(1)");
+        assertThat(Jsoup.parse(html).selectFirst("input[name=destino]").val()).isEqualTo(perigoso);
+    }
+
+    @Test
+    void oServidorRenderizaOBotaoNoEstadoNormalComORotuloDoEnvio() throws Exception {
+        Document doc = pagina("/login");
+
+        var botao = doc.selectFirst("button[data-testid=login-entrar]");
+        assertThat(botao.hasAttr("disabled")).isFalse();
+        assertThat(botao.hasAttr("aria-busy")).isFalse();
+        assertThat(botao.hasClass("botao--carregando")).isFalse();
+        assertThat(botao.select(".carregando")).isEmpty();
+        assertThat(botao.text()).isEqualTo("Entrar");
+        assertThat(botao.attr("data-enviando")).isEqualTo("Entrando…");
+    }
+
+    @Test
+    void scriptDaTelaMoveOFocoParaOAvisoDeSessaoExpirada() throws Exception {
+        Document doc = pagina("/login?expirou");
+
+        assertThat(doc.select("script[src]").eachAttr("src")).contains("/js/login.js");
+        assertThat(lerRecurso("static/js/login.js")).contains("login-sessao-expirada");
+    }
+
+    @Test
+    void scriptDesabilitaOBotaoNoEnvioSemImpedirOEnvio() throws Exception {
+        String js = lerRecurso("static/js/login.js");
+
+        assertThat(js).contains("addEventListener('submit'");
+        assertThat(js).contains("aria-busy");
+        assertThat(js).contains("botao--carregando");
+        // o envio nunca pode ser cancelado por esta tela; sem JavaScript o formulário continua funcionando
+        assertThat(js).doesNotContain("preventDefault");
     }
 }
