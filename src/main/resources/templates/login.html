@@ -4,7 +4,7 @@
     falhou   : true quando veio /login?erro (credenciais inválidas)
     expirou  : true quando veio /login?expirou (sessão expirada); o aviso de credencial prevalece sobre ele
     email    : e-mail digitado, devolvido pelo back-end depois de uma falha (a senha nunca volta)
-    destino  : para onde voltar depois de entrar; só é repassado no POST se for caminho deste site
+    destino  : para onde voltar depois de entrar; o controller só passa o valor se for caminho deste site (CaminhoDoSite)
 */-->
 <html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"
       th:replace="~{layout :: pagina(titulo='Entrar', conteudo=~{::#conteudo-pagina})}">
@@ -26,9 +26,9 @@
         </p>
 
         <form class="formulario" method="post" th:action="@{/login}" data-testid="login-formulario">
-            <!--/* mesma regra de fragments/erro.html: só caminho deste site (começa com "/", não com "//" nem "/\") */-->
+            <!--/* o controller só passa destino já validado (CaminhoDoSite); o back-end revalida no POST */-->
             <input type="hidden" name="destino" th:value="${destino}" data-testid="login-destino"
-                   th:if="${destino != null and #strings.startsWith(destino, '/') and !#strings.startsWith(destino, '//') and !#strings.startsWith(destino, '/\')}">
+                   th:if="${destino != null}">
             <div class="campo">
                 <label class="campo__rotulo" for="email">E-mail</label>
                 <input class="campo__entrada" id="email" name="email" type="email" data-testid="login-email"
