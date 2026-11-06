@@ -343,6 +343,21 @@ class RecursoFormTest {
     }
 
     @Test
+    void oFormularioQueSalvaEnviaUmaVezSoMasOAtualizarCamposContinuaLivre() throws Exception {
+        for (String caminho : new String[] {"/teste/recurso-form/sala", "/teste/recurso-form/edicao-sala"}) {
+            assertThat(pagina(caminho).selectFirst("form[data-testid=recurso-form]").hasAttr("data-envio-unico")).as(caminho).isTrue();
+        }
+    }
+
+    @Test
+    void aExplicacaoDoRestritoUsaOBadgeComumDoEstadoSolicitada() throws Exception {
+        var badge = pagina("/teste/recurso-form/sala").selectFirst("#recurso-form-restrito-ajuda .estado");
+
+        assertThat(badge.text()).isEqualTo("Solicitada");
+        assertThat(badge.hasClass("estado--solicitada")).isTrue();
+    }
+
+    @Test
     void edicaoNaoMudaOTipoEVemPreenchida() throws Exception {
         Document doc = pagina("/teste/recurso-form/edicao-sala");
 

@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.GetMapping;
  * Tela 15 do inventário (docs/frontend/telas.md): bloqueio por manutenção, prefixo {@code manutencao-},
  * RF-08 e RN-04. O back-end preenche {@code recurso} (id, nome, tipo, local, emManutencao), {@code bloqueio}
  * (recursoId, inicio, fim, motivo), e, depois de um POST recusado, {@code erros} (campo para mensagem) ou
- * {@code afetadas} (reservas que caem no período: data, horario, solicitante, estado, estadoClasse).
+ * {@code afetadas} (reservas que caem no período: data, horario, solicitante, estado com o nome por extenso).
  */
 @WebMvcTest(ManutencaoPaginaTest.PaginasDeTeste.class)
 @Import(ManutencaoPaginaTest.PaginasDeTeste.class)
@@ -57,8 +57,8 @@ class ManutencaoPaginaTest {
             return "manutencao";
         }
 
-        private static Map<String, Object> reserva(LocalDate data, String horario, String solicitante, String estado, String classe) {
-            return Map.of("data", data, "horario", horario, "solicitante", solicitante, "estado", estado, "estadoClasse", classe);
+        private static Map<String, Object> reserva(LocalDate data, String horario, String solicitante, String estado) {
+            return Map.of("data", data, "horario", horario, "solicitante", solicitante, "estado", estado);
         }
 
         @GetMapping("/teste/manutencao/novo")
@@ -103,8 +103,8 @@ class ManutencaoPaginaTest {
         @GetMapping("/teste/manutencao/afetadas")
         String afetadas(Model model) {
             model.addAttribute("afetadas", List.of(
-                    reserva(LocalDate.of(2026, 11, 12), "14:00 às 16:00", "Beatriz Nogueira", "Aprovada", "aprovada"),
-                    reserva(LocalDate.of(2026, 11, 18), "09:00 às 11:00", "Rafael Costa", "Solicitada", "solicitada")));
+                    reserva(LocalDate.of(2026, 11, 12), "14:00 às 16:00", "Beatriz Nogueira", "Aprovada"),
+                    reserva(LocalDate.of(2026, 11, 18), "09:00 às 11:00", "Rafael Costa", "Solicitada")));
             return base(model, auditorio(false),
                     bloqueio(LocalDateTime.of(2026, 11, 10, 8, 0), LocalDateTime.of(2026, 11, 20, 18, 0)));
         }
@@ -118,7 +118,16 @@ class ManutencaoPaginaTest {
         @GetMapping("/teste/manutencao/afetada-uma")
         String afetadaUma(Model model) {
             model.addAttribute("afetadas", List.of(
-                    reserva(LocalDate.of(2026, 11, 12), "14:00 às 16:00", "Beatriz Nogueira", "Em uso", "em-uso")));
+                    reserva(LocalDate.of(2026, 11, 12), "14:00 às 16:00", "Beatriz Nogueira", "Em uso")));
+            return base(model, auditorio(false),
+                    bloqueio(LocalDateTime.of(2026, 11, 10, 8, 0), LocalDateTime.of(2026, 11, 20, 18, 0)));
+        }
+
+        @GetMapping("/teste/manutencao/afetada-desconhecida")
+        String afetadaDesconhecida(Model model) {
+            model.addAttribute("afetadas", List.of(
+                    reserva(LocalDate.of(2026, 11, 12), "14:00 às 16:00", "Beatriz Nogueira", "Em análise"),
+                    reserva(LocalDate.of(2026, 11, 13), "08:00 às 09:00", "Rafael Costa", "Não compareceu")));
             return base(model, auditorio(false),
                     bloqueio(LocalDateTime.of(2026, 11, 10, 8, 0), LocalDateTime.of(2026, 11, 20, 18, 0)));
         }
@@ -137,7 +146,7 @@ class ManutencaoPaginaTest {
             recurso.put("local", "<i>Bloco</i>");
             model.addAttribute("erros", Map.of("motivo", "<b>erro</b>"));
             model.addAttribute("afetadas", List.of(
-                    reserva(LocalDate.of(2026, 11, 12), "14:00 às 16:00", "<u>Fulano</u>", "Aprovada", "aprovada")));
+                    reserva(LocalDate.of(2026, 11, 12), "14:00 às 16:00", "<u>Fulano</u>", "Aprovada")));
             return base(model, recurso, new FormularioBloqueio("3", null, null, "</textarea><b>x</b>"));
         }
     }
@@ -306,6 +315,27 @@ class ManutencaoPaginaTest {
         assertThat(itens.get(1).selectFirst("span").text()).isEqualTo("18/11/2026, 09:00 às 11:00, Rafael Costa");
         assertThat(itens.get(1).selectFirst(".estado").text()).isEqualTo("Solicitada");
         assertThat(itens.get(1).selectFirst(".estado").hasClass("estado--solicitada")).isTrue();
+    }
+
+    @Test
+    void oBadgeDoEstadoVemDoFragmentoComumEDeixaSoOTextoQuandoOEstadoENovo() throws Exception {
+        Document doc = pagina("/teste/manutencao/afetada-desconhecida");
+
+        var novo = doc.selectFirst("[data-testid=manutencao-afetada-1] .estado");
+        assertThat(novo.text()).isEqualTo("Em análise");
+        assertThat(novo.classNames()).containsExactly("estado");
+        var naoCompareceu = doc.selectFirst("[data-testid=manutencao-afetada-2] .estado");
+        assertThat(naoCompareceu.hasClass("estado--nao-compareceu")).isTrue();
+        assertThat(doc.select("[data-testid=manutencao-afetada-estado]")).hasSize(2);
+    }
+
+    @Test
+    void oFormularioEnviaUmaVezSoInclusiveAoConfirmarOBloqueio() throws Exception {
+        assertThat(pagina("/teste/manutencao/novo").getElementById("manutencao-form").hasAttr("data-envio-unico")).isTrue();
+        Document afetadas = pagina("/teste/manutencao/afetadas");
+        var form = afetadas.getElementById("manutencao-form");
+        assertThat(form.hasAttr("data-envio-unico")).isTrue();
+        assertThat(afetadas.selectFirst("button[data-testid=manutencao-confirmar]").attr("form")).isEqualTo(form.id());
     }
 
     @Test
