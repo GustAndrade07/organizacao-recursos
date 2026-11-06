@@ -6,6 +6,9 @@ spring:
     url: ${DB_URL:jdbc:postgresql://localhost:5432/recursos}
     username: ${DB_USER:recursos}
     password: ${DB_PASSWORD:recursos_dev}
+  web:
+    locale: pt-BR            # nomes de dia e datas em português, qualquer que seja o navegador
+    locale-resolver: fixed
   jpa:
     open-in-view: false
     hibernate:
