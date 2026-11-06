@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="pt-BR" class="js">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Erro 403 · 375</title>
+<link rel="stylesheet" href="../../../../src/main/resources/static/css/tokens.css">
+<link rel="stylesheet" href="../../../../src/main/resources/static/css/app.css">
+<link rel="stylesheet" href="secao01.css">
+</head>
+<body>
+<a class="pular-conteudo" href="#conteudo" data-testid="menu-pular">Pular para o conteúdo</a>
+<header class="barra" data-aberto="false" data-menu>
+<div class="barra__linha">
+<a class="barra__marca" href="#" data-testid="menu-marca">Organização de Recursos</a>
+<button type="button" class="menu__botao" data-testid="menu-abrir" aria-label="Abrir menu" aria-expanded="false" aria-controls="menu-painel"><span class="menu__barra"></span><span class="menu__barra"></span><span class="menu__barra"></span></button>
+<nav class="menu__painel" id="menu-painel" aria-label="Principal">
+<ul class="menu__lista">
+<li><a class="menu__item" href="#" data-testid="menu-item-buscar">Buscar recursos</a></li>
+<li><a class="menu__item" href="#" data-testid="menu-item-minhas">Minhas reservas</a></li>
+</ul>
+<div class="menu__rodape">
+<p class="menu__usuario"><span class="menu__nome" data-testid="menu-usuario">Ana Lima</span><span class="menu__perfil" data-testid="menu-perfil">Solicitante</span></p>
+<form action="#" method="post"><button type="submit" class="botao botao--secundario" data-testid="menu-sair">Sair</button></form>
+</div>
+</nav>
+</div>
+</header>
+<main class="conteudo" id="conteudo" tabindex="-1">
+<section class="erro">
+<p class="erro__codigo erro__codigo--aviso" data-testid="erro-codigo">Erro 403</p>
+<div class="erro__texto">
+<h1 class="erro__titulo" data-testid="erro-titulo">Você não tem permissão para acessar esta página</h1>
+<p class="erro__mensagem" data-testid="erro-mensagem">Seu perfil não permite esta ação. Se você precisa deste acesso, fale com o administrador.</p>
+</div>
+<div class="erro__acoes">
+<a class="botao botao--primario botao--bloco" href="#" data-testid="erro-acao-principal">Voltar ao início</a>
+</div>
+</section>
+</main>
+<script src="../../../../src/main/resources/static/js/menu.js" defer></script>
+</body>
+</html>
