@@ -12,6 +12,8 @@ import java.util.Map;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
@@ -19,6 +21,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * Estados da tela 6 (nova reserva): o back-end preenche {@code recurso} (nome, local, restrito) e, depois
@@ -83,9 +86,37 @@ class NovaReservaEstadosTest {
             return "reserva-nova";
         }
 
+
+        @GetMapping("/teste/reserva/erro-campo")
+        String erroDeCampo(@RequestParam String campo, Model model) {
+            base(model, false, "Sala 203");
+            model.addAttribute("erros", Map.of(campo, "Valor inválido"));
+            return "reserva-nova";
+        }
+
+        @GetMapping("/teste/reserva/erro-desconhecido")
+        String erroDesconhecido(Model model) {
+            base(model, false, "Sala 203");
+            model.addAttribute("erros", Map.of("recursoId", "Recurso indisponível"));
+            return "reserva-nova";
+        }
+
+        @GetMapping("/teste/reserva/manutencao-sem-recurso")
+        String manutencaoSemRecurso(Model model) {
+            model.addAttribute("reserva", new FormularioReserva("9", LocalDate.of(2026, 11, 12),
+                    LocalTime.of(14, 0), LocalTime.of(15, 30)));
+            model.addAttribute("manutencao", Map.of(
+                    "inicio", LocalDateTime.of(2026, 11, 12, 8, 0),
+                    "fim", LocalDateTime.of(2026, 11, 14, 18, 0)));
+            return "reserva-nova";
+        }
+
         @GetMapping("/teste/reserva/perigoso")
         String perigoso(Model model) {
-            base(model, false, "<script>alert(1)</script>");
+            model.addAttribute("reserva", new FormularioReserva("9", LocalDate.of(2026, 11, 12),
+                    LocalTime.of(14, 0), LocalTime.of(15, 30)));
+            model.addAttribute("recurso", Map.of("nome", "<script>alert(1)</script>", "local", "<i>Bloco</i>", "restrito", false));
+            model.addAttribute("erros", Map.of("termino", "<b>negrito</b>"));
             return "reserva-nova";
         }
     }
@@ -108,7 +139,8 @@ class NovaReservaEstadosTest {
         assertThat(doc.selectFirst("[data-testid=reserva-form-local]").text()).isEqualTo("Bloco C, térreo");
         var trocar = doc.selectFirst("a[data-testid=reserva-form-trocar]");
         assertThat(trocar.text()).isEqualTo("Trocar recurso");
-        assertThat(trocar.attr("href")).startsWith("/recursos/disponiveis?");
+        assertThat(trocar.attr("href")).startsWith("/recursos/disponiveis?")
+                .contains("data=2026-11-12").contains("inicio=14:00").contains("termino=15:30").doesNotContain("editar");
     }
 
     @Test
@@ -135,7 +167,7 @@ class NovaReservaEstadosTest {
         assertThat(resumo.selectFirst(".alerta__titulo").text()).isEqualTo("Corrija 1 campo para continuar");
         var link = resumo.selectFirst("li a");
         assertThat(link.attr("href")).isEqualTo("#reserva-form-termino");
-        assertThat(link.text()).isEqualTo("Hora de término: O término precisa ser depois do início");
+        assertThat(link.text()).isEqualTo("Hora de término: o término precisa ser depois do início");
 
         var campo = doc.selectFirst("input[data-testid=reserva-form-termino]");
         assertThat(campo.attr("aria-invalid")).isEqualTo("true");
@@ -198,5 +230,77 @@ class NovaReservaEstadosTest {
 
         assertThat(doc.select("script:containsData(alert)")).isEmpty();
         assertThat(doc.selectFirst("[data-testid=reserva-form-recurso]").text()).isEqualTo("<script>alert(1)</script>");
+    }
+
+    @Test
+    void avisoDeRestricaoVemDentroDoFormularioDepoisDoRecursoEAntesDeConfirmar() throws Exception {
+        Document doc = pagina("/teste/reserva/restrito");
+
+        assertThat(doc.select("form[data-testid=reserva-form] [data-testid=reserva-form-aviso-restrito]")).hasSize(1);
+        var ordem = doc.select("[data-testid]").eachAttr("data-testid");
+        assertThat(ordem.indexOf("reserva-form-aviso-restrito"))
+                .isGreaterThan(ordem.indexOf("reserva-form-recurso"))
+                .isLessThan(ordem.indexOf("reserva-form-confirmar"));
+    }
+
+    @ParameterizedTest
+    @CsvSource({"data,Data", "inicio,Hora de início", "termino,Hora de término"})
+    void cadaCampoComErroTemMensagemJuntoAoCampoELinkNoResumo(String campo, String rotulo) throws Exception {
+        Document doc = pagina("/teste/reserva/erro-campo?campo=" + campo);
+
+        var entrada = doc.selectFirst("input[data-testid=reserva-form-" + campo + "]");
+        assertThat(entrada.attr("aria-invalid")).isEqualTo("true");
+        assertThat(entrada.attr("aria-describedby")).isEqualTo("reserva-form-erro-" + campo);
+        assertThat(entrada.hasClass("campo__entrada--erro")).isTrue();
+        var mensagem = doc.selectFirst("#reserva-form-erro-" + campo);
+        assertThat(mensagem.hasAttr("hidden")).isFalse();
+        assertThat(mensagem.text()).isEqualTo("Valor inválido");
+        var link = doc.selectFirst("[data-testid=reserva-form-erro-resumo] li a");
+        assertThat(link.attr("href")).isEqualTo("#reserva-form-" + campo);
+        assertThat(link.text()).isEqualTo(rotulo + ": valor inválido");
+    }
+
+    @Test
+    void resumoMantemAOrdemDosErrosRecebidos() throws Exception {
+        Document doc = pagina("/teste/reserva/dois-erros");
+
+        assertThat(doc.select("[data-testid=reserva-form-erro-resumo] li a").eachText())
+                .containsExactly("Data: informe a data", "Hora de término: o término precisa ser depois do início");
+    }
+
+    @Test
+    void chaveDeErroDesconhecidaNaoViraRotuloDeCampoNemLinkMorto() throws Exception {
+        Document doc = pagina("/teste/reserva/erro-desconhecido");
+
+        var item = doc.selectFirst("[data-testid=reserva-form-erro-resumo] li");
+        assertThat(item.text()).isEqualTo("Recurso indisponível");
+        assertThat(item.select("a")).isEmpty();
+    }
+
+    @Test
+    void manutencaoSemRecursoNoModeloNaoImprimeNull() throws Exception {
+        Document doc = pagina("/teste/reserva/manutencao-sem-recurso");
+
+        var texto = doc.selectFirst("[data-testid=reserva-form-erro-manutencao] .alerta__texto").text();
+        assertThat(texto).doesNotContain("null")
+                .contains("12/11/2026, 08:00").contains("14/11/2026, 18:00");
+    }
+
+    @Test
+    void trocarVoltarEOsLinksDosAvisosMantemOHorarioEscolhido() throws Exception {
+        Document conflito = pagina("/teste/reserva/conflito");
+
+        var voltar = conflito.selectFirst("a[data-testid=reserva-form-voltar]").attr("href");
+        assertThat(conflito.selectFirst("a[data-testid=reserva-form-erro-voltar]").attr("href")).isEqualTo(voltar);
+        assertThat(voltar).contains("data=2026-11-12").contains("inicio=14:00").contains("termino=15:30").contains("editar");
+    }
+
+    @Test
+    void htmlNoLocalEnasMensagensDeErroTambemEhEscapado() throws Exception {
+        Document doc = pagina("/teste/reserva/perigoso");
+
+        assertThat(doc.select("[data-testid=reserva-form-local] i, [data-testid=reserva-form-erro-resumo] b, #reserva-form-erro-termino b")).isEmpty();
+        assertThat(doc.selectFirst("[data-testid=reserva-form-local]").text()).isEqualTo("<i>Bloco</i>");
+        assertThat(doc.selectFirst("#reserva-form-erro-termino").text()).isEqualTo("<b>negrito</b>");
     }
 }
