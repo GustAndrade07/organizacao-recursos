@@ -155,10 +155,13 @@ O back-end pode usar DTO próprio no lugar de `FormularioRecurso`, `FormularioBl
 | `recurso` | `id`, `nome`, `tipo` (**texto** pronto, ex. "Sala, 120 lugares"), `local`, `emManutencao` | Sem o resumo do recurso |
 | `bloqueio` | `recursoId`, `inicio` e `fim` (`LocalDateTime`), `motivo`; o controller preenche com a URL e o back-end devolve o que foi enviado | — |
 | `erros` | mapa de `inicio`, `fim` ou `motivo` para texto pronto | Sem erros |
-| `afetadas` | lista de `data` (`LocalDate`), `horario` (texto, ex. "14:00 às 16:00"), `solicitante`, `estado` (nome escrito, ex. "Em uso") e `estadoClasse` (sufixo da classe `estado--*`, ex. "em-uso") das reservas que caem no período | Sem aviso (lista vazia também) |
+| `afetadas` | lista de `data` (`LocalDate`), `horario` (texto, ex. "14:00 às 16:00"), `solicitante`, `estado` (só o nome por extenso, ex. "Em uso"; o badge vem do fragmento comum, ver "Estado da reserva (RN-05)") das reservas que caem no período | Sem aviso (lista vazia também) |
 
 - O back-end só preenche `afetadas` ao responder o `POST`. Com ela, a tela mostra o aviso `role="alert"` "N reservas caem no período do bloqueio", com data, solicitante e estado, e as ações "Confirmar bloqueio" (reenvia o formulário com `confirmar=true`) e "Voltar e ajustar o período" (link para o `GET` com os valores digitados). Nesse estado início, fim e motivo ficam **somente leitura** (`readonly`, fundo cinza) e "Confirmar bloqueio" é o primeiro botão de envio (a tecla Enter confirma o que o aviso mostrou); mudar o período só é possível por "Voltar e ajustar o período". Mesmo assim o back-end deve **recalcular as afetadas no `POST` com `confirmar=true`** e recusar (voltando ao aviso) se o período for outro que o do aviso. O que acontece com essas reservas (cancelar, manter ou notificar) é decisão pendente: a tela só lista.
 - Fim igual ou anterior ao início é barrado antes do envio por `manutencao-form.js` e também pode vir em `erros`, com "O fim do bloqueio precisa ser depois do início." junto do campo (`role="alert"`). O script só apaga o erro que ele mesmo mostrou. Sem JavaScript o back-end valida.
+
+- Os formulários que gravam (cadastro, edição e bloqueio, inclusive "Confirmar bloqueio", que é um botão ligado ao formulário por `form=`) têm `data-envio-unico` (ver "Envio único de formulário"); o `name`/`value` do botão (`confirmar=true`) segue no `POST`, que sai uma vez só no clique duplo. O "Atualizar campos" é `GET` e não precisa.
+- `.situacao` (Ativo, Em manutenção) divide a base de estilo do `.estado` e só acrescenta borda e cores.
 
 **Testes e JavaScript.** Os testes de contrato só conferem que cada tela carrega o seu script; o comportamento dos scripts (`recurso-form.js`, `manutencao-form.js`) fica para o E2E Playwright em 375 px (RF-13).
 

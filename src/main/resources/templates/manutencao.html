@@ -5,7 +5,7 @@
     tipo     : TipoRecurso da aba da lista a que a tela volta                  (o controller preenche com ?tipo=)
     bloqueio : recursoId, inicio, fim (LocalDateTime), motivo            (o controller preenche com a URL)
     erros    : mapa campo (inicio, fim, motivo) para mensagem            (back-end, após POST recusado)
-    afetadas : lista de data (LocalDate), horario, solicitante, estado, estadoClasse
+    afetadas : lista de data (LocalDate), horario, solicitante, estado (nome por extenso, ex. "Em uso")
                das reservas que caem no período                          (back-end, após POST; opcional)
 */-->
 <html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"
@@ -42,7 +42,7 @@
             <ul class="reservas-afetadas" data-testid="manutencao-afetadas-lista">
                 <li th:each="reserva, n : ${afetadas}" th:attr="data-testid='manutencao-afetada-' + ${n.count}">
                     <span th:text="${#temporals.format(reserva.data, 'dd/MM/yyyy')} + ', ' + ${reserva.horario} + ', ' + ${reserva.solicitante}">12/11/2026, 14:00 às 16:00, Beatriz Nogueira</span>
-                    <span class="estado" th:classappend="'estado--' + ${reserva.estadoClasse}" th:text="${reserva.estado}">Aprovada</span>
+                    <span th:replace="~{fragments/estado :: badge(${reserva.estado}, 'manutencao-afetada-estado')}">Aprovada</span>
                 </li>
             </ul>
             <div class="alerta__acoes">
@@ -53,7 +53,7 @@
             </div>
         </div>
 
-        <form class="cartao formulario" id="manutencao-form" method="post" novalidate data-testid="manutencao-form"
+        <form class="cartao formulario" id="manutencao-form" method="post" novalidate data-envio-unico data-testid="manutencao-form"
               th:action="@{/admin/recursos/{id}/manutencao(id=${bloqueio.recursoId})}">
             <div class="grade-campos">
                 <div th:replace="~{fragments/campo :: campo('manutencao', 'inicio', 'Início do bloqueio', 'datetime-local', ${bloqueio.inicio}, ${erros?.get('inicio')}, null, false, ${comAfetadas})}"></div>

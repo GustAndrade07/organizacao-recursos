@@ -738,8 +738,9 @@ a {
   color: var(--color-text-warning);
 }
 
-/* Estado da reserva (RN-05): o nome sempre aparece escrito, além da cor */
-.estado {
+/* Estado da reserva (RN-05) e situação do recurso: o nome sempre aparece escrito, além da cor */
+.estado,
+.situacao {
   display: inline-flex;
   align-items: center;
   padding: var(--space-1) var(--space-3);
@@ -933,15 +934,9 @@ a {
   gap: var(--space-3);
 }
 
-/* Situação do recurso: o nome sempre escrito, além da cor */
+/* Situação do recurso: a base é a do .estado; aqui ficam a borda e as cores */
 .situacao {
-  display: inline-flex;
-  align-items: center;
-  padding: var(--space-1) var(--space-3);
   border: var(--border-width-default) solid;
-  border-radius: var(--radius-full);
-  font: var(--font-label-small);
-  white-space: nowrap;
 }
 
 .situacao--ativo {

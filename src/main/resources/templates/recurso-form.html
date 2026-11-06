@@ -36,7 +36,7 @@
             </ul>
         </div>
 
-        <form class="cartao formulario" method="post" novalidate data-testid="recurso-form"
+        <form class="cartao formulario" method="post" novalidate data-envio-unico data-testid="recurso-form"
               th:action="${edicao} ? @{/admin/recursos/{id}(id=${recurso.id})} : @{/admin/recursos}">
             <!-- Enter no teclado aciona o primeiro botão de envio: este, invisível, garante que seja o de salvar -->
             <button type="submit" class="so-leitor" tabindex="-1" aria-hidden="true" th:unless="${edicao}">Salvar recurso</button>
@@ -81,7 +81,7 @@
                        aria-describedby="recurso-form-restrito-ajuda" data-testid="recurso-form-restrito">
                 <div class="opcao__texto">
                     <label class="opcao__rotulo" for="recurso-form-restrito">Recurso restrito (exige aprovação)</label>
-                    <p class="campo__ajuda" id="recurso-form-restrito-ajuda">Quem reservar este recurso fica com a reserva <span class="estado estado--solicitada">Solicitada</span> até um Responsável aprovar.</p>
+                    <p class="campo__ajuda" id="recurso-form-restrito-ajuda">Quem reservar este recurso fica com a reserva <span th:replace="~{fragments/estado :: badge('Solicitada', null)}">Solicitada</span> até um Responsável aprovar.</p>
                 </div>
             </div>
 
