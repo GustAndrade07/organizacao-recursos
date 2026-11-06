@@ -4,13 +4,13 @@ Esta pasta guarda os desenhos das telas 13, 14 e 15 do [inventário](../../telas
 
 ## Como abrir
 
-Abra `index.html` a partir de uma cópia do repositório: ele mostra cada tela em 375 e 1280 lado a lado. Os caminhos dos CSS e do `menu.js` são relativos à raiz do repositório, então a pasta precisa continuar em `docs/frontend/pranchas/secao-05/`. Cada quadro também abre sozinho, por exemplo `FormErros-375.html`. A lista em 375 px está em `Main.html` (o nome é histórico); os outros quadros têm o sufixo `-375` ou `-1280`.
+Abra `index.html` a partir de uma cópia do repositório: ele mostra cada tela em 375 e 1280 lado a lado. Os caminhos dos CSS e do `menu.js` são relativos à raiz do repositório, então a pasta precisa continuar em `docs/frontend/pranchas/secao-05/`. Cada quadro também abre sozinho, por exemplo `FormErros-375.html`. Todos os quadros têm o sufixo `-375` ou `-1280`.
 
 ## Quadros, telas e requisitos
 
 | Quadro | Tela | Requisito | O que mostra |
 |---|---|---|---|
-| `Main.html` (375) e `Lista-1280.html` | 13 · Lista de recursos | RF-02 | Abas Salas, Materiais e Professores, busca por nome, situação Ativo ou Em manutenção mais a etiqueta Restrito, botões Editar e Manutenção |
+| `Lista-375.html` e `Lista-1280.html` | 13 · Lista de recursos | RF-02 | Abas Salas, Materiais e Professores, busca por nome, situação Ativo ou Em manutenção mais a etiqueta Restrito, botões Editar e Manutenção |
 | `ListaSalvo-*` | 13 · Lista de recursos | RF-02 | Aviso de confirmação depois de salvar o recurso (`role="status"`) |
 | `ListaBloqueado-*` | 13 · Lista de recursos | RF-08 | Aviso de confirmação depois de bloquear o recurso (`role="status"`) |
 | `ListaProfessores-*` | 13 · Lista de recursos | RF-02 | Aba Professores, sem situação restrita nem em manutenção e sem o botão Manutenção |
