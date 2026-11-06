@@ -139,7 +139,13 @@ Acessibilidade: rótulos visíveis, `autocomplete="username"` e `"current-passwo
 
 Os dois diálogos são `<dialog>` que o servidor entrega com o atributo `open`, e `dialogo.js` (só carregado quando há diálogo) troca `open` por `showModal()`: fundo escurecido, foco preso, Esc fecha e o endereço volta ao da lista. Sem JavaScript o `<dialog open>` fica não modal, aparece fixo sobre a lista sem o fundo escurecido e vem depois da tabela na ordem de tabulação (quem navega por teclado precisa passar pela lista para chegar a ele); "Voltar" é um link para a lista. Com JavaScript, ao fechar com Esc o foco volta ao link que abriu o diálogo (`data-origem` guarda o `data-testid` dele) e o endereço volta ao da lista. O foco inicial é o campo do motivo na rejeição e o botão "Voltar" na confirmação de não compareceu.
 
-O nome do estado vem por extenso e a classe `estado--*` do badge sai dele (fragmento `fragments/estado.html`, que também traz o aviso de confirmação); um nome fora dos sete estados aparece escrito, mas sem cor.
+O badge do estado vem de `fragments/estado.html :: badge` (ver "Estado da reserva (RN-05)" abaixo: nome desconhecido aparece escrito, com cor neutra; estado nulo não aparece). O aviso de confirmação é o fragmento `fragments/confirmacao.html`, usado pelas duas telas.
+
+**As decisões de ação comparam o nome EXATO e diferenciam maiúsculas.** A tela 10 só oferece "Registrar retirada" se `estado` for exatamente `Aprovada` e "Registrar devolução" se for exatamente `Em uso`; a tela 9 só abre o diálogo de rejeição para `Solicitada`, e a tela 10 só abre o de não compareceu para `Aprovada`. Qualquer outro texto (`aprovada`, `EM USO`, `Em análise`, nulo) mostra "Sem ação disponível" e nenhum botão, mesmo que o badge consiga colori-lo.
+
+**`confirmacao` tem duas formas no projeto:** `{titulo, reserva, estado}` nas telas 9 e 10 (o aviso monta "{reserva}, agora está {estado}. A mudança ficou registrada.") e `{titulo, texto}` na tela de recursos (seção 05), que não tem estado de reserva. Não misture os dois: cada tela documenta a sua.
+
+Todo formulário que envia uma ação (aprovar, rejeitar, retirar, devolver, confirmar não compareceu) tem `data-envio-unico` e um botão de envio, então `envio-unico.js` (carregado pelo layout) desabilita o botão no primeiro envio e a ação não sai duas vezes; ver "Envio único de formulário" abaixo. O formulário do filtro (GET) não precisa. O diálogo reaproveita `cartao__titulo`, `pagina__descricao` e `formulario__acoes`, e o "(você)" usa `tabela__nota`.
 
 Risco aberto: `dialogo.js` não tem teste automatizado (o teste de servidor só confere o HTML). O comportamento com JavaScript (modal, foco, Esc, endereço) foi conferido à mão no Chromium e depende do E2E Playwright em 375 px (RF-13) para ficar coberto.
 
