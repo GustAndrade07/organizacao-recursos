@@ -444,6 +444,12 @@ a {
   color: var(--color-text-secondary);
 }
 
+.pagina__descricao a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--size-control-md);
+}
+
 .campo__ajuda {
   margin: 0;
   color: var(--color-text-secondary);
@@ -744,6 +750,8 @@ a {
   align-items: center;
   padding: var(--space-1) var(--space-3);
   border-radius: var(--radius-full);
+  background: var(--color-bg-subtle);
+  color: var(--color-text-secondary);
   font: var(--font-label-small);
   white-space: nowrap;
 }
