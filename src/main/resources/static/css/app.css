@@ -1000,3 +1000,17 @@ a {
     text-align: right;
   }
 }
+
+/* Login (tela 1): botão Entrar em envio. .botao:disabled e .alerta--aviso já existem acima. */
+.botao--carregando {
+  gap: var(--space-2);
+}
+
+.carregando {
+  display: inline-block;
+  width: var(--size-icon);
+  height: var(--size-icon);
+  border: var(--border-width-focus) solid var(--color-text-secondary);
+  border-top-color: transparent;
+  border-radius: var(--radius-full);
+}

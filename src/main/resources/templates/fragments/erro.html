@@ -2,8 +2,8 @@
 <!--/*
   Corpo das páginas de erro (tela 3 do inventário, prefixo data-testid "erro-").
   tom: aviso | info | perigo. acao2Rotulo/acao2Href podem ser null (só uma ação).
-  O destino da ação principal só é aceito se for um caminho deste site (começa com "/", mas não com "//");
-  qualquer outra coisa vira o início.
+  O destino da ação principal só é aceito se for um caminho deste site (regra única em CaminhoDoSite, exposta como ${caminhoDoSite}:
+  "/<TAB>/x", "/\x", "//x", "%2f" etc. são recusados); qualquer outra coisa vira o início.
 */-->
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
@@ -16,7 +16,7 @@
     </div>
     <div class="erro__acoes">
         <a class="botao botao--primario botao--bloco" data-testid="erro-acao-principal"
-           th:href="${acaoHref != null and #strings.startsWith(acaoHref, '/') and !#strings.startsWith(acaoHref, '//')} ? ${acaoHref} : @{/}"
+           th:href="${caminhoDoSite.valido(acaoHref)} ? ${acaoHref} : @{/}"
            th:text="${acaoRotulo}">Voltar ao início</a>
         <a class="botao botao--secundario botao--bloco" data-testid="erro-acao-secundaria" th:if="${acao2Rotulo != null}"
            th:href="${acao2Href}" th:text="${acao2Rotulo}">Voltar ao início</a>
