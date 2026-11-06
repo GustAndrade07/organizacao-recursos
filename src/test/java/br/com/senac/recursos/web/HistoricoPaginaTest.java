@@ -29,8 +29,8 @@ import org.springframework.web.bind.annotation.RequestParam;
  * {@code eventos} (instante, de, para, usuario, motivo), do mais antigo ao mais recente. A tela é somente
  * leitura. O 403 do Solicitante (RN-11) é a página de erro 403 que o back-end devolve; não há tela própria.
  */
-@WebMvcTest({HistoricoController.class, HistoricoPaginaTest.PaginasDeTeste.class})
-@Import(HistoricoPaginaTest.PaginasDeTeste.class)
+@WebMvcTest(HistoricoPaginaTest.PaginasDeTeste.class)
+@Import({HistoricoController.class, HistoricoPaginaTest.PaginasDeTeste.class})
 class HistoricoPaginaTest {
 
     @Controller
@@ -81,12 +81,40 @@ class HistoricoPaginaTest {
             return "historico";
         }
 
+        @GetMapping("/teste/historico/fora-de-ordem")
+        String foraDeOrdem(Model model) {
+            model.addAttribute("reserva", reserva("Sala 203", "Aprovada"));
+            model.addAttribute("eventos", List.of(
+                    evento(LocalDateTime.of(2026, 11, 12, 14, 5), "Aprovada", "Em uso", "Carlos Souza", null),
+                    evento(LocalDateTime.of(2026, 11, 6, 9, 12), null, "Solicitada", "Ana Lima", null),
+                    evento(LocalDateTime.of(2026, 11, 6, 11, 40), "Solicitada", "Aprovada", "Carlos Souza", null)));
+            return "historico";
+        }
+
+        @GetMapping("/teste/historico/sem-eventos")
+        String semEventos(Model model) {
+            model.addAttribute("reserva", reserva("Sala 203", "Solicitada"));
+            model.addAttribute("eventos", List.of());
+            return "historico";
+        }
+
+        @GetMapping("/teste/historico/estado-nulo")
+        String estadoNulo(Model model) {
+            Map<String, Object> reserva = new HashMap<>(reserva("Sala 203", "x"));
+            reserva.put("estado", null);
+            model.addAttribute("reserva", reserva);
+            model.addAttribute("eventos", List.of(
+                    evento(LocalDateTime.of(2026, 11, 6, 9, 12), null, "Solicitada", "Ana Lima", null),
+                    evento(LocalDateTime.of(2026, 11, 6, 11, 40), "Solicitada", null, "Carlos Souza", null)));
+            return "historico";
+        }
+
         @GetMapping("/teste/historico/voltar")
         String comVoltar(Model model) {
             model.addAttribute("reserva", reserva("Sala 203", "Aprovada"));
             model.addAttribute("eventos", List.of(
                     evento(LocalDateTime.of(2026, 11, 6, 9, 12), null, "Solicitada", "Ana Lima", null)));
-            model.addAttribute("voltar", "/emprestimos");
+            model.addAttribute("voltar", "/retirada-devolucao");
             return "historico";
         }
 
@@ -133,7 +161,7 @@ class HistoricoPaginaTest {
 
         var voltar = pagina("/teste/historico/voltar").selectFirst("a[data-testid=historico-voltar]");
         assertThat(voltar.text()).isEqualTo("Voltar");
-        assertThat(voltar.attr("href")).isEqualTo("/emprestimos");
+        assertThat(voltar.attr("href")).isEqualTo("/retirada-devolucao");
     }
 
     @Test
@@ -170,6 +198,51 @@ class HistoricoPaginaTest {
         var novo = doc.selectFirst("[data-testid=historico-evento-2-para]");
         assertThat(novo.text()).isEqualTo(nome);
         assertThat(novo.hasClass(classe)).isTrue();
+    }
+
+    @Test
+    void rotaExigeIdNumericoEDevolve400ParaOutroValor() throws Exception {
+        mvc.perform(get("/reservas/abc/historico")).andExpect(status().isBadRequest());
+        mvc.perform(get("/reservas/5/historico")).andExpect(status().isOk());
+    }
+
+    @Test
+    void nomeDeEstadoDesconhecidoApareceEscritoComBadgeNeutro() throws Exception {
+        Document doc = pagina("/teste/historico/estado?nome=Em análise");
+
+        var atual = doc.selectFirst("[data-testid=historico-estado-atual]");
+        assertThat(atual.text()).isEqualTo("Em análise");
+        assertThat(atual.classNames()).containsExactly("estado");
+        assertThat(doc.selectFirst("[data-testid=historico-evento-2-para]").classNames()).containsExactly("estado");
+    }
+
+    @Test
+    void estadoNuloNaoQuebraAPaginaNemMostraBadgeVazio() throws Exception {
+        Document doc = pagina("/teste/historico/estado-nulo");
+
+        assertThat(doc.select("[data-testid=historico-estado-atual]")).isEmpty();
+        assertThat(doc.selectFirst("section[data-testid=historico-resumo] h2").text()).isEqualTo("Sala 203");
+        assertThat(doc.select("[data-testid=historico-evento-2-para].estado")).isEmpty();
+        assertThat(doc.selectFirst("[data-testid=historico-evento-2-para]").text()).isEqualTo("Estado novo não informado");
+        assertThat(doc.selectFirst("[data-testid=historico-evento-2-de]").text()).isEqualTo("Solicitada");
+    }
+
+    @Test
+    void aTelaNaoReordenaOsEventosQueOBackEndEnviou() throws Exception {
+        Document doc = pagina("/teste/historico/fora-de-ordem");
+
+        assertThat(doc.select("ol[data-testid=historico-linha-tempo] time").eachText()).containsExactly(
+                "12/11/2026 às 14:05", "06/11/2026 às 09:12", "06/11/2026 às 11:40");
+        assertThat(doc.selectFirst("[data-testid=historico-evento-1-para]").text()).isEqualTo("Em uso");
+    }
+
+    @Test
+    void semEventosMostraNenhumaMudancaRegistradaEmVezDaListaVazia() throws Exception {
+        Document doc = pagina("/teste/historico/sem-eventos");
+
+        assertThat(doc.selectFirst("[data-testid=historico-sem-eventos]").text()).isEqualTo("Nenhuma mudança registrada.");
+        assertThat(doc.select("ol, li")).isEmpty();
+        assertThat(doc.selectFirst("section[data-testid=historico-resumo] h2").text()).isEqualTo("Sala 203");
     }
 
     @Test
@@ -249,7 +322,7 @@ class HistoricoPaginaTest {
 
         assertThat(doc.select("main form, main button, main input, main textarea, main select")).isEmpty();
         assertThat(doc.select("main a").eachAttr("data-testid")).containsExactly("historico-voltar");
-        assertThat(doc.selectFirst("p.nota-leitura[data-testid=historico-somente-leitura]").text())
+        assertThat(doc.selectFirst("p.tabela__nota[data-testid=historico-somente-leitura]").text())
                 .isEqualTo("Os registros são somente leitura: não podem ser alterados nem apagados.");
     }
 

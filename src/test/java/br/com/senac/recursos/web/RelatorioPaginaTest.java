@@ -27,8 +27,8 @@ import org.springframework.web.bind.annotation.GetMapping;
  * {@code relatorio} (recursos, professores, totalReservas, totalHoras e conflitos); sem ele a página mostra
  * só o filtro. Professor é quem pediu a reserva.
  */
-@WebMvcTest({RelatorioController.class, RelatorioPaginaTest.PaginasDeTeste.class})
-@Import(RelatorioPaginaTest.PaginasDeTeste.class)
+@WebMvcTest(RelatorioPaginaTest.PaginasDeTeste.class)
+@Import({RelatorioController.class, RelatorioPaginaTest.PaginasDeTeste.class})
 class RelatorioPaginaTest {
 
     private static final String MENSAGEM_PERIODO = "A data de fim não pode ser anterior à data de início.";
@@ -176,7 +176,36 @@ class RelatorioPaginaTest {
         assertThat(doc.selectFirst("input[data-testid=relatorio-inicio]").val()).isEmpty();
         assertThat(doc.selectFirst("input[data-testid=relatorio-fim]").val()).isEmpty();
         assertThat(doc.select("section.bloco, [data-testid=relatorio-vazio], table")).isEmpty();
-        assertThat(doc.select("[data-testid=relatorio-erro-periodo]:not([hidden])")).isEmpty();
+        confereErroEscondidoMasPresenteParaOScript(doc);
+    }
+
+    private void confereErroEscondidoMasPresenteParaOScript(Document doc) {
+        var erro = doc.selectFirst("#relatorio-fim-erro");
+        assertThat(erro).as("o script precisa do elemento do erro").isNotNull();
+        assertThat(erro.hasAttr("hidden")).isTrue();
+        assertThat(erro.attr("role")).isEqualTo("alert");
+        assertThat(erro.attr("data-testid")).isEqualTo("relatorio-fim-erro");
+        assertThat(erro.text()).isEmpty();
+    }
+
+    @Test
+    void semErroOElementoDoErroExisteEscondidoParaOScriptUsar() throws Exception {
+        confereErroEscondidoMasPresenteParaOScript(pagina("/relatorios/utilizacao"));
+        confereErroEscondidoMasPresenteParaOScript(pagina("/relatorios/utilizacao?inicio=2026-10-05&fim=2026-10-05"));
+    }
+
+    @Test
+    void parametrosVaziosOuSoOInicioNaoSaoErroENaoGeramRelatorio() throws Exception {
+        Document vazios = pagina("/relatorios/utilizacao?inicio=&fim=");
+        assertThat(vazios.selectFirst("input[data-testid=relatorio-inicio]").val()).isEmpty();
+        assertThat(vazios.selectFirst("input[data-testid=relatorio-fim]").val()).isEmpty();
+        confereErroEscondidoMasPresenteParaOScript(vazios);
+
+        Document soInicio = pagina("/relatorios/utilizacao?inicio=2026-10-01");
+        assertThat(soInicio.selectFirst("input[data-testid=relatorio-inicio]").val()).isEqualTo("2026-10-01");
+        assertThat(soInicio.selectFirst("input[data-testid=relatorio-fim]").val()).isEmpty();
+        confereErroEscondidoMasPresenteParaOScript(soInicio);
+        assertThat(soInicio.select("section.bloco, table")).isEmpty();
     }
 
     @Test
@@ -193,14 +222,14 @@ class RelatorioPaginaTest {
     void fimAnteriorAoInicioNaoGeraRelatorioEMostraOErroJuntoAoCampo() throws Exception {
         Document doc = pagina("/relatorios/utilizacao?inicio=2026-10-31&fim=2026-10-01");
 
-        var erro = doc.selectFirst("#relatorio-erro-periodo");
-        assertThat(erro.attr("data-testid")).isEqualTo("relatorio-erro-periodo");
+        var erro = doc.selectFirst("#relatorio-fim-erro");
+        assertThat(erro.attr("data-testid")).isEqualTo("relatorio-fim-erro");
         assertThat(erro.attr("role")).isEqualTo("alert");
         assertThat(erro.hasAttr("hidden")).isFalse();
         assertThat(erro.text()).isEqualTo(MENSAGEM_PERIODO);
         var fim = doc.selectFirst("input[data-testid=relatorio-fim]");
         assertThat(fim.attr("aria-invalid")).isEqualTo("true");
-        assertThat(fim.attr("aria-describedby")).isEqualTo("relatorio-erro-periodo");
+        assertThat(fim.attr("aria-describedby")).isEqualTo("relatorio-fim-erro");
         assertThat(fim.hasClass("campo__entrada--erro")).isTrue();
         assertThat(doc.selectFirst("input[data-testid=relatorio-inicio]").hasAttr("aria-invalid")).isFalse();
         assertThat(doc.select("section.bloco, [data-testid=relatorio-vazio], table")).isEmpty();
@@ -211,7 +240,7 @@ class RelatorioPaginaTest {
     void mesmoDiaNoInicioENoFimEhPeriodoValido() throws Exception {
         Document doc = pagina("/relatorios/utilizacao?inicio=2026-10-05&fim=2026-10-05");
 
-        assertThat(doc.select("[data-testid=relatorio-erro-periodo]:not([hidden])")).isEmpty();
+        confereErroEscondidoMasPresenteParaOScript(doc);
         assertThat(doc.selectFirst("input[data-testid=relatorio-fim]").hasAttr("aria-invalid")).isFalse();
     }
 
@@ -219,7 +248,7 @@ class RelatorioPaginaTest {
     void erroDoServidorImpedeOsBlocosMesmoQueOBackEndTenhaPreenchidoORelatorio() throws Exception {
         Document doc = pagina("/teste/relatorio/com-erro");
 
-        assertThat(doc.selectFirst("[data-testid=relatorio-erro-periodo]").text()).isEqualTo(MENSAGEM_PERIODO);
+        assertThat(doc.selectFirst("[data-testid=relatorio-fim-erro]").text()).isEqualTo(MENSAGEM_PERIODO);
         assertThat(doc.select("section.bloco, [data-testid=relatorio-vazio], table")).isEmpty();
     }
 
@@ -239,6 +268,8 @@ class RelatorioPaginaTest {
 
         var bloco = doc.selectFirst("section[aria-labelledby=relatorio-recursos-titulo]");
         assertThat(bloco.selectFirst("h2#relatorio-recursos-titulo").text()).isEqualTo("Horas reservadas por recurso");
+        assertThat(bloco.selectFirst("h2#relatorio-recursos-titulo").hasClass("cartao__titulo")).isTrue();
+        assertThat(bloco.selectFirst("[data-testid=relatorio-recursos-total]").hasClass("pagina__descricao")).isTrue();
         assertThat(bloco.selectFirst("[data-testid=relatorio-recursos-total]").text()).isEqualTo("Total: 20 reservas, 39 h 30 min");
         var tabela = bloco.selectFirst("table[data-testid=relatorio-recursos]");
         assertThat(tabela.selectFirst("caption").text()).isEqualTo("Horas reservadas por recurso");
