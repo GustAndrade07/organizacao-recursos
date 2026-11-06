@@ -7,7 +7,7 @@
   }
   var inicio = form.querySelector('[data-testid="relatorio-inicio"]');
   var fim = form.querySelector('[data-testid="relatorio-fim"]');
-  var erro = document.getElementById('relatorio-erro-periodo');
+  var erro = document.getElementById('relatorio-fim-erro');
   var mensagem = 'A data de fim não pode ser anterior à data de início.';
 
   function periodoInvalido() {

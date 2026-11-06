@@ -32,8 +32,8 @@
                            th:value="${filtro.fim}" data-testid="relatorio-fim"
                            th:classappend="${erroFim != null} ? 'campo__entrada--erro'"
                            th:aria-invalid="${erroFim != null} ? 'true'"
-                           th:aria-describedby="${erroFim != null} ? 'relatorio-erro-periodo'">
-                    <p class="campo__erro" id="relatorio-erro-periodo" role="alert" data-testid="relatorio-erro-periodo" hidden
+                           th:aria-describedby="${erroFim != null} ? 'relatorio-fim-erro'">
+                    <p class="campo__erro" id="relatorio-fim-erro" role="alert" data-testid="relatorio-fim-erro" hidden
                        th:hidden="${erroFim == null}" th:text="${erroFim}"></p>
                 </div>
             </div>
@@ -56,8 +56,8 @@
         <th:block th:if="${gerado and relatorio.totalReservas > 0}"
                   th:with="total='Total: ' + ${relatorio.totalReservas} + (${relatorio.totalReservas == 1} ? ' reserva, ' : ' reservas, ') + ${relatorio.totalHoras}">
             <section class="cartao bloco" aria-labelledby="relatorio-recursos-titulo">
-                <h2 class="bloco__titulo" id="relatorio-recursos-titulo">Horas reservadas por recurso</h2>
-                <p class="bloco__total" data-testid="relatorio-recursos-total" th:text="${total}">Total: 20 reservas, 39 h 30 min</p>
+                <h2 class="cartao__titulo" id="relatorio-recursos-titulo">Horas reservadas por recurso</h2>
+                <p class="pagina__descricao" data-testid="relatorio-recursos-total" th:text="${total}">Total: 20 reservas, 39 h 30 min</p>
                 <table class="tabela" data-testid="relatorio-recursos">
                     <caption class="so-leitor">Horas reservadas por recurso</caption>
                     <thead>
@@ -78,8 +78,8 @@
             </section>
 
             <section class="cartao bloco" aria-labelledby="relatorio-professores-titulo">
-                <h2 class="bloco__titulo" id="relatorio-professores-titulo">Carga horária por professor</h2>
-                <p class="bloco__total" data-testid="relatorio-professores-total" th:text="${total}">Total: 20 reservas, 39 h 30 min</p>
+                <h2 class="cartao__titulo" id="relatorio-professores-titulo">Carga horária por professor</h2>
+                <p class="pagina__descricao" data-testid="relatorio-professores-total" th:text="${total}">Total: 20 reservas, 39 h 30 min</p>
                 <table class="tabela" data-testid="relatorio-professores">
                     <caption class="so-leitor">Carga horária por professor</caption>
                     <thead>
@@ -100,7 +100,7 @@
             </section>
 
             <section class="cartao bloco" aria-labelledby="relatorio-conflitos-titulo">
-                <h2 class="bloco__titulo" id="relatorio-conflitos-titulo">Conflitos evitados no período</h2>
+                <h2 class="cartao__titulo" id="relatorio-conflitos-titulo">Conflitos evitados no período</h2>
                 <p class="metrica" data-testid="relatorio-conflitos">
                     <span class="metrica__valor" th:text="${relatorio.conflitos}">7</span>
                     <span class="metrica__rotulo">tentativas de reserva recusadas por sobreposição de horário</span>
