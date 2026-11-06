@@ -293,4 +293,15 @@ class LoginPaginaTest {
         // o envio nunca pode ser cancelado por esta tela; sem JavaScript o formulário continua funcionando
         assertThat(js).doesNotContain("preventDefault");
     }
+
+    @Test
+    void scriptRestauraOBotaoPorTemporizadorDeSegurancaEEmQualquerPageshow() throws Exception {
+        String js = lerRecurso("static/js/login.js");
+
+        // Esc/Parar, rede caída ou resposta sem navegação não podem deixar o botão preso em "Entrando…"
+        assertThat(js).contains("setTimeout").contains("30000").contains("clearTimeout");
+        assertThat(js).contains("addEventListener('pageshow'");
+        assertThat(js).doesNotContain("persisted");
+        assertThat(js).contains("focus()");
+    }
 }
