@@ -1,0 +1,308 @@
+/*
+ * Seção 02 · Busca e reserva. Só tokens semânticos de tokens.css.
+ * Mobile primeiro; números só em media query. Vai para app.css na implementação.
+ */
+
+.secao {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.pagina__cabecalho {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.pagina__cabecalho h1 {
+  margin: 0;
+}
+
+.pagina__descricao {
+  margin: 0;
+  color: var(--color-text-secondary);
+}
+
+/* Campos: select, ajuda, erro, desabilitado */
+.campo__entrada--erro {
+  border-color: var(--color-border-danger);
+  border-width: var(--border-width-focus);
+}
+
+.campo__erro {
+  margin: 0;
+  color: var(--color-text-danger);
+  font: var(--font-body-small);
+}
+
+.campo__entrada:disabled {
+  background: var(--color-bg-disabled);
+  color: var(--color-text-disabled);
+  cursor: not-allowed;
+}
+
+.grade-campos {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-4);
+}
+
+.formulario__acoes {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/* Botões: perigo e desabilitado */
+.botao:disabled {
+  border-color: transparent;
+  background: var(--color-bg-disabled);
+  color: var(--color-text-disabled);
+  cursor: not-allowed;
+}
+
+/* Avisos */
+.alerta__titulo {
+  display: block;
+  font: var(--font-label-default);
+}
+
+.alerta__texto {
+  margin: 0;
+}
+
+.alerta--info {
+  background: var(--color-bg-info-subtle);
+  border-color: var(--color-border-info);
+  color: var(--color-text-info);
+}
+
+/* Estado da reserva (RN-05): nome sempre escrito, além da cor */
+.estado {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-full);
+  font: var(--font-label-small);
+  white-space: nowrap;
+}
+
+.estado--solicitada {
+  background: var(--color-status-solicitada-bg);
+  color: var(--color-status-solicitada-fg);
+}
+
+.estado--aprovada {
+  background: var(--color-status-aprovada-bg);
+  color: var(--color-status-aprovada-fg);
+}
+
+.estado--em-uso {
+  background: var(--color-status-em-uso-bg);
+  color: var(--color-status-em-uso-fg);
+}
+
+.estado--concluida {
+  background: var(--color-status-concluida-bg);
+  color: var(--color-status-concluida-fg);
+}
+
+.estado--rejeitada {
+  background: var(--color-status-rejeitada-bg);
+  color: var(--color-status-rejeitada-fg);
+}
+
+/* Resumo da busca e dados em lista */
+.lista-dados {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--space-3) var(--space-6);
+  margin: 0;
+}
+
+.lista-dados dt {
+  color: var(--color-text-secondary);
+  font: var(--font-label-default);
+}
+
+.lista-dados dd {
+  margin: 0;
+}
+
+.cartao__cabecalho--linha {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/* Estado vazio */
+.vazio {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-6);
+  border: var(--border-width-default) solid var(--color-border-default);
+  border-radius: var(--radius-lg);
+  background: var(--color-bg-surface);
+}
+
+.vazio__titulo {
+  margin: 0;
+  font: var(--font-heading-h3);
+}
+
+/* Tabela no desktop, cards no mobile: mesmo HTML */
+.so-leitor {
+  position: absolute;
+  width: var(--border-width-default);
+  height: var(--border-width-default);
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.tabela,
+.tabela tbody,
+.tabela tr,
+.tabela td {
+  display: block;
+}
+
+.tabela thead {
+  position: absolute;
+  width: var(--border-width-default);
+  height: var(--border-width-default);
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+.tabela tbody {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.tabela tr {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  border: var(--border-width-default) solid var(--color-border-default);
+  border-radius: var(--radius-lg);
+  background: var(--color-bg-surface);
+  box-shadow: var(--shadow-card);
+}
+
+.tabela td {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.tabela td::before {
+  content: attr(data-rotulo);
+  color: var(--color-text-secondary);
+  font: var(--font-label-small);
+}
+
+.tabela .tabela__nome {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-1);
+  font: var(--font-heading-h3);
+  text-align: left;
+}
+
+.tabela .tabela__nome::before,
+.tabela .tabela__acao::before {
+  content: none;
+}
+
+@media (min-width: 768px) {
+  .grade-campos {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .formulario__acoes,
+  .dialogo__acoes,
+  .alerta__acoes {
+    flex-direction: row;
+  }
+
+  .formulario__acoes {
+    justify-content: flex-end;
+  }
+
+  .resumo-busca,
+  .cartao__cabecalho--linha {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .tabela {
+    display: table;
+    border-collapse: separate;
+    border-spacing: 0;
+    overflow: hidden;
+    border: var(--border-width-default) solid var(--color-border-default);
+    border-radius: var(--radius-lg);
+    background: var(--color-bg-surface);
+    box-shadow: var(--shadow-card);
+  }
+
+  .tabela thead {
+    position: static;
+    display: table-header-group;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    clip-path: none;
+  }
+
+  .tabela tbody {
+    display: table-row-group;
+  }
+
+  .tabela tr {
+    display: table-row;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .tabela th,
+  .tabela td {
+    display: table-cell;
+    padding: var(--space-3) var(--space-4);
+    border-bottom: var(--border-width-default) solid var(--color-border-subtle);
+    vertical-align: middle;
+    text-align: left;
+  }
+
+  .tabela th {
+    background: var(--color-bg-subtle);
+    color: var(--color-text-secondary);
+    font: var(--font-label-small);
+  }
+
+  .tabela tbody tr:last-child > * {
+    border-bottom: 0;
+  }
+
+  .tabela td::before {
+    content: none;
+  }
+
+  .tabela tbody .tabela__nome {
+    display: table-cell;
+    background: transparent;
+    color: var(--color-text-primary);
+    font: var(--font-label-default);
+  }
+}
