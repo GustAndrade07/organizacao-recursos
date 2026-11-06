@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<!--/*
+  Estado da reserva (RN-05: o nome do estado sempre escrito, além da cor). ÚNICO ponto que converte o estado em classe.
+
+  badge(estado, testid)
+    estado  : String com o nome por extenso, como "Em uso" (é só isso que o modelo traz). Sem acento também vale
+              ("Concluida", "Nao compareceu"); maiúsculas e espaços sobrando (pontas ou duplos) não importam para a classe.
+    testid  : valor do data-testid do badge; null ou vazio = sem o atributo.
+
+  Saída: <span class="estado estado--X" data-testid="testid">texto exatamente como veio (escapado)</span>
+    - X vem de uma tabela fechada: solicitada, aprovada, em uso -> em-uso, concluída -> concluida, rejeitada,
+      cancelada, não compareceu -> nao-compareceu.
+    - nome desconhecido: só class="estado" (cor neutra), o texto continua visível.
+    - estado nulo ou em branco: não renderiza nada.
+
+  Nunca escreva <span class="estado ..."> à mão nas telas; use  th:replace="~{fragments/estado :: badge(${...}, 'x-estado')}".
+*/-->
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Estado da reserva</title>
+</head>
+<body>
+<span class="estado" th:fragment="badge(estado, testid)" th:if="${!#strings.isEmpty(#strings.trim(estado))}"
+      th:with="classe=${ {'solicitada': 'estado--solicitada', 'aprovada': 'estado--aprovada',
+                         'em uso': 'estado--em-uso',
+                         'concluída': 'estado--concluida', 'concluida': 'estado--concluida',
+                         'rejeitada': 'estado--rejeitada', 'cancelada': 'estado--cancelada',
+                         'não compareceu': 'estado--nao-compareceu', 'nao compareceu': 'estado--nao-compareceu'}
+                        [#strings.toLowerCase(#strings.trim(estado)).replaceAll('\s+', ' ')] }"
+      th:classappend="${classe}"
+      th:attr="data-testid=${#strings.isEmpty(testid) ? null : testid}" th:text="${estado}">Solicitada</span>
+</body>
+</html>

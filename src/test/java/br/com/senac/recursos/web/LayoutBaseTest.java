@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import org.jsoup.Jsoup;
@@ -12,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Controller;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.ui.Model;
@@ -48,9 +51,14 @@ class LayoutBaseTest {
             model.addAttribute("usuario", Map.of("nome", "Carlos Lima", "perfil", "Responsável"));
             model.addAttribute("menu", List.of(
                     Map.of("id", "aprovacoes", "rotulo", "Aprovações", "href", "/aprovacoes", "ativo", false),
-                    Map.of("id", "emprestimos", "rotulo", "Empréstimos", "href", "/emprestimos", "ativo", false),
+                    Map.of("id", "retirada-devolucao", "rotulo", "Retirada e devolução", "href", "/retirada-devolucao", "ativo", false),
                     Map.of("id", "relatorios", "rotulo", "Relatórios", "href", "/relatorios/utilizacao", "ativo", false)));
             return "teste/pagina";
+        }
+
+        @GetMapping("/teste/envio-unico")
+        String envioUnico() {
+            return "teste/envio-unico";
         }
 
         @GetMapping("/teste/nome-perigoso")
@@ -115,7 +123,7 @@ class LayoutBaseTest {
     void responsavelNaoVeItensDeSolicitante() throws Exception {
         Document doc = pagina("/teste/responsavel");
 
-        assertThat(doc.select("[data-testid^=menu-item-]").eachText()).containsExactly("Aprovações", "Empréstimos", "Relatórios");
+        assertThat(doc.select("[data-testid^=menu-item-]").eachText()).containsExactly("Aprovações", "Retirada e devolução", "Relatórios");
         assertThat(doc.select("[data-testid=menu-item-buscar]")).isEmpty();
     }
 
@@ -146,5 +154,28 @@ class LayoutBaseTest {
 
         assertThat(doc.select("script:containsData(alert(1))")).isEmpty();
         assertThat(doc.selectFirst("[data-testid=menu-usuario]").text()).isEqualTo("<script>alert(1)</script>");
+    }
+
+    @Test
+    void scriptsSaoCarregadosEmTodaPaginaComDefer() throws Exception {
+        Document doc = pagina("/teste/anonimo");
+
+        assertThat(doc.select("script[src]").eachAttr("src")).containsExactly("/js/menu.js", "/js/envio-unico.js");
+        assertThat(doc.select("script[src]")).allMatch(script -> script.hasAttr("defer"));
+    }
+
+    @Test
+    void paginaComFormularioMarcadoComoEnvioUnicoReferenciaOScript() throws Exception {
+        Document doc = pagina("/teste/envio-unico");
+
+        assertThat(doc.select("form[data-envio-unico]")).hasSize(1);
+        assertThat(doc.select("script[src='/js/envio-unico.js'][defer]")).hasSize(1);
+    }
+
+    @Test
+    void scriptDeEnvioUnicoExisteENuncaCancelaOEnvio() throws IOException {
+        String js = new String(new ClassPathResource("static/js/envio-unico.js").getInputStream().readAllBytes(), StandardCharsets.UTF_8);
+
+        assertThat(js).contains("data-envio-unico").contains("pageshow").doesNotContain("preventDefault");
     }
 }
