@@ -2,6 +2,7 @@
 <!--/*
   Tela 15 do inventário (prefixo "manutencao-"), RF-08 e RN-04. Atributos de modelo (docs/frontend/README.md):
     recurso  : id, nome, tipo, local, emManutencao                       (back-end; sem ele não há resumo)
+    tipo     : TipoRecurso da aba da lista a que a tela volta                  (o controller preenche com ?tipo=)
     bloqueio : recursoId, inicio, fim (LocalDateTime), motivo            (o controller preenche com a URL)
     erros    : mapa campo (inicio, fim, motivo) para mensagem            (back-end, após POST recusado)
     afetadas : lista de data (LocalDate), horario, solicitante, estado, estadoClasse
@@ -13,7 +14,7 @@
 <div id="conteudo-pagina">
     <div class="secao"
          th:with="comAfetadas=${afetadas != null and !#lists.isEmpty(afetadas)},
-                  voltar=@{/admin/recursos}">
+                  voltar=${tipo != null} ? @{/admin/recursos(tipo=${tipo.chave})} : @{/admin/recursos}">
         <header class="pagina__cabecalho">
             <h1 data-testid="manutencao-titulo">Bloquear para manutenção</h1>
             <p class="pagina__descricao"><a th:href="${voltar}" data-testid="manutencao-voltar">Voltar para a lista de recursos</a></p>
@@ -39,7 +40,7 @@
                     th:text="${total} + (${total == 1} ? ' reserva cai' : ' reservas caem') + ' no período do bloqueio'">2 reservas caem no período do bloqueio</strong>
             <p class="alerta__texto" th:text="${total == 1} ? 'Confira antes de confirmar. Esta reserva será afetada:' : 'Confira antes de confirmar. Estas reservas serão afetadas:'">Confira antes de confirmar.</p>
             <ul class="reservas-afetadas" data-testid="manutencao-afetadas-lista">
-                <li th:each="reserva, estado : ${afetadas}" th:attr="data-testid='manutencao-afetada-' + ${estado.count}">
+                <li th:each="reserva, n : ${afetadas}" th:attr="data-testid='manutencao-afetada-' + ${n.count}">
                     <span th:text="${#temporals.format(reserva.data, 'dd/MM/yyyy')} + ', ' + ${reserva.horario} + ', ' + ${reserva.solicitante}">12/11/2026, 14:00 às 16:00, Beatriz Nogueira</span>
                     <span class="estado" th:classappend="'estado--' + ${reserva.estadoClasse}" th:text="${reserva.estado}">Aprovada</span>
                 </li>
@@ -48,17 +49,17 @@
                 <button type="submit" form="manutencao-form" name="confirmar" value="true" class="botao botao--perigo"
                         data-testid="manutencao-confirmar">Confirmar bloqueio</button>
                 <a class="botao botao--secundario" data-testid="manutencao-ajustar"
-                   th:href="@{/admin/recursos/{id}/manutencao(id=${bloqueio.recursoId},inicio=${bloqueio.inicio},fim=${bloqueio.fim},motivo=${bloqueio.motivo})}">Voltar e ajustar o período</a>
+                   th:href="@{/admin/recursos/{id}/manutencao(id=${bloqueio.recursoId},tipo=${tipo?.chave},inicio=${bloqueio.inicio},fim=${bloqueio.fim},motivo=${bloqueio.motivo})}">Voltar e ajustar o período</a>
             </div>
         </div>
 
         <form class="cartao formulario" id="manutencao-form" method="post" novalidate data-testid="manutencao-form"
               th:action="@{/admin/recursos/{id}/manutencao(id=${bloqueio.recursoId})}">
             <div class="grade-campos">
-                <div th:replace="~{fragments/campo :: campo('manutencao', 'inicio', 'Início do bloqueio', 'datetime-local', ${bloqueio.inicio}, ${erros?.get('inicio')}, null, false)}"></div>
-                <div th:replace="~{fragments/campo :: campo('manutencao', 'fim', 'Fim do bloqueio', 'datetime-local', ${bloqueio.fim}, ${erros?.get('fim')}, null, true)}"></div>
+                <div th:replace="~{fragments/campo :: campo('manutencao', 'inicio', 'Início do bloqueio', 'datetime-local', ${bloqueio.inicio}, ${erros?.get('inicio')}, null, false, ${comAfetadas})}"></div>
+                <div th:replace="~{fragments/campo :: campo('manutencao', 'fim', 'Fim do bloqueio', 'datetime-local', ${bloqueio.fim}, ${erros?.get('fim')}, null, true, ${comAfetadas})}"></div>
             </div>
-            <div th:replace="~{fragments/campo :: campo('manutencao', 'motivo', 'Motivo', 'textarea', ${bloqueio.motivo}, ${erros?.get('motivo')}, null, false)}"></div>
+            <div th:replace="~{fragments/campo :: campo('manutencao', 'motivo', 'Motivo', 'textarea', ${bloqueio.motivo}, ${erros?.get('motivo')}, null, false, ${comAfetadas})}"></div>
             <div class="formulario__acoes" th:unless="${comAfetadas}">
                 <button type="submit" class="botao botao--primario" data-testid="manutencao-bloquear">Bloquear recurso</button>
                 <a class="botao botao--secundario" th:href="${voltar}" data-testid="manutencao-cancelar">Cancelar</a>

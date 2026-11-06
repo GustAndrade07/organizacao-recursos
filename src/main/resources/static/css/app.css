@@ -971,6 +971,11 @@ a {
   align-self: flex-start;
 }
 
+/* Valor só para conferir (reservas afetadas pelo bloqueio): o ajuste é por "Voltar e ajustar o período" */
+.campo__entrada[readonly] {
+  background: var(--color-bg-subtle);
+}
+
 .opcao {
   display: flex;
   align-items: flex-start;

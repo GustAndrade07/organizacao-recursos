@@ -10,6 +10,8 @@
   var fim = document.getElementById('manutencao-fim');
   var erro = document.getElementById('manutencao-fim-erro');
   var mensagem = 'O fim do bloqueio precisa ser depois do início.';
+  // Só apaga o erro que o próprio script mostrou: o que veio do servidor fica até o envio seguinte
+  var erroDoScript = false;
 
   function fimAntesDoInicio() {
     return inicio.value && fim.value && new Date(fim.value) <= new Date(inicio.value);
@@ -21,6 +23,7 @@
     fim.removeAttribute('aria-describedby');
     erro.textContent = '';
     erro.hidden = true;
+    erroDoScript = false;
   }
 
   function mostrarErro() {
@@ -29,6 +32,7 @@
     fim.setAttribute('aria-describedby', erro.id);
     erro.textContent = mensagem;
     erro.hidden = false;
+    erroDoScript = true;
     fim.focus();
   }
 
@@ -42,7 +46,7 @@
 
   [inicio, fim].forEach(function (campo) {
     campo.addEventListener('input', function () {
-      if (fim.getAttribute('aria-invalid') === 'true' && !fimAntesDoInicio()) {
+      if (erroDoScript && !fimAntesDoInicio()) {
         limparErro();
       }
     });

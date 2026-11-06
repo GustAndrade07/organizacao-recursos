@@ -29,7 +29,10 @@ public class RecursoController {
         return "recursos";
     }
 
-    /** Também recebe o que já foi digitado: a troca de tipo sem JavaScript recarrega a página por GET. */
+    /**
+     * Também recebe o que já foi digitado: a troca de tipo recarrega a página por GET. Tipo desconhecido
+     * ou {@code restrito} que não seja booleano respondem 400.
+     */
     @GetMapping("/admin/recursos/novo")
     public String novo(
             @RequestParam(required = false) String tipo,
@@ -40,7 +43,7 @@ public class RecursoController {
             @RequestParam(required = false) String competencias,
             @RequestParam(defaultValue = "false") boolean restrito,
             Model model) {
-        model.addAttribute("tipo", TipoRecurso.da(tipo));
+        model.addAttribute("tipo", TipoRecurso.exigir(tipo));
         model.addAttribute("recurso", new FormularioRecurso(null, nome, capacidade, localizacao, patrimonio,
                 competencias, restrito));
         return "recurso-form";
@@ -49,18 +52,21 @@ public class RecursoController {
     /** O back-end sobrescreve {@code recurso} com os dados gravados e {@code tipo} com o tipo do recurso. */
     @GetMapping("/admin/recursos/{id}")
     public String editar(@PathVariable String id, @RequestParam(required = false) String tipo, Model model) {
-        model.addAttribute("tipo", TipoRecurso.da(tipo));
+        model.addAttribute("tipo", TipoRecurso.exigir(tipo));
         model.addAttribute("recurso", new FormularioRecurso(id, null, null, null, null, null, false));
         return "recurso-form";
     }
 
+    /** O {@code tipo} só serve para a tela voltar à aba certa da lista. */
     @GetMapping("/admin/recursos/{id}/manutencao")
     public String manutencao(
             @PathVariable String id,
+            @RequestParam(required = false) String tipo,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime inicio,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fim,
             @RequestParam(required = false) String motivo,
             Model model) {
+        model.addAttribute("tipo", TipoRecurso.exigir(tipo));
         model.addAttribute("bloqueio", new FormularioBloqueio(id, inicio, fim, motivo));
         return "manutencao";
     }

@@ -98,10 +98,10 @@
                 </td>
                 <td class="tabela__acao">
                     <div class="botoes-linha">
-                        <a class="botao botao--secundario" th:href="@{/admin/recursos/{id}(id=${recurso.id})}"
+                        <a class="botao botao--secundario" th:href="@{/admin/recursos/{id}(id=${recurso.id},tipo=${tipo.chave})}"
                            th:attr="data-testid='recursos-editar-' + ${recurso.id}, aria-label='Editar ' + ${recurso.nome}">Editar</a>
                         <a class="botao botao--secundario" th:unless="${professores}"
-                           th:href="@{/admin/recursos/{id}/manutencao(id=${recurso.id})}"
+                           th:href="@{/admin/recursos/{id}/manutencao(id=${recurso.id},tipo=${tipo.chave})}"
                            th:attr="data-testid='recursos-manutencao-' + ${recurso.id}, aria-label='Manutenção de ' + ${recurso.nome}">Manutenção</a>
                     </div>
                 </td>
