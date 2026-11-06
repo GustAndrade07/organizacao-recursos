@@ -41,7 +41,8 @@
         <!-- Inclui os templates Thymeleaf para o Sonar procurar XSS (aviso "templates not indexed") -->
         <sonar.sources>src/main/java,src/main/resources</sonar.sources>
         <sonar.coverage.jacoco.xmlReportPaths>target/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
-        <sonar.coverage.exclusions>**/RecursosApplication.java</sonar.coverage.exclusions>
+        <!-- O JaCoCo só mede Java: os scripts de tela (static/js) contariam como não cobertos no código novo -->
+        <sonar.coverage.exclusions>**/RecursosApplication.java,**/static/js/**</sonar.coverage.exclusions>
     </properties>
 
     <dependencies>

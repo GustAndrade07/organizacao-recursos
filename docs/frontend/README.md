@@ -82,3 +82,22 @@ Acessibilidade: rótulos visíveis, `autocomplete="username"` e `"current-passwo
 - Resultados: tabela no desktop e cards no mobile com o mesmo HTML (cada célula traz o rótulo em `data-rotulo`).
 - O filtro de competência (professor) ficou de fora: depende de decidir se professor é recurso reservável.
 - O idioma fixo é pt-BR (`spring.web.locale`), para nomes de dia e datas.
+
+## Nova reserva
+
+`GET /reservas/nova` (`ReservaController`, template `reserva-nova.html`) mostra o formulário preenchido com o que veio da busca (`recursoId`, `data`, `inicio`, `termino`) e envia por `POST /reservas`. **Não grava a reserva**; contrato com o back-end (RF-04 a RF-06), a confirmar com o Pedro:
+
+| Atributo de modelo | Conteúdo | Sem ele |
+|---|---|---|
+| `reserva` | `recursoId`, `data`, `inicio`, `termino` (o controller já preenche) | — |
+| `recurso` | `nome`, `local`, `restrito`; o back-end deve fornecer também no GET (hoje o controller não o preenche) | A tela não mostra o recurso nem o aviso de restrição |
+| `erros` | `LinkedHashMap` de `data`, `inicio` ou `termino` para texto pronto para o usuário, na ordem do formulário; outra chave aparece no resumo como texto simples, sem link | Sem erros |
+| `conflito` | verdadeiro após o 409 de horário (RN-02, RN-03) | Sem aviso |
+| `manutencao` | `inicio` e `fim`, do tipo `LocalDateTime`, após o 409 de manutenção (RN-04) | Sem aviso |
+
+`conflito` e `manutencao` são excludentes. O corpo do `POST /reservas` leva `recursoId`, `data`, `inicio` e `termino`; o back-end rejeita `recursoId` ausente ou vazio. Ao recusar, ele renderiza `reserva-nova` com `reserva` (os mesmos quatro campos) e `recurso`; o status HTTP é livre, a tela não depende dele. Campo obrigatório vazio é barrado pelo navegador (aviso nativo), sem resumo.
+
+- Recurso restrito avisa, dentro do formulário e antes de confirmar, que a reserva ficará Solicitada até a aprovação. "Trocar recurso" leva à lista de resultados e "Voltar à busca" ao formulário, os dois com o horário escolhido.
+- Erro de campo aparece junto ao campo e num resumo no topo (`role="alert"`), com link para o campo.
+- `reserva-form.js` bloqueia término igual ou anterior ao início antes do envio (RN-01) e desabilita o botão Confirmar durante o envio. Sem JavaScript o back-end valida.
+- Sucesso leva ao detalhe da reserva (tela 8), decisão do back-end.
