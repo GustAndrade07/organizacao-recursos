@@ -50,7 +50,7 @@ O teste `CssSemValoresSoltosTest` reprova cor, medida ou fonte solta em qualquer
 
 O Spring escolhe o template pelo status: `templates/error/401.html`, `403.html`, `404.html` e `500.html`. Status sem página própria usam `4xx.html` ou `5xx.html` (modelo genérico, em português). O corpo é o fragmento `fragments/erro.html`: código com tom (`aviso`, `info`, `perigo`), título, mensagem e um caminho para continuar.
 
-- 401 leva a `/login`; 403 e 404 levam ao início; 500 oferece "Tentar novamente" na URL original e "Voltar ao início". O destino só é aceito se for um caminho deste site.
+- 401 leva a `/login?expirou` (a tela de login mostra "Sua sessão expirou. Entre novamente."); 403 e 404 levam ao início; 500 oferece "Tentar novamente" na URL original e "Voltar ao início". O destino só é aceito se for um caminho deste site (regra `CaminhoDoSite`, descrita em "Login"); qualquer outro vira o início.
 - A página usa o layout base. Para mostrar o menu a quem está logado (403, 404, 500), o back-end precisa colocar `usuario` e `menu` no modelo de **todas** as telas, inclusive `/error`, por exemplo com um `@ControllerAdvice` com `@ModelAttribute`. Sem isso, a página mostra só a marca.
 - Se o back-end passar a responder erros de API com `ProblemDetail`, a negociação por `Accept: text/html` precisa continuar levando às páginas acima.
 
@@ -67,14 +67,18 @@ O Spring escolhe o template pelo status: `templates/error/401.html`, `403.html`,
 
 | Atributo de modelo / parâmetro | Conteúdo | Sem ele |
 |---|---|---|
-| `email` (atributo de modelo) | E-mail digitado, que o back-end devolve depois de uma falha (por exemplo, atributo flash do redirect para `/login?erro`, para não ir na URL). O Thymeleaf escapa o valor. A senha **nunca** volta | Campo vazio |
-| `?destino=` (parâmetro) | Página anterior, por exemplo `/login?expirou&destino=/reservas/minhas`. A tela repassa o valor no `POST /login` num campo oculto `destino`; **quem decide o redirecionamento é o back-end**. Só vale caminho deste site: começa com `/` e não com `//` nem `/\` (a regra das páginas de erro, mais `/\`); qualquer outro valor é descartado | Sem campo oculto |
+| `email` (atributo de modelo) | E-mail digitado, que o back-end devolve depois de uma falha **por atributo flash** do redirect para `/login?erro` (nunca na URL, para não ir a logs e histórico). O Thymeleaf escapa o valor. A senha **nunca** volta | Campo vazio |
+| `?destino=` (parâmetro de **URL**) | Página anterior, por exemplo `/login?expirou&destino=/reservas/minhas`. O `LoginController` só põe no modelo o valor que passa em `CaminhoDoSite`; a tela o repassa no `POST /login` num campo oculto `destino`. **Quem decide o redirecionamento é o back-end** | Sem campo oculto |
 
-Se o back-end redirecionar de volta a `/login?erro`, deve repetir o `destino` na URL para o usuário não perdê-lo na segunda tentativa.
+**`destino` vai SÓ pela URL** (`/login?...&destino=...`); **`email` vai só por flash**. Se o back-end redirecionar de volta a `/login?erro`, deve repetir o `destino` na URL, senão o usuário o perde na segunda tentativa.
+
+**O back-end DEVE revalidar o `destino` recebido no `POST /login`** com a mesma regra: o campo oculto é editável pelo cliente, então a tela não é uma barreira. Se for inválido, redirecionar para `/`.
+
+Regra de `CaminhoDoSite` (`br.com.senac.recursos.web`, usada no login e nas páginas de erro): começa com `/`; o segundo caractere não é `/` nem `\`; não tem `\` em posição nenhuma; não tem caractere de controle (TAB, LF, CR, NUL...), espaço (inclusive Unicode) nem caractere invisível; não tem `%2f`, `%5c` nem `%25` (sem diferenciar maiúsculas); no máximo 2000 caracteres; é uma URI válida, sem esquema nem autoridade. Isso fecha `/<TAB>/evil.com` (o navegador remove TAB, LF e CR e lê `//evil.com`) e `/\evil.com`. Um valor que não passa não vai ao formulário (login) nem vira link (páginas de erro, que caem em `/`). Os templates chamam a regra por `${caminhoDoSite.valido(x)}`, atributo que um `@ControllerAdvice` (`AtributosDasTelas`) põe no modelo de todas as telas, inclusive `/error`.
 
 Acessibilidade: rótulos visíveis, `autocomplete="username"` e `"current-password"`, colar liberado, avisos com `role="alert"` e `tabindex="-1"` (o `login.js` leva o foco ao aviso de erro ou de sessão expirada) e o erro não diz qual campo errou.
 
-Envio: no evento `submit`, o `login.js` desabilita o botão Entrar, mostra "Entrando…" com um anel (`aria-hidden`) e marca `aria-busy="true"` e `aria-disabled="true"`, sem cancelar o envio (o botão não tem `name`, então nada some do formulário). Voltar pelo histórico restaura o botão. Sem JavaScript o formulário envia normalmente. O texto do botão desabilitado (`--color-text-secondary` sobre `--color-bg-disabled`) tem contraste de 6,1:1.
+Envio: no evento `submit`, o `login.js` desabilita o botão Entrar, mostra "Entrando…" com um anel (`aria-hidden`) e marca `aria-busy="true"` e `aria-disabled="true"`, sem cancelar o envio (o botão não tem `name`, então nada some do formulário). O botão também volta ao normal (com o foco nele) em qualquer `pageshow` e por um temporizador de segurança de 30 s, para não ficar preso em "Entrando…" se a navegação não terminar (Esc/Parar, rede caída, resposta 204 ou download). Sem JavaScript o formulário envia normalmente. O texto do botão desabilitado (`--color-text-secondary` sobre `--color-bg-disabled`) tem contraste de 6,1:1.
 
 
 ## Busca e resultados
