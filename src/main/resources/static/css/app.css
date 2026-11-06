@@ -675,3 +675,108 @@ a {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
+
+/* Nova reserva (tela 6): avisos, erros de campo, estado e dados em lista */
+[hidden] {
+  display: none;
+}
+
+.botao:disabled {
+  border-color: transparent;
+  background: var(--color-bg-disabled);
+  color: var(--color-text-disabled);
+  cursor: not-allowed;
+}
+
+.campo__entrada--erro {
+  border-color: var(--color-border-danger);
+  border-width: var(--border-width-focus);
+}
+
+.campo__erro {
+  margin: 0;
+  color: var(--color-text-danger);
+  font: var(--font-body-small);
+}
+
+.campo-par {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.alerta__titulo {
+  display: block;
+  font: var(--font-label-default);
+}
+
+.alerta__texto {
+  margin: 0;
+}
+
+.alerta__lista {
+  margin: var(--space-2) 0 0;
+  padding-left: var(--space-5);
+}
+
+.alerta__acoes {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: var(--space-3);
+}
+
+.alerta--aviso {
+  background: var(--color-bg-warning-subtle);
+  border-color: var(--color-border-warning);
+  color: var(--color-text-warning);
+}
+
+/* Estado da reserva (RN-05): o nome sempre aparece escrito, além da cor */
+.estado {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-full);
+  font: var(--font-label-small);
+  white-space: nowrap;
+}
+
+.estado--solicitada {
+  background: var(--color-status-solicitada-bg);
+  color: var(--color-status-solicitada-fg);
+}
+
+.lista-dados {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--space-3) var(--space-6);
+  margin: 0;
+}
+
+.lista-dados dt {
+  color: var(--color-text-secondary);
+  font: var(--font-label-default);
+}
+
+.lista-dados dd {
+  margin: 0;
+}
+
+.cartao__cabecalho--linha {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+@media (min-width: 768px) {
+  .alerta__acoes {
+    flex-direction: row;
+  }
+
+  .cartao__cabecalho--linha {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
