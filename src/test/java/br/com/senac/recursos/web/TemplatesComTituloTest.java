@@ -15,7 +15,7 @@ import org.springframework.core.io.ClassPathResource;
  */
 class TemplatesComTituloTest {
 
-    private static final List<String> TEMPLATES_DE_TELA = List.of("busca", "reserva-nova");
+    private static final List<String> TEMPLATES_DE_TELA = List.of("busca", "reserva-nova", "login", "error/401");
 
     @Test
     void todoTemplateDeTelaDeclaraUmTitleNoHead() throws Exception {
