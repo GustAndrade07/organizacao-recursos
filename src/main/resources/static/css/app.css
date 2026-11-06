@@ -892,14 +892,9 @@ a {
   }
 }
 
-/* Fila de aprovação e retirada e devolução (telas 9 e 10): detalhe do solicitante e diálogo de confirmação */
+/* Fila de aprovação e retirada e devolução (telas 9 e 10): texto dos botões em linha e diálogo de confirmação */
 .botoes-linha .botao {
   text-align: center;
-}
-
-.tabela__detalhe {
-  color: var(--color-text-secondary);
-  font: var(--font-body-small);
 }
 
 /* <dialog> aberto pelo servidor: sem JavaScript fica fixo sobre a lista; com JavaScript vira modal.
@@ -933,31 +928,4 @@ a {
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
-}
-
-.dialogo__titulo {
-  margin: 0;
-  font: var(--font-heading-h2);
-}
-
-.dialogo__texto {
-  margin: 0;
-  color: var(--color-text-secondary);
-}
-
-.dialogo__acoes {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-}
-
-@media (min-width: 768px) {
-  .dialogo__acoes {
-    flex-direction: row;
-    justify-content: flex-end;
-  }
-
-  .tabela__nome .tabela__detalhe {
-    display: block;
-  }
 }

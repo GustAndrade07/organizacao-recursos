@@ -47,7 +47,7 @@
             <tr th:each="pedido : ${pedidos}" th:attr="data-testid='aprovacao-linha-' + ${pedido.id}">
                 <th scope="row" class="tabela__nome">
                     <th:block th:text="${pedido.solicitante}">Laura Mendes</th:block>
-                    <span class="tabela__detalhe" th:if="${pedido.proprio}">(você)</span>
+                    <p class="tabela__nota" th:if="${pedido.proprio}">(você)</p>
                 </th>
                 <td data-rotulo="Recurso" th:text="${pedido.recurso}">Laboratório de Química</td>
                 <td data-rotulo="Data" th:text="${pedido.data}">09/11/2026</td>
@@ -57,7 +57,7 @@
                 </td>
                 <td class="tabela__acao">
                     <div class="botoes-linha" th:unless="${pedido.proprio}">
-                        <form method="post" th:action="@{/aprovacoes/{id}/aprovar(id=${pedido.id})}">
+                        <form method="post" data-envio-unico th:action="@{/aprovacoes/{id}/aprovar(id=${pedido.id})}">
                             <button type="submit" class="botao botao--primario"
                                     th:attr="data-testid='aprovacao-aprovar-' + ${pedido.id}, aria-label='Aprovar reserva de ' + ${pedido.solicitante} + ' para ' + ${pedido.recurso}">Aprovar</button>
                         </form>
@@ -74,10 +74,10 @@
                 data-testid="aprovacao-rejeitar-dialogo" th:if="${dialogoAberto}"
                 th:attr="data-origem='aprovacao-rejeitar-' + ${rejeitando.id}"
                 th:with="erroMotivo=${erros != null and erros.containsKey('motivo')}">
-            <form method="post" th:action="@{/aprovacoes/{id}/rejeitar(id=${rejeitando.id})}">
-                <h2 class="dialogo__titulo" id="aprovacao-rejeitar-titulo"
+            <form method="post" data-envio-unico th:action="@{/aprovacoes/{id}/rejeitar(id=${rejeitando.id})}">
+                <h2 class="cartao__titulo" id="aprovacao-rejeitar-titulo"
                     th:text="'Rejeitar o pedido de ' + ${rejeitando.solicitante} + '?'">Rejeitar o pedido de Laura Mendes?</h2>
-                <p class="dialogo__texto" id="aprovacao-rejeitar-texto"><th:block th:text="${rejeitando.recurso} + ', ' + ${rejeitando.data} + ', das ' + ${rejeitando.horario}">Laboratório de Química, 09/11/2026, das 08:00 às 10:00</th:block>. A reserva passa para <span th:replace="~{fragments/estado :: badge('Rejeitada', null)}">Rejeitada</span>.</p>
+                <p class="pagina__descricao" id="aprovacao-rejeitar-texto"><th:block th:text="${rejeitando.recurso} + ', ' + ${rejeitando.data} + ', das ' + ${rejeitando.horario}">Laboratório de Química, 09/11/2026, das 08:00 às 10:00</th:block>. A reserva passa para <span th:replace="~{fragments/estado :: badge('Rejeitada', null)}">Rejeitada</span>.</p>
                 <div class="campo">
                     <label class="campo__rotulo" for="aprovacao-motivo">Motivo da rejeição (obrigatório)</label>
                     <textarea class="campo__entrada campo__entrada--area" id="aprovacao-motivo" name="motivo" required aria-required="true" autofocus
@@ -89,7 +89,7 @@
                     <p class="campo__erro" id="aprovacao-motivo-erro" role="alert" data-testid="aprovacao-motivo-erro"
                        th:if="${erroMotivo}" th:text="${erros.get('motivo')}">Informe o motivo da rejeição.</p>
                 </div>
-                <div class="dialogo__acoes">
+                <div class="formulario__acoes">
                     <a class="botao botao--secundario" th:href="@{/aprovacoes}" data-fechar data-testid="aprovacao-rejeitar-voltar">Voltar</a>
                     <button type="submit" class="botao botao--perigo" data-testid="aprovacao-rejeitar-confirmar">Rejeitar pedido</button>
                 </div>

@@ -69,11 +69,11 @@
                 </td>
                 <td class="tabela__acao">
                     <div class="botoes-linha" th:if="${aprovada or emUso}">
-                        <form method="post" th:if="${aprovada}" th:action="@{/retirada-devolucao/{id}/retirar(id=${reserva.id})}">
+                        <form method="post" data-envio-unico th:if="${aprovada}" th:action="@{/retirada-devolucao/{id}/retirar(id=${reserva.id})}">
                             <button type="submit" class="botao botao--primario"
                                     th:attr="data-testid='retirada-devolucao-retirar-' + ${reserva.id}, aria-label='Registrar retirada de ' + ${reserva.recurso} + ' por ' + ${reserva.solicitante}">Registrar retirada</button>
                         </form>
-                        <form method="post" th:if="${emUso}" th:action="@{/retirada-devolucao/{id}/devolver(id=${reserva.id})}">
+                        <form method="post" data-envio-unico th:if="${emUso}" th:action="@{/retirada-devolucao/{id}/devolver(id=${reserva.id})}">
                             <button type="submit" class="botao botao--primario"
                                     th:attr="data-testid='retirada-devolucao-devolver-' + ${reserva.id}, aria-label='Registrar devolução de ' + ${reserva.recurso} + ' por ' + ${reserva.solicitante}">Registrar devolução</button>
                         </form>
@@ -91,10 +91,10 @@
         <dialog class="dialogo" open role="alertdialog" aria-labelledby="retirada-devolucao-nc-titulo" aria-describedby="retirada-devolucao-nc-texto"
                 data-testid="retirada-devolucao-nc-dialogo" th:if="${dialogoAberto}"
                 th:attr="data-origem='retirada-devolucao-nao-compareceu-' + ${naoCompareceu.id}">
-            <form method="post" th:action="@{/retirada-devolucao/{id}/nao-compareceu(id=${naoCompareceu.id})}">
-                <h2 class="dialogo__titulo" id="retirada-devolucao-nc-titulo">Marcar como não compareceu?</h2>
-                <p class="dialogo__texto" id="retirada-devolucao-nc-texto"><th:block th:text="${naoCompareceu.recurso} + ', de ' + ${naoCompareceu.solicitante} + ', ' + ${naoCompareceu.data} + ', das ' + ${naoCompareceu.horario}">Kit de microscópio M-02, de Beatriz Nogueira, 05/11/2026, das 09:00 às 11:00</th:block>. A reserva passa para <span th:replace="~{fragments/estado :: badge('Não compareceu', null)}">Não compareceu</span> e a mudança fica registrada.</p>
-                <div class="dialogo__acoes">
+            <form method="post" data-envio-unico th:action="@{/retirada-devolucao/{id}/nao-compareceu(id=${naoCompareceu.id})}">
+                <h2 class="cartao__titulo" id="retirada-devolucao-nc-titulo">Marcar como não compareceu?</h2>
+                <p class="pagina__descricao" id="retirada-devolucao-nc-texto"><th:block th:text="${naoCompareceu.recurso} + ', de ' + ${naoCompareceu.solicitante} + ', ' + ${naoCompareceu.data} + ', das ' + ${naoCompareceu.horario}">Kit de microscópio M-02, de Beatriz Nogueira, 05/11/2026, das 09:00 às 11:00</th:block>. A reserva passa para <span th:replace="~{fragments/estado :: badge('Não compareceu', null)}">Não compareceu</span> e a mudança fica registrada.</p>
+                <div class="formulario__acoes">
                     <a class="botao botao--secundario" th:href="@{/retirada-devolucao(estado=${filtro})}" autofocus data-fechar
                        data-testid="retirada-devolucao-nc-voltar">Voltar</a>
                     <button type="submit" class="botao botao--perigo" data-testid="retirada-devolucao-nc-confirmar">Sim, marcar como não compareceu</button>
