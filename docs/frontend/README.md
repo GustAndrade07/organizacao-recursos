@@ -90,12 +90,14 @@ Acessibilidade: rótulos visíveis, `autocomplete="username"` e `"current-passwo
 | Atributo de modelo | Conteúdo | Sem ele |
 |---|---|---|
 | `reserva` | `recursoId`, `data`, `inicio`, `termino` (o controller já preenche) | — |
-| `recurso` | `nome`, `local`, `restrito` | A tela não mostra o recurso nem o aviso de restrição |
-| `erros` | mapa `data`/`inicio`/`termino` para a mensagem, após um POST recusado | Sem erros |
+| `recurso` | `nome`, `local`, `restrito`; o back-end deve fornecer também no GET (hoje o controller não o preenche) | A tela não mostra o recurso nem o aviso de restrição |
+| `erros` | `LinkedHashMap` de `data`, `inicio` ou `termino` para texto pronto para o usuário, na ordem do formulário; outra chave aparece no resumo como texto simples, sem link | Sem erros |
 | `conflito` | verdadeiro após o 409 de horário (RN-02, RN-03) | Sem aviso |
-| `manutencao` | `inicio` e `fim` (`LocalDateTime`) após o 409 de manutenção (RN-04) | Sem aviso |
+| `manutencao` | `inicio` e `fim`, do tipo `LocalDateTime`, após o 409 de manutenção (RN-04) | Sem aviso |
 
-- Recurso restrito avisa, antes de confirmar, que a reserva ficará Solicitada até a aprovação.
+`conflito` e `manutencao` são excludentes. O corpo do `POST /reservas` leva `recursoId`, `data`, `inicio` e `termino`; o back-end rejeita `recursoId` ausente ou vazio. Ao recusar, ele renderiza `reserva-nova` com `reserva` (os mesmos quatro campos) e `recurso`; o status HTTP é livre, a tela não depende dele. Campo obrigatório vazio é barrado pelo navegador (aviso nativo), sem resumo.
+
+- Recurso restrito avisa, dentro do formulário e antes de confirmar, que a reserva ficará Solicitada até a aprovação. "Trocar recurso" leva à lista de resultados e "Voltar à busca" ao formulário, os dois com o horário escolhido.
 - Erro de campo aparece junto ao campo e num resumo no topo (`role="alert"`), com link para o campo.
 - `reserva-form.js` bloqueia término igual ou anterior ao início antes do envio (RN-01) e desabilita o botão Confirmar durante o envio. Sem JavaScript o back-end valida.
 - Sucesso leva ao detalhe da reserva (tela 8), decisão do back-end.
