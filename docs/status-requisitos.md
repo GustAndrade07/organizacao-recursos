@@ -20,7 +20,7 @@
 | RF-10 Histórico auditável | ausente | | | Gustavo |
 | RF-11 Notificação externa | ausente | | | Pedro |
 | RF-12 Relatório de utilização | ausente | | | Gustavo / Pedro / Leandro |
-| RF-13 Telas responsivas e erros claros | parcial | Telas em Thymeleaf com teste de contrato: `LayoutBaseTest`, `PaginasDeErroTest`, `LoginPaginaTest`, `CaminhoDoSiteTest`, `ContrasteBotaoDesabilitadoTest`, `BuscaPaginaTest`, `ResultadosBuscaTest`, `NovaReservaPaginaTest`, `NovaReservaEstadosTest`; nenhum valor solto no CSS: `CssSemValoresSoltosTest`. Falta o E2E Playwright em 375 px e as demais telas | | Leandro |
+| RF-13 Telas responsivas e erros claros | parcial | Telas em Thymeleaf com teste de contrato: `LayoutBaseTest`, `PaginasDeErroTest`, `LoginPaginaTest`, `CaminhoDoSiteTest`, `ContrasteBotaoDesabilitadoTest`, `BuscaPaginaTest`, `ResultadosBuscaTest`, `NovaReservaPaginaTest`, `NovaReservaEstadosTest`, `HistoricoPaginaTest`, `RelatorioPaginaTest`; nenhum valor solto no CSS: `CssSemValoresSoltosTest`. Falta o E2E Playwright em 375 px e as demais telas | | Leandro |
 | RF-14 Documentação da API | ausente | | | Pedro |
 
 ## Pendências e divisão
