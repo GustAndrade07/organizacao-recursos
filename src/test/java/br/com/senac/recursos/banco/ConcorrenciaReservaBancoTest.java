@@ -14,6 +14,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import org.junit.jupiter.api.RepeatedTest;
+import org.junit.jupiter.api.Test;
 
 /**
  * RN-03 e RF-06 no nível do banco: 20 pedidos simultâneos para o mesmo intervalo geram 1 aceito e 19 recusados pela
@@ -68,6 +69,29 @@ class ConcorrenciaReservaBancoTest extends BancoComDadosTest {
         // a reserva aceita ocupa a sala dela e o professor; as 19 recusadas não deixaram sala nenhuma
         assertThat(contar("reserva_recurso")).isEqualTo(2);
         assertThat(contar("tentativa_recusada")).isEqualTo(PEDIDOS - 1);
+    }
+
+    /**
+     * D7: sem a trava, 9 de 40 rodadas dos testes acima terminaram em deadlock (40P01). Este teste é determinístico:
+     * dentro da transação a sessão segura uma trava (advisory) por recurso gravado e a solta no commit.
+     */
+    @Test
+    void gravarOcupacaoTomaUmaTravaPorRecursoEASoltaNoFimDaTransacao() {
+        long ana = novoUsuario("ana");
+        long sala = novoRecurso("SALA", "Sala 101");
+        long professor = novoRecurso("PROFESSOR", "Profa. Marta");
+        String travasDestaSessao =
+                "select count(*) from pg_locks where locktype = 'advisory' and pid = pg_backend_pid()";
+        long[] dentro = new long[1];
+
+        tx.executeWithoutResult(status -> {
+            reservar(ana, "SOLICITADA", periodo("10:00:00", "12:00:00"), sala, professor);
+            dentro[0] = jdbc.queryForObject(travasDestaSessao, Long.class);
+        });
+        Long depois = jdbc.queryForObject(travasDestaSessao, Long.class);
+
+        assertThat(dentro[0]).as("travas dentro da transação (sala + professor)").isEqualTo(2L);
+        assertThat(depois).as("travas depois do commit").isZero();
     }
 
     private long[] solicitantes() {
