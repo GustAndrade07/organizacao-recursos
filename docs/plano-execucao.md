@@ -1,11 +1,11 @@
 # Qualidade de Software 2026.2 — Auditoria da matéria e plano de execução
 
-> Fonte: Hub de Aulas do Prof. Afonso (home, especificação do projeto, escopo da prova, página de entrega e materiais/slides das Aulas 01 a 17), lidos em 01/11/2026.
+> Fonte: Hub de Aulas do Prof. Afonso (home, especificação do projeto, escopo da prova, página de entrega e materiais/slides das Aulas 01 a 17), lidos em 01/11/2026. Materiais das Aulas 09 a 15 e a especificação reconferidos em 04/11/2026 (https://afonsolelis.github.io/aulas_senac/pages/home_qualidade_2026_2.html).
 > Plano escrito no **domingo, 01/11 (fim da Semana 44)**. Turma **STADSCAS4ND (sexta, 19h10–22h45, salas C237 / D156)**.
 > **Entrega: sexta 13/11** (Aula 14), com meta interna de terminar antes. Prova oral: **sexta 20/11** (Semana 47).
 > Grupo (3): Gustavo Oliveira Fernandes de Andrade · Leandro Sato · Pedro Henrique (conferir o nome completo com a lista da turma).
 >
-> **Status em 04/11/2026 (quarta):** Etapa 1 parcialmente concluída. Repositório público criado (https://github.com/GustAndrade07/organizacao-recursos); esqueleto Spring Boot 3.5 / Java 21 / Maven Wrapper aberto no PR #1 (CI `verify` verde, aguardando revisão do Pedro); `main` protegida por ruleset. Pendentes da Etapa 1: SonarCloud + `SONAR_TOKEN`, validar o README em clone limpo, `docs/arquitetura.md` e `docs/plano-de-teste.md`. Etapas 2 a 6 ainda não iniciadas.
+> **Status em 04/11/2026 (quarta, noite):** Etapa 1 quase concluída. Repositório público criado (https://github.com/GustAndrade07/organizacao-recursos); PRs #1 a #8 já tratados (#1, #2, #4, #5, #6, #7 e #8 mergeados; #3 fechado sem merge e substituído pelo #5; os PRs do Gustavo são revisados pelo Leandro); esqueleto Spring Boot 3.5 / Java 21 / Maven Wrapper, CI `verify` + SonarCloud (`SONAR_TOKEN` criado, Quality Gate passou no PR #4) e `main` protegida por ruleset. Docker Desktop instalado e validado nesta máquina em 04/11 (`docker run hello-world`, `docker compose up -d`, `/actuator/health` = `UP`, `./mvnw -B verify` com 21 testes e 0 ignorados). Pendentes da Etapa 1: validar o README em clone limpo (por outra pessoa), `docs/arquitetura.md` e `docs/plano-de-teste.md`. Etapas 2 a 6 ainda não iniciadas. Regras de contexto para a IA e para o grupo: `AGENTS.md` (raiz). Releitura das Aulas 09 a 15 em 04/11: ajustes marcados com **[Aula NN]** nas etapas abaixo.
 
 ---
 
@@ -139,12 +139,12 @@ Regras de trabalho valem para todas as etapas:
 ### Etapa 1 — Diagnóstico inicial e fundação (Dia 1 · dom 01/11 – seg 02/11)
 **Equivale às Aulas 01–03.**
 - [x] Criar repo público, Spring Initializr (Java 21, Web, Security, Data JPA, Validation, PostgreSQL, Flyway, Testcontainers, Actuator, springdoc-openapi). — feito em 04/11 (PR #1), Spring Boot 3.5.16; Security e springdoc entram com o back-end (Pedro).
-- [ ] `docker-compose.yml` com PostgreSQL; `README.md` com "como subir" e "como testar". — Compose e README escritos; README ainda não validado em clone limpo.
+- [ ] `docker-compose.yml` com PostgreSQL; `README.md` com "como subir" e "como testar". — Compose e README escritos; compose e `spring-boot:run` conferidos na máquina do Gustavo em 04/11; README ainda não validado em clone limpo por outra pessoa.
 - [x] **CI mínimo já no primeiro dia** (`ci.yml` com `./mvnw -B verify`) — tira o limitador "pipeline ausente" do caminho. — `ci.yml` rodando `verify`; verde no PR #1.
 - [x] Proteção da `main` exigindo o check. — ruleset ativo com o check `verify` obrigatório (Pedro e Leandro ainda precisam aceitar o convite).
 - [x] `docs/prd.md`: visão, 3 personas (Solicitante, Responsável, Administrador), RF-01..RF-14, RNF numerados **com número** (ex.: p95 ≤ 300 ms com 50 usuários, erro < 1%), regras críticas RN-01..RN-08, fora de escopo. — rascunho em `docs/prd.md` (RF-01..14, RN-01..13, RNF-01..03); personas e números a validar com o grupo.
 - [ ] Esqueleto de `docs/arquitetura.md` e `docs/plano-de-teste.md`. — pendente (`docs/arquitetura.md` ainda não existe).
-- [ ] Criar conta no SonarCloud e importar o repo (passo manual, de um humano). — pendente (passo manual do Gustavo).
+- [x] Criar conta no SonarCloud e importar o repo (passo manual, de um humano). — feito: organização `gustandrade07`, projeto `GustAndrade07_organizacao-recursos`, análise pelo CI (Automatic Analysis desligada), secret `SONAR_TOKEN` criado; Quality Gate passou no PR #4. Pendente: olhar os "Dependency risks" (meta: 0 vulnerabilidades críticas) e confirmar a análise da `main`.
 
 ### Etapa 2 — Requisitos, riscos e RTM (Dia 2 · ter 03/11)
 **Equivale às Aulas 02, 04 e 05 (parte de inventário).**
@@ -155,6 +155,7 @@ Regras de trabalho valem para todas as etapas:
 
 ### Etapa 3 — Testes e integração (Dias 3–5 · qua 04/11 – sex 06/11)
 **Equivale às Aulas 05, 06, 08 e 09.**
+- [ ] **[Aula 09]** Decidir com o grupo as "Perguntas em aberto" de `docs/testes/bdd-aprovacao-bloqueio.md` (fronteiras do período de manutenção: termina exatamente no início, começa exatamente no fim, cruza um segundo) **antes** do primeiro teste vermelho. O professor manda registrar a dúvida em vez de inventar a política. A decisão também define os limites do intervalo no banco (`tstzrange` com limite inferior fechado e superior aberto, ou outro; fica no ADR).
 - [ ] **TDD red:** testes vermelhos para cada regra do plano (commits `test(red): ...`).
 - [ ] **TDD green:** domínio e regras até a suíte ficar verde (`feat(green): ...`, `refactor: ...`). `Clock` injetado, nunca `Instant.now()` solto nem `Thread.sleep`.
 - [ ] Entidades: Recurso (sala/material, restrito, capacidade, localização), Professor (competências), Reserva + estados, Manutenção/Bloqueio, Retirada/Devolução, Auditoria, Usuário/Perfil.
@@ -174,13 +175,16 @@ Regras de trabalho valem para todas as etapas:
 
 ### Etapa 5 — Concorrência, carga, auditoria, autorização (Dias 6–7 · sáb 07/11 – dom 08/11)
 **Equivale às Aulas 10–12.**
+- [ ] **[Aula 11]** Começar a Etapa 5 pelo diagnóstico: atualizar `docs/status-requisitos.md` (feito/parcial/ausente; só vale "feito" com teste citado), ordenar as pendências pelos 4 limitadores de nota e dividir entre os três até a Semana 46. Esse arquivo é atualizado em **todo** PR depois disso, não só no fim.
+- [ ] **[Aula 11 · banco]** O relatório de utilização pede "conflitos evitados" = tentativas recusadas por sobreposição no período. Isso só existe se a tentativa recusada for **gravada** (data, recurso, intervalo pedido, motivo). Entra no modelo de dados da migração V1, senão o RF-12 não tem como ser calculado nem testado.
+- [ ] **[Aula 10 · pré-requisito]** Apache JMeter 5.6 instalado (`jmeter -v`) na máquina de quem rodar a carga (Leandro); aplicação local com PostgreSQL em container. Rodada sempre em modo CLI contra a aplicação local.
 - [ ] Teste de concorrência: 20 requisições simultâneas (`ExecutorService` + `CountDownLatch`) → 1 aceita, 19× **409**, contagem **no banco**; repetir para a agenda do professor; rodar 5×. Mostrar vermelho sem a proteção.
 - [ ] `docs/performance/rnf.md` (escrito **antes** de rodar) → `perf/reservas.jmx` + `perf/usuarios.csv` → rodada CLI → `docs/performance/resultado-01.md` (p50/p95/p99, vazão, erro separando 409 de erro real, limites da conclusão).
-- [ ] Auditoria por TDD, com teste de rollback (sem auditoria órfã) e 403 do Solicitante no histórico.
+- [ ] Auditoria por TDD, com teste de rollback (sem auditoria órfã) e 403 do Solicitante no histórico. **[Aula 11]** O registro guarda reserva, usuário, instante (via `Clock`), estado anterior, estado novo e motivo; a API não altera nem apaga registro; reserva já iniciada não pode ser apagada; a consulta do histórico é só de Responsável e Administrador (RN-09 a RN-12 do PRD). Testes de unidade primeiro, depois integração com Testcontainers; commits de teste e de código separados.
 - [ ] `GET /relatorios/utilizacao` com testes caixa-preta e valores calculados à mão no comentário do teste (período vazio, reserva cruzando borda, cancelada não conta).
 - [ ] `docs/status-requisitos.md` (feito/parcial/ausente com teste citado).
-- [ ] `docs/seguranca/matriz-autorizacao.md` (operação × anônimo/Solicitante/Responsável/Admin) → `@ParameterizedTest` lendo a matriz; casos de posse; validação 400 com mensagem clara e sem stack trace.
-- [ ] `docs/testes/mutacao-manual.md`: quebrar cada regra crítica, ver o teste falhar, `git restore`.
+- [ ] `docs/seguranca/matriz-autorizacao.md` (operação × anônimo/Solicitante/Responsável/Admin) → `@ParameterizedTest` lendo a matriz; casos de posse; validação 400 com mensagem clara e sem stack trace. **[Aula 12]** Toda rota do código precisa estar na matriz; marcar onde o código diverge da matriz (sem corrigir na hora) e listar rotas fora de qualquer regra de segurança. Cada célula vermelha vira `docs/defeitos/DEF-xxx` **antes** da correção, e a correção vem em commit próprio citando o defeito. Nenhuma célula é apagada para o teste passar.
+- [ ] `docs/testes/mutacao-manual.md`: quebrar cada regra crítica, ver o teste falhar, `git restore`. **[Aula 12]** As seis regras: sobreposição, dupla reserva, aprovação de restrito, manutenção, autorização e auditoria. Teste que continua verde com a regra quebrada é lacuna: escrever o teste que falta. Nenhuma mutação pode sobrar no código.
 - [ ] `docs/rtm.md` com **100%** dos críticos ligados a teste e run do CI.
 - [ ] Cada falha encontrada vira arquivo em `docs/defeitos/` antes da correção.
 
@@ -188,16 +192,17 @@ Regras de trabalho valem para todas as etapas:
 > Meta interna: tag `v1.0.0-rc1` e formulário enviados até **qua 11/11**. Quinta fica de folga para correções (`rc2`) e sexta é a aula de entrega e conferência na mesa.
 > Na aula de sex 06/11 (Aula 13), usar o tempo de sala para avançar o projeto e tirar dúvidas com o professor.
 **Equivale às Aulas 13–14.**
-- [ ] `docs/relatorio-qualidade.md` com números reais (cada número com fonte).
-- [ ] `docs/prova-oral/perguntas.md` (15 perguntas do projeto) e ensaio cronometrado → `docs/prova-oral/ensaio.md`.
-- [ ] Checklist em **clone limpo** seguindo só o README → `docs/entrega/checklist.md`.
+- [ ] `docs/relatorio-qualidade.md` com números reais (cada número com fonte). **[Aula 13]** Estrutura pedida: identificação (repositório, commit, data, integrantes, ambiente), escopo e fora de escopo, estratégia de teste por nível, resultados comparados às metas (80/70, 100% críticos na RTM, 0 bugs/vulnerabilidades críticas), defeitos por severidade e situação, riscos residuais e recomendação. Cada afirmação com **evidência, interpretação e limite**; o que não foi medido fica "não medido", com o motivo.
+- [ ] `docs/prova-oral/perguntas.md` (15 perguntas do projeto) e ensaio cronometrado → `docs/prova-oral/ensaio.md`. **[Aula 13]** Perguntas citam arquivos do projeto e distribuídas para ninguém responder só sobre a própria parte; respostas **não** são escritas; o ensaio é individual (todos presentes) e as lacunas viram tarefas com responsável.
+- [ ] **[Entregável da especificação: "Apresentação e demonstração do sistema"]** Roteiro da demo dentro dos 8 minutos, massa de dados de demonstração e ensaio no notebook que será usado (banco subindo com `docker compose up -d`, aplicação em `localhost:8080`). Sem aplicação executando, é limitador de nota.
+- [ ] Checklist em **clone limpo** seguindo só o README → `docs/entrega/checklist.md`. **[Aula 14]** Quem faz o clone não pode ter escrito o README nem reaproveitar nada da própria máquina; anotar o que faltou, listar bloqueadores em ordem e só então corrigir.
 - [ ] Tag anotada `v1.0.0-rc1` com CI verde (correção depois = `rc2`, nunca mover tag).
 - [ ] `CHANGELOG.md`, `docs/evidencias/README.md` (tudo apontando para o commit da tag), `docs/decisao-qualidade.md` (liberar/ressalvas/bloquear + quem fez o quê).
-- [ ] **Um integrante envia o formulário** (nomes completos + link do repo). Reenvio com o mesmo link substitui.
+- [ ] **Um integrante envia o formulário** (nomes completos + link do repo). Reenvio com o mesmo link substitui. **[Aula 14]** Texto curto para colar no formulário: link do repositório público + tag avaliada (`v1.0.0-rc1`).
 
 ### Pós-entrega (Semanas 47–50)
 - **S47 — Prova oral:** cada integrante precisa responder sobre partes que **não** escreveu.
-- **S48 — Feedback:** defeitos do feedback → 5 porquês → `test(regressao)` + `fix(...)` → `AGENTS.md`/`CLAUDE.md` + `docs/licoes-aprendidas.md`.
+- **S48 — Feedback:** defeitos do feedback → 5 porquês → `test(regressao)` + `fix(...)` → `AGENTS.md`/`CLAUDE.md` + `docs/licoes-aprendidas.md`. **[Aula 15]** Classificar cada observação (defeito de produto, lacuna de teste, lacuna de documentação ou falha de argumentação); os três primeiros viram arquivo em `docs/defeitos/`; commits `test(regressao): <id>` e `fix(<id>): <descrição>`; causa raiz = algo sobre o qual o grupo age (processo, teste ausente, requisito ambíguo, decisão de design); decisão de arquitetura que mudar vira ADR novo que substitui o anterior, sem apagar o antigo. O `AGENTS.md` já existe desde 04/11 (regras de contexto); na S48 ele só ganha as regras que os defeitos do feedback ensinarem, cada uma apontando para o teste ou verificação que a garante.
 - **S49 — Revisão integrada:** mapa regra→técnica→evidência, revisão do repo de outra equipe, incidente simulado.
 - **S50 — Encerramento:** `docs/retrospectiva-final.md`.
 
@@ -228,3 +233,6 @@ Revisão em roda: Gustavo → Pedro → Leandro → Gustavo.
 2. **Reserva dupla:** regra dentro do próprio PostgreSQL (`EXCLUDE USING gist` em `tstzrange`): o banco recusa dois horários sobrepostos para o mesmo recurso, mesmo com pedidos simultâneos. É a primeira opção que a Aula 10 cita.
 3. **Telas:** Thymeleaf, com páginas HTML geradas pelo próprio Spring, no mesmo projeto. O repositório da disciplina usa esse modelo. Basta cumprir "interface responsiva e mensagens de erro claras".
 4. **Teste E2E:** Playwright para Java (roda sem tela no CI).
+
+## 9. Como este plano se mantém atualizado
+Regra do grupo (detalhes em `AGENTS.md`): **todo pull request atualiza este plano**. Na descrição do PR entra a seção "Plano de execução" (o que foi marcado ou mudou aqui) e, neste arquivo, as caixas da etapa, a linha de status do topo (com a data) e, se for o caso, `docs/status-requisitos.md`, `docs/rtm.md` e `CHANGELOG.md`. Quando um defeito, um feedback ou a revisão de um colega ensinar algo novo ao grupo, a regra correspondente entra no `AGENTS.md` com a indicação de onde ela é verificada.

@@ -29,6 +29,7 @@
 | Registro de defeitos | parcial | não | `docs/defeitos/` |
 | Relatório final de qualidade (fonte de cada número) | não | não | `docs/relatorio-qualidade.md` |
 | Banco de perguntas e ensaio da prova oral | parcial | não | `docs/prova-oral/perguntas.md`, `docs/prova-oral/ensaio.md` |
+| Apresentação e demonstração do sistema (entregável da especificação; roteiro de 8 min com demo ensaiada) | não | não | `docs/prova-oral/ensaio.md` (a demo é a etapa 3 do roteiro) |
 
 ## Entregáveis finais
 - [ ] Tag anotada `v1.0.0-rc1` com CI verde **no commit da tag** (se corrigir depois: `rc2`; nunca mover tag já usada)
