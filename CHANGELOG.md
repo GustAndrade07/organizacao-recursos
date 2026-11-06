@@ -8,3 +8,4 @@
 - Layout base e menu em Thymeleaf (`layout.html`, `app.css`, `menu.js`), com teste que impede valor solto fora dos tokens.
 - Páginas de erro 401, 403, 404 e 500 em Thymeleaf (mais modelo genérico 4xx/5xx), com caminho para continuar e teste de servidor que prova a 404 real.
 - Tela de login em Thymeleaf (`GET /login`): formulário acessível e aviso de falha (`/login?erro`); a autenticação continua com o back-end.
+- Menu do Responsável: o item "Empréstimos" passa a se chamar "Retirada e devolução", igual ao título da tela 10; rota proposta `/retirada-devolucao` e prefixo `retirada-devolucao-` no inventário de telas.
