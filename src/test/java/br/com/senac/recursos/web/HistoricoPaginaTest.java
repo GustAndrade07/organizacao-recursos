@@ -143,6 +143,7 @@ class HistoricoPaginaTest {
         Document doc = pagina("/teste/historico/concluida");
 
         assertThat(doc.title()).isEqualTo("Histórico da reserva · Organização de Recursos");
+        assertThat(doc.select("title")).hasSize(1);
         assertThat(doc.select("h1")).hasSize(1);
         assertThat(doc.selectFirst("main#conteudo h1[data-testid=historico-titulo]").text()).isEqualTo("Histórico da reserva");
     }

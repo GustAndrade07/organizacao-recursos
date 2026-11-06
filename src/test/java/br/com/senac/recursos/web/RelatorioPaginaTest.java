@@ -133,6 +133,7 @@ class RelatorioPaginaTest {
         Document doc = pagina("/relatorios/utilizacao");
 
         assertThat(doc.title()).isEqualTo("Relatório de utilização · Organização de Recursos");
+        assertThat(doc.select("title")).hasSize(1);
         assertThat(doc.select("h1")).hasSize(1);
         assertThat(doc.selectFirst("main#conteudo h1[data-testid=relatorio-titulo]").text()).isEqualTo("Relatório de utilização");
     }
