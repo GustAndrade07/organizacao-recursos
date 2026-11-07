@@ -1,0 +1,194 @@
+/*
+ * Seção 05 · Cadastro e manutenção. Só tokens semânticos de tokens.css.
+ * Soma-se a secao02.css (tabela que vira card, alerta, estado, lista de dados, vazio). Vai para app.css na implementação.
+ */
+
+/* Cabeçalho com ação principal */
+.pagina__cabecalho--acao {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+/* Abas por tipo: links com aria-current, sem JavaScript */
+.abas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.aba {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--size-control-md);
+  padding: 0 var(--space-4);
+  border: var(--border-width-default) solid transparent;
+  border-radius: var(--radius-md);
+  color: var(--color-text-primary);
+  font: var(--font-label-default);
+  text-decoration: none;
+}
+
+.aba:hover {
+  background: var(--color-bg-subtle);
+}
+
+.aba[aria-current="page"] {
+  border-color: var(--color-border-info);
+  background: var(--color-bg-info-subtle);
+  color: var(--color-text-brand);
+}
+
+/* Busca por nome */
+.busca-nome {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/* Situação do recurso: o nome sempre escrito, além da cor */
+.situacao {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-1) var(--space-3);
+  border: var(--border-width-default) solid;
+  border-radius: var(--radius-full);
+  font: var(--font-label-small);
+  white-space: nowrap;
+}
+
+.situacao--ativo {
+  background: var(--color-bg-success-subtle);
+  border-color: var(--color-border-success);
+  color: var(--color-text-success);
+}
+
+.situacao--manutencao {
+  background: var(--color-bg-danger-subtle);
+  border-color: var(--color-border-danger);
+  color: var(--color-text-danger);
+}
+
+.situacoes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* Várias ações na linha: empilhadas até 1023 px, lado a lado no desktop */
+.botoes-linha {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+/* Campos do formulário */
+.campo__obrig {
+  color: var(--color-text-secondary);
+  font: var(--font-body-small);
+}
+
+.campo__entrada--area {
+  min-height: calc(var(--size-control-md) * 2);
+  padding: var(--space-3);
+  resize: vertical;
+}
+
+.opcao {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border: var(--border-width-default) solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-subtle);
+}
+
+.opcao input {
+  flex: none;
+  width: var(--size-icon);
+  height: var(--size-icon);
+  margin: var(--space-3) 0 0;
+  accent-color: var(--color-bg-brand);
+}
+
+.opcao__texto {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.opcao__rotulo {
+  display: flex;
+  align-items: center;
+  min-height: var(--size-control-md);
+  font: var(--font-label-default);
+}
+
+.opcao .campo__ajuda {
+  color: var(--color-text-secondary);
+}
+
+/* Lista de reservas afetadas dentro do aviso */
+.alerta__lista a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--size-control-md);
+}
+
+.reservas-afetadas {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: var(--space-3) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.reservas-afetadas li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.tabela__nota {
+  color: var(--color-text-secondary);
+  font: var(--font-body-small);
+}
+
+@media (min-width: 768px) {
+  .pagina__cabecalho--acao {
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+  }
+
+  .busca-nome {
+    flex-direction: row;
+    align-items: flex-end;
+  }
+
+  .busca-nome .campo {
+    flex: 1;
+  }
+
+  .botoes-linha {
+    align-items: stretch;
+  }
+}
+
+@media (min-width: 1024px) {
+  .botoes-linha {
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+}
+
+/* Os badges de situação e de estado não esticam na largura do cartão no mobile */
+.cartao__cabecalho--linha .situacao,
+.cartao__cabecalho--linha .estado {
+  align-self: flex-start;
+}
