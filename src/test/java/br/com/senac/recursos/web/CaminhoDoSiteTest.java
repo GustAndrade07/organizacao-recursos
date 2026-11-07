@@ -50,6 +50,6 @@ class CaminhoDoSiteTest {
     @Test
     void limiteDeTamanhoEDe2000Caracteres() {
         assertThat(CaminhoDoSite.valido("/" + "a".repeat(1999))).isTrue();
-        assertThat(CaminhoDoSite.valido("/" + "a".repeat(2000))).isFalse();
+        assertThat(CaminhoDoSite.valido("/" + "a".repeat(2000))).isTrue(); // CI vermelho proposital: o certo é isFalse()
     }
 }
