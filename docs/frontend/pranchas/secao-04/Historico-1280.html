@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="pt-BR" class="js">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Histórico da reserva · 1280</title>
+<link rel="stylesheet" href="../../../../src/main/resources/static/css/tokens.css">
+<link rel="stylesheet" href="../../../../src/main/resources/static/css/app.css">
+<link rel="stylesheet" href="secao02.css">
+<link rel="stylesheet" href="secao04.css">
+</head>
+<body>
+<a class="pular-conteudo" href="#conteudo" data-testid="menu-pular">Pular para o conteúdo</a>
+<header class="barra" data-aberto="false" data-menu>
+<div class="barra__linha">
+<a class="barra__marca" href="#" data-testid="menu-marca">Organização de Recursos</a>
+<button type="button" class="menu__botao" data-testid="menu-abrir" aria-label="Abrir menu" aria-expanded="false" aria-controls="menu-painel"><span class="menu__barra"></span><span class="menu__barra"></span><span class="menu__barra"></span></button>
+<nav class="menu__painel" id="menu-painel" aria-label="Principal">
+<ul class="menu__lista">
+<li><a class="menu__item" href="#" data-testid="menu-item-aprovacoes">Aprovações</a></li>
+<li><a class="menu__item" href="#" data-testid="menu-item-retirada-devolucao">Retirada e devolução</a></li>
+<li><a class="menu__item" href="#" data-testid="menu-item-relatorios">Relatórios</a></li>
+</ul>
+<div class="menu__rodape">
+<p class="menu__usuario"><span class="menu__nome" data-testid="menu-usuario">Carlos Souza</span><span class="menu__perfil" data-testid="menu-perfil">Responsável</span></p>
+<form action="#" method="post"><button type="submit" class="botao botao--secundario" data-testid="menu-sair">Sair</button></form>
+</div>
+</nav>
+</div>
+</header>
+<main class="conteudo" id="conteudo" tabindex="-1">
+<div class="secao">
+<header class="pagina__cabecalho">
+<h1 data-testid="historico-titulo">Histórico da reserva</h1>
+<p class="pagina__descricao"><a href="#" data-testid="historico-voltar">Voltar</a></p>
+</header>
+<section class="cartao" aria-labelledby="historico-resumo-titulo" data-testid="historico-resumo">
+<div class="cartao__cabecalho--linha">
+<h2 class="cartao__titulo" id="historico-resumo-titulo">Laboratório de Química</h2>
+<span class="estado estado--concluida" data-testid="historico-estado-atual">Concluída</span>
+</div>
+<dl class="lista-dados">
+<dt>Solicitante</dt>
+<dd>Ana Lima</dd>
+<dt>Data</dt>
+<dd>12/11/2026</dd>
+<dt>Horário</dt>
+<dd>14:00 às 15:30</dd>
+</dl>
+</section>
+<section class="cartao" aria-labelledby="historico-linha-titulo">
+<h2 class="cartao__titulo" id="historico-linha-titulo">Mudanças de estado</h2>
+<ol class="linha-tempo" data-testid="historico-linha-tempo">
+<li class="linha-tempo__item" data-testid="historico-evento-1">
+<time class="linha-tempo__data" datetime="2026-11-06T09:12" data-testid="historico-evento-1-data">06/11/2026 às 09:12</time>
+<div class="linha-tempo__corpo">
+<p class="linha-tempo__troca"><span class="linha-tempo__ponte" data-testid="historico-evento-1-de">Sem estado anterior</span> <span class="linha-tempo__ponte">para</span> <span class="estado estado--solicitada" data-testid="historico-evento-1-para">Solicitada</span></p>
+<dl class="lista-dados">
+<dt>Usuário</dt>
+<dd data-testid="historico-evento-1-usuario">Ana Lima</dd>
+<dt>Motivo</dt>
+<dd data-testid="historico-evento-1-motivo">Não informado</dd>
+</dl>
+</div>
+</li>
+<li class="linha-tempo__item" data-testid="historico-evento-2">
+<time class="linha-tempo__data" datetime="2026-11-06T11:40" data-testid="historico-evento-2-data">06/11/2026 às 11:40</time>
+<div class="linha-tempo__corpo">
+<p class="linha-tempo__troca"><span class="linha-tempo__ponte">de</span> <span class="estado estado--solicitada" data-testid="historico-evento-2-de">Solicitada</span> <span class="linha-tempo__ponte">para</span> <span class="estado estado--aprovada" data-testid="historico-evento-2-para">Aprovada</span></p>
+<dl class="lista-dados">
+<dt>Usuário</dt>
+<dd data-testid="historico-evento-2-usuario">Carlos Souza</dd>
+<dt>Motivo</dt>
+<dd data-testid="historico-evento-2-motivo">Não informado</dd>
+</dl>
+</div>
+</li>
+<li class="linha-tempo__item" data-testid="historico-evento-3">
+<time class="linha-tempo__data" datetime="2026-11-12T14:05" data-testid="historico-evento-3-data">12/11/2026 às 14:05</time>
+<div class="linha-tempo__corpo">
+<p class="linha-tempo__troca"><span class="linha-tempo__ponte">de</span> <span class="estado estado--aprovada" data-testid="historico-evento-3-de">Aprovada</span> <span class="linha-tempo__ponte">para</span> <span class="estado estado--em-uso" data-testid="historico-evento-3-para">Em uso</span></p>
+<dl class="lista-dados">
+<dt>Usuário</dt>
+<dd data-testid="historico-evento-3-usuario">Carlos Souza</dd>
+<dt>Motivo</dt>
+<dd data-testid="historico-evento-3-motivo">Não informado</dd>
+</dl>
+</div>
+</li>
+<li class="linha-tempo__item" data-testid="historico-evento-4">
+<time class="linha-tempo__data" datetime="2026-11-12T15:32" data-testid="historico-evento-4-data">12/11/2026 às 15:32</time>
+<div class="linha-tempo__corpo">
+<p class="linha-tempo__troca"><span class="linha-tempo__ponte">de</span> <span class="estado estado--em-uso" data-testid="historico-evento-4-de">Em uso</span> <span class="linha-tempo__ponte">para</span> <span class="estado estado--concluida" data-testid="historico-evento-4-para">Concluída</span></p>
+<dl class="lista-dados">
+<dt>Usuário</dt>
+<dd data-testid="historico-evento-4-usuario">Carlos Souza</dd>
+<dt>Motivo</dt>
+<dd data-testid="historico-evento-4-motivo">Não informado</dd>
+</dl>
+</div>
+</li>
+</ol>
+<p class="nota-leitura" data-testid="historico-somente-leitura">Os registros são somente leitura: não podem ser alterados nem apagados.</p>
+</section>
+</div>
+</main>
+<script src="../../../../src/main/resources/static/js/menu.js" defer></script>
+</body>
+</html>

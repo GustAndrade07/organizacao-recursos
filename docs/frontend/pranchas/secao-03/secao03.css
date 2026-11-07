@@ -1,0 +1,46 @@
+/*
+ * Seção 03 · Aprovação, retirada e devolução. Só tokens semânticos de tokens.css.
+ * Soma-se a secao02.css (tabela que vira card, estado, alerta, diálogo). Vai para app.css na implementação.
+ */
+
+/* Várias ações na mesma linha da tabela: empilhadas no mobile, lado a lado no desktop */
+.botoes-linha {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.tabela__nota {
+  color: var(--color-text-secondary);
+  font: var(--font-body-small);
+}
+
+/* Área de texto do motivo */
+.campo__entrada--area {
+  min-height: calc(var(--size-control-md) * 2);
+  padding: var(--space-3);
+  resize: vertical;
+}
+
+/* Tablet: botões empilhados para a tabela caber em 768 px; lado a lado só no desktop */
+@media (min-width: 768px) {
+  .botoes-linha {
+    align-items: stretch;
+  }
+}
+
+@media (min-width: 1024px) {
+  .botoes-linha {
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+}
+
+/* Diálogo centralizado no desktop (em secao02.css ele fica colado à esquerda acima de 448 px) */
+.dialogo {
+  left: 50%;
+  right: auto;
+  width: calc(100% - var(--space-8));
+  transform: translateX(-50%);
+}

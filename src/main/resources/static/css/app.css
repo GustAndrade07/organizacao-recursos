@@ -444,6 +444,12 @@ a {
   color: var(--color-text-secondary);
 }
 
+.pagina__descricao a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--size-control-md);
+}
+
 .campo__ajuda {
   margin: 0;
   color: var(--color-text-secondary);
@@ -738,12 +744,15 @@ a {
   color: var(--color-text-warning);
 }
 
-/* Estado da reserva (RN-05): o nome sempre aparece escrito, além da cor */
-.estado {
+/* Estado da reserva (RN-05) e situação do recurso: o nome sempre aparece escrito, além da cor */
+.estado,
+.situacao {
   display: inline-flex;
   align-items: center;
   padding: var(--space-1) var(--space-3);
   border-radius: var(--radius-full);
+  background: var(--color-bg-subtle);
+  color: var(--color-text-secondary);
   font: var(--font-label-small);
   white-space: nowrap;
 }
@@ -789,5 +798,407 @@ a {
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
+  }
+}
+
+/* Componentes compartilhados das telas de Responsável e Administrador (seções 03 a 05) */
+.campo__entrada:disabled {
+  background: var(--color-bg-disabled);
+  color: var(--color-text-disabled);
+  cursor: not-allowed;
+}
+
+.campo__entrada--area {
+  min-height: calc(var(--size-control-md) * 2);
+  padding: var(--space-3);
+  resize: vertical;
+}
+
+.botao--perigo {
+  border: var(--border-width-default) solid transparent;
+  background: var(--color-bg-danger);
+  color: var(--color-text-on-brand);
+}
+
+.botao--perigo:hover {
+  background: var(--color-bg-danger-hover);
+}
+
+.alerta--info {
+  background: var(--color-bg-info-subtle);
+  border-color: var(--color-border-info);
+  color: var(--color-text-info);
+}
+
+.alerta--sucesso {
+  background: var(--color-bg-success-subtle);
+  border-color: var(--color-border-success);
+  color: var(--color-text-success);
+}
+
+/* Estados da reserva (RN-05): os demais estados, além de SOLICITADA; o nome sempre aparece escrito */
+.estado--aprovada {
+  background: var(--color-status-aprovada-bg);
+  color: var(--color-status-aprovada-fg);
+}
+
+.estado--em-uso {
+  background: var(--color-status-em-uso-bg);
+  color: var(--color-status-em-uso-fg);
+}
+
+.estado--concluida {
+  background: var(--color-status-concluida-bg);
+  color: var(--color-status-concluida-fg);
+}
+
+.estado--rejeitada {
+  background: var(--color-status-rejeitada-bg);
+  color: var(--color-status-rejeitada-fg);
+}
+
+.estado--cancelada {
+  background: var(--color-status-cancelada-bg);
+  color: var(--color-status-cancelada-fg);
+}
+
+.estado--nao-compareceu {
+  background: var(--color-status-nao-compareceu-bg);
+  color: var(--color-status-nao-compareceu-fg);
+}
+
+/* O badge não estica na largura do cartão no mobile */
+.cartao__linha .estado,
+.cartao__linha .situacao {
+  align-self: flex-start;
+}
+
+/* Várias ações na mesma linha da tabela: empilhadas até 1023 px, lado a lado no desktop */
+.botoes-linha {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.tabela__nota {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font: var(--font-body-small);
+}
+
+@media (min-width: 768px) {
+  .botoes-linha {
+    align-items: stretch;
+  }
+}
+
+@media (min-width: 1024px) {
+  .botoes-linha {
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+}
+
+/* Histórico e relatório (telas 11 e 12): linha do tempo somente leitura, blocos e métrica do relatório */
+.linha-tempo {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.linha-tempo__item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: 0 0 var(--space-6) var(--space-8);
+}
+
+.linha-tempo__item:last-child {
+  padding-bottom: 0;
+}
+
+.linha-tempo__item::before {
+  content: "";
+  position: absolute;
+  top: var(--space-1);
+  left: 0;
+  width: var(--space-3);
+  height: var(--space-3);
+  border-radius: var(--radius-full);
+  background: var(--color-border-input);
+}
+
+.linha-tempo__item::after {
+  content: "";
+  position: absolute;
+  top: var(--space-5);
+  bottom: 0;
+  left: calc(var(--space-3) / 2);
+  width: var(--border-width-default);
+  background: var(--color-border-default);
+}
+
+.linha-tempo__item:last-child::after {
+  content: none;
+}
+
+.linha-tempo__data {
+  color: var(--color-text-secondary);
+  font: var(--font-label-default);
+}
+
+.linha-tempo__troca {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+}
+
+.linha-tempo__ponte {
+  color: var(--color-text-secondary);
+  font: var(--font-body-small);
+}
+
+.linha-tempo__corpo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.bloco {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.metrica {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: 0;
+}
+
+.metrica__valor {
+  font: var(--font-heading-h1);
+}
+
+.metrica__rotulo {
+  color: var(--color-text-secondary);
+}
+
+@media (min-width: 768px) {
+  .linha-tempo__item {
+    display: grid;
+    grid-template-columns: calc(var(--space-16) * 3) minmax(0, 1fr);
+    gap: var(--space-6);
+  }
+
+  .tabela .tabela__num {
+    text-align: right;
+  }
+}
+
+/* Login (tela 1): botão Entrar em envio. .botao:disabled e .alerta--aviso já existem acima. */
+.botao--carregando {
+  gap: var(--space-2);
+}
+
+.carregando {
+  display: inline-block;
+  width: var(--size-icon);
+  height: var(--size-icon);
+  border: var(--border-width-focus) solid var(--color-text-secondary);
+  border-top-color: transparent;
+  border-radius: var(--radius-full);
+}
+
+/* Fila de aprovação e retirada e devolução (telas 9 e 10): texto dos botões em linha e diálogo de confirmação */
+.botoes-linha .botao {
+  text-align: center;
+}
+
+/* <dialog> aberto pelo servidor: sem JavaScript fica fixo sobre a lista; com JavaScript vira modal.
+   Sem display aqui, o diálogo fechado continua escondido pelo navegador. */
+.dialogo {
+  position: fixed;
+  top: var(--space-16);
+  right: auto;
+  bottom: auto;
+  left: 50%;
+  width: calc(100% - var(--space-8));
+  max-width: calc(var(--space-16) * 7);
+  max-height: calc(100% - var(--space-16) - var(--space-4));
+  margin: 0;
+  padding: var(--space-6);
+  overflow: auto;
+  transform: translateX(-50%);
+  border: 0;
+  border-radius: var(--radius-lg);
+  background: var(--color-bg-surface);
+  color: var(--color-text-primary);
+  box-shadow: var(--shadow-overlay);
+}
+
+.dialogo::backdrop {
+  background: var(--color-text-primary);
+  opacity: 0.5;
+}
+
+.dialogo > form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+/* Cadastro de recursos e bloqueio por manutenção (telas 13 a 15) */
+.pagina__cabecalho--acao {
+  gap: var(--space-4);
+}
+
+/* Abas por tipo: links com aria-current, sem JavaScript */
+.abas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.aba {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--size-control-md);
+  padding: 0 var(--space-4);
+  border: var(--border-width-default) solid transparent;
+  border-radius: var(--radius-md);
+  color: var(--color-text-primary);
+  font: var(--font-label-default);
+  text-decoration: none;
+}
+
+.aba:hover {
+  background: var(--color-bg-subtle);
+}
+
+.aba[aria-current="page"] {
+  border-color: var(--color-border-info);
+  background: var(--color-bg-info-subtle);
+  color: var(--color-text-brand);
+}
+
+.busca-nome {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/* Situação do recurso: a base é a do .estado; aqui ficam a borda e as cores */
+.situacao {
+  border: var(--border-width-default) solid;
+}
+
+.situacao--ativo {
+  background: var(--color-bg-success-subtle);
+  border-color: var(--color-border-success);
+  color: var(--color-text-success);
+}
+
+.situacao--manutencao {
+  background: var(--color-bg-danger-subtle);
+  border-color: var(--color-border-danger);
+  color: var(--color-text-danger);
+}
+
+.situacoes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* Formulário de recurso e de bloqueio */
+.campo__obrig {
+  color: var(--color-text-secondary);
+  font: var(--font-body-small);
+}
+
+.campo__acao {
+  align-self: flex-start;
+}
+
+/* Valor só para conferir (reservas afetadas pelo bloqueio): o ajuste é por "Voltar e ajustar o período" */
+.campo__entrada[readonly] {
+  background: var(--color-bg-subtle);
+}
+
+.opcao {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border: var(--border-width-default) solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-subtle);
+}
+
+.opcao input {
+  flex: none;
+  width: var(--size-icon);
+  height: var(--size-icon);
+  margin: var(--space-3) 0 0;
+  accent-color: var(--color-bg-brand);
+}
+
+.opcao__texto {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.opcao__rotulo {
+  display: flex;
+  align-items: center;
+  min-height: var(--size-control-md);
+  font: var(--font-label-default);
+}
+
+.opcao .campo__ajuda {
+  color: var(--color-text-secondary);
+}
+
+/* Reservas afetadas pelo bloqueio, dentro do aviso */
+.reservas-afetadas {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: var(--space-3) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.reservas-afetadas li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+@media (min-width: 768px) {
+  .pagina__cabecalho--acao {
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+  }
+
+  .busca-nome {
+    flex-direction: row;
+    align-items: flex-end;
+  }
+
+  .busca-nome .campo {
+    flex: 1;
   }
 }

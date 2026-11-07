@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<!--/*
+  Tela 14 do inventário (prefixo "recurso-form-"), RF-02. Atributos de modelo (docs/frontend/README.md):
+    tipo    : TipoRecurso (o controller preenche a partir de ?tipo=; o back-end o define na edição)
+    recurso : id, nome, capacidade, localizacao, patrimonio, competencias, restrito
+              (com id é a edição, que o back-end preenche; sem id é o cadastro)
+    erros   : mapa campo (nome, capacidade, localizacao, patrimonio, competencias) para mensagem  (back-end; opcional)
+*/-->
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: pagina(titulo=${recurso.id != null ? 'Editar recurso' : 'Cadastrar recurso'}, conteudo=~{::#conteudo-pagina})}">
+<head>
+    <title th:text="${recurso.id != null ? 'Editar recurso' : 'Cadastrar recurso'}">Cadastrar recurso</title>
+</head>
+<body>
+<div id="conteudo-pagina">
+    <div class="secao"
+         th:with="edicao=${recurso.id != null},
+                  total=${erros != null ? erros.size() : 0},
+                  camposComErro=${tipo.contarCampos(erros)},
+                  lista=@{/admin/recursos(tipo=${tipo.chave})}">
+        <header class="pagina__cabecalho">
+            <h1 data-testid="recurso-form-titulo" th:text="${edicao} ? 'Editar recurso' : 'Cadastrar recurso'">Cadastrar recurso</h1>
+            <p class="pagina__descricao"><a th:href="${lista}" data-testid="recurso-form-voltar">Voltar para a lista de recursos</a></p>
+        </header>
+
+        <div class="alerta alerta--perigo" role="alert" tabindex="-1" data-testid="recurso-form-erros" th:if="${total > 0}">
+            <strong class="alerta__titulo">Não foi possível salvar o recurso</strong>
+            <p class="alerta__texto" th:if="${camposComErro > 0}"
+               th:text="${camposComErro == 1} ? 'Corrija o campo destacado:' : 'Corrija os ' + ${camposComErro} + ' campos destacados:'">Corrija os 3 campos destacados:</p>
+            <ul class="alerta__lista">
+                <li th:each="erro : ${erros}" th:switch="${tipo.campos.contains(erro.key)} ? ${erro.key} : '*'">
+                    <a th:case="'nome'" href="#recurso-form-nome" th:text="${tipo.rotuloNome}">Nome do recurso</a>
+                    <a th:case="'capacidade'" href="#recurso-form-capacidade">Capacidade (lugares)</a>
+                    <a th:case="'localizacao'" href="#recurso-form-localizacao">Localização</a>
+                    <a th:case="'patrimonio'" href="#recurso-form-patrimonio">Número de patrimônio</a>
+                    <a th:case="'competencias'" href="#recurso-form-competencias">Competências</a>
+                    <span th:case="'*'" th:text="${erro.value}">Erro sem campo</span>
+                </li>
+            </ul>
+        </div>
+
+        <form class="cartao formulario" method="post" novalidate data-envio-unico data-testid="recurso-form"
+              th:action="${edicao} ? @{/admin/recursos/{id}(id=${recurso.id})} : @{/admin/recursos}">
+            <!-- Enter no teclado aciona o primeiro botão de envio: este, invisível, garante que seja o de salvar -->
+            <button type="submit" class="so-leitor" tabindex="-1" aria-hidden="true" th:unless="${edicao}">Salvar recurso</button>
+
+            <div class="campo" th:unless="${edicao}">
+                <label class="campo__rotulo" for="recurso-form-tipo">Tipo de recurso</label>
+                <select class="campo__entrada" id="recurso-form-tipo" name="tipo" autocomplete="off"
+                        aria-describedby="recurso-form-tipo-ajuda" data-testid="recurso-form-tipo">
+                    <option value="salas" th:selected="${tipo.chave == 'salas'}">Sala</option>
+                    <option value="materiais" th:selected="${tipo.chave == 'materiais'}">Material</option>
+                    <option value="professores" th:selected="${tipo.chave == 'professores'}">Professor</option>
+                </select>
+                <p class="campo__ajuda" id="recurso-form-tipo-ajuda">Depois de escolher o tipo, use Atualizar campos.</p>
+                <button type="submit" class="botao botao--secundario campo__acao" formmethod="get"
+                        th:formaction="@{/admin/recursos/novo}"
+                        data-testid="recurso-form-trocar-tipo">Atualizar campos</button>
+            </div>
+
+            <div class="campo" th:if="${edicao}">
+                <span class="campo__rotulo">Tipo de recurso</span>
+                <span data-testid="recurso-form-tipo" th:text="${tipo.singular}">Sala</span>
+                <input type="hidden" name="tipo" th:value="${tipo.chave}">
+                <p class="campo__ajuda">O tipo não muda depois do cadastro.</p>
+            </div>
+
+            <div th:replace="~{fragments/campo :: campo('recurso-form', 'nome', ${tipo.rotuloNome}, 'text', ${recurso.nome}, ${erros?.get('nome')}, null, false, false)}"></div>
+            <th:block th:if="${tipo.chave == 'salas'}">
+                <div th:replace="~{fragments/campo :: campo('recurso-form', 'capacidade', 'Capacidade (lugares)', 'number', ${recurso.capacidade}, ${erros?.get('capacidade')}, null, false, false)}"></div>
+            </th:block>
+            <th:block th:if="${tipo.chave == 'materiais'}">
+                <div th:replace="~{fragments/campo :: campo('recurso-form', 'patrimonio', 'Número de patrimônio', 'text', ${recurso.patrimonio}, ${erros?.get('patrimonio')}, null, false, false)}"></div>
+            </th:block>
+            <th:block th:unless="${tipo.chave == 'professores'}">
+                <div th:replace="~{fragments/campo :: campo('recurso-form', 'localizacao', 'Localização', 'text', ${recurso.localizacao}, ${erros?.get('localizacao')}, null, false, false)}"></div>
+            </th:block>
+            <th:block th:if="${tipo.chave == 'professores'}">
+                <div th:replace="~{fragments/campo :: campo('recurso-form', 'competencias', 'Competências', 'textarea', ${recurso.competencias}, ${erros?.get('competencias')}, 'Separe as competências por vírgula.', false, false)}"></div>
+            </th:block>
+
+            <div class="opcao" th:unless="${tipo.chave == 'professores'}">
+                <input type="checkbox" id="recurso-form-restrito" name="restrito" th:checked="${recurso.restrito}"
+                       aria-describedby="recurso-form-restrito-ajuda" data-testid="recurso-form-restrito">
+                <div class="opcao__texto">
+                    <label class="opcao__rotulo" for="recurso-form-restrito">Recurso restrito (exige aprovação)</label>
+                    <p class="campo__ajuda" id="recurso-form-restrito-ajuda">Quem reservar este recurso fica com a reserva <span th:replace="~{fragments/estado :: badge('Solicitada', null)}">Solicitada</span> até um Responsável aprovar.</p>
+                </div>
+            </div>
+
+            <div class="formulario__acoes">
+                <button type="submit" class="botao botao--primario"
+                        data-testid="recurso-form-salvar" th:text="${edicao} ? 'Salvar alterações' : 'Salvar recurso'">Salvar recurso</button>
+                <a class="botao botao--secundario" th:href="${lista}" data-testid="recurso-form-cancelar">Cancelar</a>
+            </div>
+        </form>
+    </div>
+    <script th:src="@{/js/recurso-form.js}" defer></script>
+</div>
+</body>
+</html>
