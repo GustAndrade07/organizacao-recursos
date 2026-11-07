@@ -4,7 +4,7 @@
 > Situação: `feito` · `parcial` · `ausente`. Atualizar a cada PR e ao fim de cada etapa.
 > Ordem das pendências: primeiro o que zera a nota (aplicação não roda, CI ausente, falha de autorização, reserva dupla).
 
-Última atualização: 06/11/2026 (RF-13 `parcial` com as telas em Thymeleaf; RF-05, RF-06, RF-10 e RF-12 `parcial` só no nível do banco, com a migração V1; os demais seguem `ausente`).
+Última atualização: 07/11/2026 (RF-13 `parcial` com as telas em Thymeleaf; RF-05, RF-06, RF-10 e RF-12 `parcial` só no nível do banco, com a migração V1; os demais seguem `ausente`).
 
 | Requisito | Situação | Evidência (arquivo e nome do teste) | Risco se ficar de fora | Dono |
 |---|---|---|---|---|
