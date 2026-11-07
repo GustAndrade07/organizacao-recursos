@@ -1,8 +1,9 @@
 -- Esquema consolidado do banco (documentação). NÃO é migração: o Flyway só roda src/main/resources/db/migration.
 -- Gerado em 07/11/2026 a partir da migração V1__nucleo_da_reserva.sql, num PostgreSQL 16.15 descartável:
---   docker run --rm -d --name pg-schema -e POSTGRES_PASSWORD=x -e POSTGRES_DB=recursos postgres:16
---   psql -U postgres -d recursos -f V1__nucleo_da_reserva.sql
---   pg_dump -U postgres -d recursos --schema-only --no-owner --no-privileges
+--   1. subir um contêiner postgres:16 só para isso (Docker, banco vazio chamado recursos, apagado depois);
+--   2. aplicar a V1 com psql -f V1__nucleo_da_reserva.sql;
+--   3. rodar pg_dump --schema-only --no-owner --no-privileges nesse banco.
+-- Só estrutura: não há dados, usuários, papéis nem credenciais neste arquivo.
 -- (as linhas \restrict e \unrestrict do pg_dump, com token aleatório, foram removidas para o arquivo ser estável)
 -- Ao criar a V2, gere de novo. Não edite à mão: a fonte da verdade é a pasta db/migration.
 -- Fora da V1 (ficam para a V2): tabela movimentacao_material (RF-09) e colunas de competência e localização de recurso.
