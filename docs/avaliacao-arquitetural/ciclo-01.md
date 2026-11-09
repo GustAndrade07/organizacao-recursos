@@ -2,7 +2,7 @@
 
 > **Escrito em 07/11/2026 por Gustavo (dono da arquitetura).** É um ciclo de **leitura e análise**, feito a partir de `docs/arquitetura.md`, dos ADRs, do PRD e dos testes que existem. **Não houve sessão com Pedro e Leandro**: os pontos que dependem deles estão marcados como pendentes. O ciclo 02 está previsto para depois da API, do `GET /relatorios/utilizacao` e da rodada de carga (Etapa 5).
 > **Regra de números:** todo número tem fonte na seção 9; o que não foi medido está escrito **"não medido"**. Medições feitas na máquina do Gustavo (Windows 11, JDK 21, Docker Desktop, PostgreSQL 16.15 em Testcontainers) **não se generalizam**; não há run do CI com elas.
-> **Versão avaliada:** `main` em `009a4be` mais as branches empilhadas `feat/banco-v1` (PR #28, V1 e ADR-0007) e `feat/banco-auditoria-relatorio` (auditoria e relatório no nível do banco, ainda sem PR). `verify` dessa pilha em 07/11/2026: 510 testes, 0 falhas, 0 ignorados.
+> **Versão avaliada (atualizada em 09/11/2026):** `main` em `a6d6374`, que já tem a V1 e o ADR-0007 (PR #28), a auditoria e o relatório no nível do banco (PR #33), a checagem de CI de migração (PR #34), a seção 10 da arquitetura (PR #35) e a correção DEF-001 (PR #32, do Leandro). A versão de 07/11 era a `main` em `009a4be` mais duas branches empilhadas; o `verify` dessa pilha deu 510 testes, 0 falhas, 0 ignorados (fonte 8). O `verify` desta branch, depois do merge da `main` de 09/11, está na fonte 9.
 
 ## 1. Objetivo e escopo
 
@@ -33,7 +33,7 @@ Resumo (detalhes e diagramas C4 em [`docs/arquitetura.md`](../arquitetura.md), s
 | [0006](../adr/0006-flyway-dono-do-esquema.md) | Flyway como único dono do esquema | proposto |
 | [0007](../adr/0007-modelagem-protecao-reserva-dupla.md) | Uma constraint para recurso e professor, estado copiado por FK composta, trava por recurso | proposto (D6 e D7; a confirmar com o Pedro) |
 
-O que **existe no código** hoje: a V1 do banco e seus testes, as telas Thymeleaf (sem lógica de reserva) e o `verify` no CI. O que **não existe**: serviço de reserva, API REST, autenticação JWT, auditoria no serviço, endpoint do relatório. Toda conclusão sobre esses itens é, portanto, **sobre o desenho**, não sobre código.
+O que **existe no código** da `main` (conferido em 09/11/2026 em `a6d6374`): a V1 do banco e seus testes, as consultas do relatório e os testes de auditoria no nível do banco, as telas Thymeleaf (em `src/main/java` só há controllers de tela, sem lógica de reserva), o `verify` no CI e a checagem de migração imutável no CI. O que **não existe**: serviço de reserva, API REST, autenticação JWT, auditoria no serviço, endpoint do relatório. Toda conclusão sobre esses itens é, portanto, **sobre o desenho**, não sobre código.
 
 ## 4. Utility tree
 
@@ -47,7 +47,7 @@ Importância (A/M/B) e dificuldade/risco técnico (A/M/B), do ponto de vista da 
 | Auditabilidade | Mudança de estado e auditoria na mesma transação | C4 | A | M | nível banco: sim; serviço: não |
 | Usabilidade | Tela de reserva em 375 px, erro de conflito claro | C5 | M | B | nenhuma medida neste ciclo (**não medido**) |
 | Testabilidade | Banco real em teste, relógio injetado, integração externa isolada | transversal | A | B | banco real: sim; `Clock` e WireMock: ainda sem código que os use |
-| Manutenibilidade | Esquema só por Flyway; regra fora dos controllers | transversal | M | B | Flyway: sim (V1 aplicada em banco vazio, `MigracoesBancoTest`); regra fora dos controllers: sem serviço para conferir |
+| Manutenibilidade | Esquema só por Flyway; regra fora dos controllers | transversal | M | B | Flyway: sim (V1 aplicada em banco vazio, `MigracoesBancoTest`); migração mergeada não editada: checagem de CI (fonte 10), que só tem o que proteger agora que a V1 está na `main`; regra fora dos controllers: sem serviço para conferir |
 
 ## 5. Cenários em seis partes
 
@@ -136,7 +136,7 @@ Importância (A/M/B) e dificuldade/risco técnico (A/M/B), do ponto de vista da 
 | T3 | JWT em cada requisição | Casa com JMeter e com teste por perfil | Sem revogação imediata | Segurança × simplicidade | ADR-0001 |
 | T4 | Thymeleaf no mesmo projeto | Um deploy; menos peças | Interação rica limitada | Usabilidade × simplicidade | ADR-0003 |
 | T5 | Notificação isolada por cliente HTTP | Falha externa não derruba a reserva; testável com WireMock | A notificação pode se perder (aceito: é "simulada") | Disponibilidade × garantia de entrega | ADR-0005 |
-| T6 | Flyway imutável | Esquema reproduzível no CI e em clone limpo | Erro em migração mergeada só se corrige com a próxima versão | Manutenibilidade × agilidade | ADR-0006 |
+| T6 | Flyway imutável | Esquema reproduzível no CI e em clone limpo | Erro em migração mergeada só se corrige com a próxima versão | Manutenibilidade × agilidade | ADR-0006; checagem de CI em `.github/scripts/verificar-migracoes-imutaveis.sh` (PR #34) |
 
 O trade-off decisivo do ciclo é **T1**: a decisão que protege o limitador de maior peso (reserva dupla) é a mesma que pode custar desempenho. Hoje só um lado está medido.
 
@@ -153,7 +153,8 @@ O trade-off decisivo do ciclo é **T1**: a decisão que protege o limitador de m
 | RK5 | Linhas da mesma reserva com períodos diferentes | Reserva incoerente entre sala e professor | T2 | Regra do serviço; decidir se o banco impõe (ponto em aberto do ADR-0007) | Pedro / Gustavo |
 | RK6 | Dependências com CVSS crítico: 2 críticos do Spring Framework 6.2.19 sem correção na linha 3.5 | Meta "0 vulnerabilidades críticas" (critério da D4 ainda sem resposta do professor) | N2 | Justificativa em `docs/seguranca/riscos-dependencias.md`; pergunta ao professor | Gustavo |
 | RK7 | Fronteira do BDD desatualizada em relação à D1 | Teste e banco discordam | S1 | Atualizar `docs/testes/bdd-aprovacao-bloqueio.md` | Pedro |
-| RK8 | Premissas do relatório (D8) sem confirmação | Valores do RF-12 sem definição fechada | C1, RF-12 | Confirmar D8 na seção 9 do plano | Grupo |
+| RK8 | Premissas do relatório (D8) sem confirmação, incluindo (d): "professor" no relatório é o docente alocado (consultas do banco) ou o solicitante (spec do Front-end) | Valores do RF-12 sem definição fechada | C1, RF-12 | Confirmar D8 na seção 9 do plano | Grupo |
+| RK9 | Quality Gate do SonarCloud vermelho na `main` desde o merge do PR #12 (06/11/2026): `Web:PageWithoutTitleCheck` em páginas de erro (DEF-001); correção no PR #32. **Gate verde na `main` a confirmar** (painel privado; lista de issues não lida) | **Limitador de nota** "pipeline vermelho" | N2 | Reanalisar a `main` e ler o gate; regra 10 do `AGENTS.md` | Gustavo (Sonar), Leandro (DEF-001) |
 
 ### Não riscos (com a ressalva do nível)
 
@@ -180,7 +181,7 @@ O trade-off decisivo do ciclo é **T1**: a decisão que protege o limitador de m
 - Escrito por uma pessoa, sem sessão com os outros dois integrantes: os "dono" da seção 8 são **proposta**.
 - Os cenários C2, C3 e C5 não têm medição; C1 e C4 têm medição **só no nível do banco**, em **uma máquina**, e fora do CI.
 - Os ADRs 0005, 0006 e 0007 estão como "proposto"; este ciclo não os aceita. Eles só viram "aceito" na revisão dos PRs.
-- As fontes 3 e 5 estão na branch empilhada `feat/banco-auditoria-relatorio`; o link só funciona na `main` depois do merge do PR dessa branch.
+- As fontes 3 e 5 entraram na `main` com o PR #33 (merge em 09/11/2026); os links agora valem na `main`. As medições citadas continuam sendo as de 07/11/2026, só na máquina do Gustavo: o merge não as repetiu no CI.
 
 ## 10. Fontes
 
@@ -192,3 +193,5 @@ O trade-off decisivo do ciclo é **T1**: a decisão que protege o limitador de m
 6. [`docs/seguranca/riscos-dependencias.md`](../seguranca/riscos-dependencias.md): 2 críticos do Spring Framework 6.2.19 (painel do SonarCloud lido em 05/11/2026).
 7. [`docs/arquitetura.md`](../arquitetura.md) e [`docs/prd.md`](../prd.md): cenários, utility tree, RNF-01 a RNF-03, personas.
 8. `verify` de 07/11/2026 na pilha `feat/banco-auditoria-relatorio`: 510 testes, 0 falhas, 0 ignorados (máquina do Gustavo).
+9. `.\mvnw.cmd -B verify` desta branch, depois do merge da `main` (`a6d6374`) em 09/11/2026: 510 testes, 0 falhas, 0 ignorados, "All coverage checks have been met", BUILD SUCCESS (só na máquina do Gustavo; o run do CI do PR é a fonte oficial).
+10. [`.github/scripts/verificar-migracoes-imutaveis.sh`](../../.github/scripts/verificar-migracoes-imutaveis.sh) e [`testar-verificacao-migracoes.sh`](../../.github/scripts/testar-verificacao-migracoes.sh): auto-teste de 9 casos, 0 falhas no run do PR #34 (job 129396491011, lido em 09/11/2026); o run da `main` correspondente é o CI #143. Caso "migração existente alterada" provado só pelo auto-teste, não contra a V1 real.

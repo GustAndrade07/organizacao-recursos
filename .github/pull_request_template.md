@@ -8,6 +8,11 @@
 <!-- O que mudou em docs/plano-execucao.md (caixas marcadas, status do topo) e nos docs vivos
      (status-requisitos, RTM, CHANGELOG, ADR). Sem mudança no plano? Diga por quê. -->
 
+## Specs atualizadas
+<!-- Link da spec do Notion alterada neste PR (ou, no máximo em 24 h, a combinar aqui), ou
+     "não se aplica, porque ...". Obrigatório se a mudança toca requisito, regra de negócio,
+     rota, modelo de dados, decisão ou estado de entrega. -->
+
 ## Verificado
 <!-- O que foi rodado e o resultado. Ex.: ./mvnw -B verify, 21 testes, 0 ignorados -->
 
@@ -19,6 +24,7 @@
 - [ ] Testes novos/ajustados (no TDD, commit vermelho veio antes)
 - [ ] `docs/plano-execucao.md` atualizado (caixas e status do topo, com a data)
 - [ ] RTM e `docs/status-requisitos.md` atualizados, se a mudança tocou requisito
+- [ ] Spec do Notion da minha área atualizada (ou linha "Specs atualizadas" explica por que não se aplica)
 - [ ] Regra nova para `AGENTS.md` (seção 9), se o PR ensinou algo ao grupo
 - [ ] Branch atualizada com merge de `origin/main` (sem rebase)
 - [ ] Sem token/senha no código
