@@ -13,10 +13,11 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 /**
  * Prova que a aplicação sobe contra um PostgreSQL de verdade (sem H2) e que o Flyway roda no start.
- * Sem Docker na máquina o teste é ignorado; no CI (GitHub Actions) o Docker existe e ele roda.
+ * Docker é requisito para desenvolver (AGENTS.md, seção 8): sem Docker o teste falha em vez de ser ignorado,
+ * para o {@code verify} nunca esconder um teste atrás de "Skipped".
  */
 @SpringBootTest
-@Testcontainers(disabledWithoutDocker = true)
+@Testcontainers
 class AplicacaoSmokeTest {
 
     @Container
