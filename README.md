@@ -29,7 +29,7 @@ No Windows (PowerShell) use `.\mvnw.cmd` no lugar de `./mvnw`.
 ```bash
 ./mvnw -B verify              # testes + cobertura (JaCoCo: o build falha abaixo de 80% de linhas / 70% de branches)
 ```
-Os testes de integração usam Testcontainers e precisam do Docker rodando. Sem Docker eles são ignorados (não falham), e o CI os executa.
+Os testes de integração usam Testcontainers (PostgreSQL 16 de verdade) e precisam do Docker rodando. Sem Docker eles **falham** (não são ignorados), para o `verify` mostrar sempre `Skipped: 0`.
 Relatório de cobertura: `target/site/jacoco/index.html`.
 
 ## Regras do dia a dia
