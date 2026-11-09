@@ -44,3 +44,28 @@
 3. Falha de autorização
 4. Possibilidade de reserva dupla
 5. (demais, após o clone limpo)
+
+## Conferido sem clone (07/11/2026)
+**Isto não substitui o clone limpo.** A tabela acima continua com o estado de 04/11 e só será refeita por quem fizer o clone (ver o [roteiro](roteiro-clone-limpo.md); **o clone ainda não foi feito**). Aqui está apenas o que se conferiu sem clone, e a fonte de cada linha.
+
+**Existência de arquivos na `main`** (`git ls-tree -r origin/main`, commit `009a4be`, 07/11/2026; só diz se o arquivo existe, **não** se está atualizado nem correto):
+
+| Arquivo | Na `main` |
+|---|---|
+| `README.md`, `docker-compose.yml`, `CHANGELOG.md` | existem |
+| `.github/workflows/ci.yml` | existe (o resultado dos runs **não** foi conferido aqui) |
+| `docs/prd.md`, `docs/rtm.md`, `docs/status-requisitos.md`, `docs/arquitetura.md`, `docs/plano-de-teste.md`, `docs/plano-execucao.md` | existem |
+| `docs/adr/0001` a `0006` | existem (0005 e 0006 como "proposto") |
+| `docs/testes/bdd-aprovacao-bloqueio.md`, `docs/seguranca/riscos-dependencias.md` | existem |
+| `docs/prova-oral/perguntas.md`, `docs/prova-oral/ensaio.md` | existem |
+| `docs/testes/plano-tdd.md`, `docs/testes/evidencia-tdd.md`, `docs/testes/mutacao-manual.md` | **não existem** |
+| `docs/seguranca/matriz-autorizacao.md` | **não existe** |
+| `perf/reservas.jmx`, `docs/performance/rnf.md`, `docs/performance/resultado-01.md` | **não existem** |
+| `docs/relatorio-qualidade.md`, `docs/decisao-qualidade.md`, `docs/evidencias/README.md` | **não existem** |
+| `docs/avaliacao-arquitetural/ciclo-01.md`, `docs/banco/schema.sql` | **não existem** (em PRs abertos) |
+| Arquivos `.feature` (BDD), OpenAPI/Swagger | **não existem** |
+| `docs/defeitos/` | só `TEMPLATE.md` (nenhum defeito registrado) |
+
+**Pontos que o README da `main` tem hoje e que o clone deve confirmar:** o README diz que "sem Docker os testes são ignorados"; o PR #28 corrige isso (teste sem Docker falha). A seção "Histórico de CI vermelho proposital" do README está vazia na `main`; o PR #30 a preenche. Os dois PRs estão abertos, sem aprovação de pessoa, em 07/11/2026.
+
+**Não conferido:** se a aplicação sobe seguindo o README, o `verify` em máquina limpa, o resultado dos runs do CI na `main`, o Quality Gate atual e qualquer coluna "Atualizado".
