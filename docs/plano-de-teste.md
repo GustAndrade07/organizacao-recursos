@@ -24,7 +24,7 @@ Dar **evidência objetiva** de que o sistema cumpre os 14 requisitos funcionais 
 
 ## 3. Política de mock e ambiente
 - **Mock só em teste de unidade isolado.** Persistência e integração crítica usam **Testcontainers** (PostgreSQL 16 real) ou **WireMock**. Sem H2.
-- **Docker** é requisito para desenvolver (README). Teste novo **não** usa `disabledWithoutDocker`; o `AplicacaoSmokeTest` atual ainda usa e será trocado junto com os testes de repositório. O CI (Ubuntu) já tem Docker.
+- **Docker** é requisito para desenvolver (README). Nenhum teste usa `disabledWithoutDocker` (o `AplicacaoSmokeTest` foi trocado em 06/11/2026, junto com os testes de banco), então o `verify` mostra `Skipped: 0`; sem Docker os testes falham. O CI (Ubuntu) já tem Docker.
 - **Tempo:** `Clock` injetado nas regras de manutenção, auditoria e relatório; nunca `Instant.now()` solto nem `Thread.sleep` em teste.
 - **Dados de teste:** massa pequena semeada pelo próprio teste, com usuários dos três perfis (Solicitante, Responsável, Administrador) e recursos comum e restrito. Valores esperados de relatório são **calculados à mão**, com a conta no comentário do teste (nunca copiados da saída da aplicação). A massa de demonstração é separada da massa de teste.
 - **Banco:** esquema só por migração Flyway; nenhum teste altera o esquema por fora.
