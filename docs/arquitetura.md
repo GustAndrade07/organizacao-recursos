@@ -1,6 +1,6 @@
 # Arquitetura — Organização de Recursos
 
-> **Esqueleto da Etapa 1 (Aulas 03 e 04).** Estrutura completa e primeiras versões dos diagramas, escritas a partir do [PRD](prd.md), dos [ADRs](adr/) e do [plano](plano-execucao.md). Última atualização: 05/11/2026.
+> **Esqueleto da Etapa 1 (Aulas 03 e 04).** Estrutura completa e primeiras versões dos diagramas, escritas a partir do [PRD](prd.md), dos [ADRs](adr/) e do [plano](plano-execucao.md). Última atualização: 05/11/2026 (seção 10: coluna de evidência do RF-13 em 09/11/2026).
 > **O que é fato e o que é proposta:** o que existe no código hoje está marcado como *existe*. O resto é **proposta** (de Gustavo, dono da arquitetura) para o Pedro (back-end) e o Leandro (front-end) validarem antes da implementação. Números vêm do PRD e continuam "a validar" até serem medidos: o que não foi medido está escrito **"não medido"**.
 > Os diagramas usam Mermaid e aparecem renderizados no GitHub.
 
@@ -195,7 +195,7 @@ Outros cenários (esboço): **C4** mudança de estado sem auditoria → impossí
 | R8 | Histórico "fabricado" (red depois do green) | Perde pontos de autoria | Commits `test(red)` antes de `feat(green)`; merge com merge commit | `docs/testes/evidencia-tdd.md` |
 
 ## 10. Matriz requisito → decisão → componente → evidência (inicial)
-A coluna "Evidência" é preenchida conforme os testes existem (a RTM, `docs/rtm.md`, é o documento oficial de rastreabilidade).
+A coluna "Evidência" é preenchida conforme os testes existem (a RTM, `docs/rtm.md`, é o documento oficial de rastreabilidade). **Em 09/11/2026 só o RF-13 tem teste na `main`** (testes de contrato das telas); as demais linhas seguem "a preencher". Teste de tela prova a tela, não a regra: `FilaAprovacaoTest`, `HistoricoPaginaTest` e `RelatorioPaginaTest` não são citados como evidência de RF-07, RF-10 e RF-12.
 
 | Requisito | Decisão | Componente | Evidência |
 |---|---|---|---|
@@ -207,13 +207,14 @@ A coluna "Evidência" é preenchida conforme os testes existem (a RTM, `docs/rtm
 | RF-10 histórico auditável | auditoria na mesma transação | auditoria | a preencher |
 | RF-11 notificação | adapter HTTP isolado (ADR-0005) | notificacao | a preencher |
 | RF-12 relatório | tentativa recusada gravada | relatorio, banco | a preencher |
-| RF-13 telas e erros claros | ADR-0003 | web | a preencher |
+| RF-13 telas e erros claros | ADR-0003 | web | **parcial**: testes de contrato das telas na `main` (`LayoutBaseTest`, `PaginasDeErroTest`, `LoginPaginaTest`, `CaminhoDoSiteTest`, `CssSemValoresSoltosTest`; lista completa em [status-requisitos](status-requisitos.md)); falta o E2E Playwright em 375 px |
 
 ## 11. Pendências deste documento
 - [ ] Validar pacotes e rotas com o Pedro e as telas com o Leandro.
 - [x] Completar a seção "Consequências" dos ADRs 0001 a 0004 e escrever os ADRs de notificação e de Flyway (Etapa 2). — feito em 05/11: ADRs 0001 a 0004 com ganhos, perdas e testes exigidos; ADR-0005 (notificação) e ADR-0006 (Flyway) escritos com status **proposto**, a validar com o Pedro.
 - [x] Decidir o intervalo semiaberto (pergunta em aberto do BDD) e registrar no ADR-0002. — D1 decidida em 05/11 pelo Gustavo (`[início, fim)`), registrada no ADR-0002 e na seção 9 do [plano](plano-execucao.md); a confirmar com Pedro e Leandro na revisão.
 - [x] D2 (tentativa recusada em transação própria), D3 (409 para transição inválida) e D5 (estados que ocupam o horário), seção 9 do plano: decididas em 05/11 e registradas nos ADRs 0002, 0005 e 0006.
+- [ ] Preencher a coluna "Evidência" da seção 10 à medida que os testes de regra entram na `main` (hoje só o RF-13, parcial); cada célula cita arquivo e nome do teste.
 - [ ] Atualizar a tabela de fronteiras e a pergunta em aberto de `docs/testes/bdd-aprovacao-bloqueio.md` com a D1 (arquivo do Pedro; não alterado neste PR).
 - [ ] D4 (critério de "0 vulnerabilidades críticas"): resposta do professor ainda pendente.
 - [ ] Ciclo 01 da avaliação arquitetural: `docs/avaliacao-arquitetural/ciclo-01.md` (Etapa 3).
