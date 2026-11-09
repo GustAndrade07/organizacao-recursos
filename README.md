@@ -49,4 +49,18 @@ Relatório de cobertura: `target/site/jacoco/index.html`.
 - A `main` é protegida: só recebe código por pull request aprovado por outra pessoa, com o check `verify` verde.
 
 ## Histórico de CI vermelho proposital
-(anotar aqui o CI vermelho proposital e a recuperação)
+Etapa 4 do plano: provar que o pipeline barra código quebrado e que ele se recupera. Feito no [PR #30](https://github.com/GustAndrade07/organizacao-recursos/pull/30) (branch `ci/run-vermelho-proposital`), em 07/11/2026.
+
+| Run | Commit | Resultado | Link |
+|---|---|---|---|
+| Vermelho proposital | `22b68ae` (`test(red)`) | `failure` | [run #120, ID 42427577443](https://github.com/GustAndrade07/organizacao-recursos/actions/runs/42427577443) |
+| Recuperação (verde) | `1e5cc0b` (`ci: remove as falhas propositais...`) | `success` | [run #121, ID 42428144208](https://github.com/GustAndrade07/organizacao-recursos/actions/runs/42428144208) |
+
+**O que o run vermelho mostrou** (fonte: log e anotações do job `verify` do run #120):
+- Duas falhas provocadas de propósito: o teste novo `CiVermelhoPropositalTest` (`1 + 1 == 3`) e a asserção do limite de 2000 caracteres invertida em `CaminhoDoSiteTest.limiteDeTamanhoEDe2000Caracteres`.
+- O passo "Build, testes e cobertura" terminou com `Tests run: 428, Failures: 2, Errors: 0, Skipped: 0` e `BUILD FAILURE`; o job `verify` terminou em `failure` em 52 s.
+- O passo de artifacts rodou mesmo com a falha (`if: always()`, passo `success`) e o passo do SonarCloud foi pulado (`skipped`), porque o `verify` falhou antes dele.
+
+**O que o run verde mostrou** (fonte: jobs e check-runs do run #121 na API do GitHub): job `verify` em `success` em 1 min 48 s; passos "Build, testes e cobertura", artifacts e SonarCloud todos em `success`; checks `verify` e `SonarCloud Code Analysis` verdes no commit `1e5cc0b`. O total de testes no log do CI não foi lido neste run (log recolhido); o `verify` local do mesmo código deu 427 testes, 0 ignorados.
+
+**Como foi feito:** o `ci.yml` só dispara em `pull_request` e em push na `main`, então o vermelho exigiu abrir PR (em rascunho, sem pedir revisão até o verde). O commit de correção removeu o teste novo e restaurou a asserção. Medições feitas só nesta máquina ou só neste run não se generalizam.
