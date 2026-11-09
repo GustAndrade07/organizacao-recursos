@@ -20,7 +20,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0   # SonarCloud precisa do histórico completo
+          fetch-depth: 0   # SonarCloud e a checagem de migrações precisam do histórico completo
+      # ADR-0006: migração já mergeada na base não se edita (erro se corrige com a próxima versão).
+      # A checagem compara com a base do PR; o auto-teste roda sempre e prova que ela falha quando deve.
+      - name: Migrações existentes não podem ser alteradas (só em PR)
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: bash .github/scripts/verificar-migracoes-imutaveis.sh "origin/${BASE_REF}"
+      - name: Auto-teste da checagem de migrações
+        run: bash .github/scripts/testar-verificacao-migracoes.sh
       - uses: actions/setup-java@v4
         with:
           distribution: temurin

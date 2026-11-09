@@ -38,7 +38,7 @@ Conferência: PR sem alteração em `docs/plano-execucao.md` precisa dizer na de
 ## 5. Regras técnicas
 | Regra | Como se confere |
 |---|---|
-| Esquema do banco só por migração Flyway (`src/main/resources/db/migration`); `ddl-auto: validate`; nunca editar migração já mergeada, criar a próxima | Flyway no `verify`; revisão do PR |
+| Esquema do banco só por migração Flyway (`src/main/resources/db/migration`); `ddl-auto: validate`; nunca editar migração já mergeada, criar a próxima | Flyway no `verify`; passo "Migrações existentes não podem ser alteradas" do `ci.yml` (`.github/scripts/verificar-migracoes-imutaveis.sh`); revisão do PR |
 | Testes de persistência com **Testcontainers (PostgreSQL real)**; sem H2 | `grep -r h2 pom.xml` vazio |
 | Teste novo **sem** `disabledWithoutDocker`: Docker é requisito para desenvolver (o CI já tem). O `AplicacaoSmokeTest` foi trocado em 06/11/2026; hoje nenhum teste usa a anotação | `Skipped: 0` no `verify` |
 | Mock só em teste de unidade isolado; persistência e integrações externas com Testcontainers ou WireMock | Revisão do PR |

@@ -20,7 +20,7 @@
   - **Exige de testes:**
     - Teste com Testcontainers que aplica **todas** as migrações num banco vazio e sobe o contexto com `ddl-auto: validate`.
     - Teste que confirma a extensão `btree_gist` instalada e a constraint de exclusão existente no catálogo do banco (ex.: `pg_extension`, `pg_constraint`), para o teste de concorrência não passar em banco sem proteção.
-    - Revisão de PR (e, como proposta, uma checagem no CI que falhe se um arquivo já existente em `db/migration` for modificado em relação a `origin/main`; **não existe hoje**).
+    - Revisão de PR e uma checagem no CI que falha se um arquivo `V<n>__*.sql` já existente em `db/migration` for modificado, apagado ou renomeado em relação à base do PR (`.github/scripts/verificar-migracoes-imutaveis.sh`, passo do `ci.yml`, com auto-teste em `.github/scripts/testar-verificacao-migracoes.sh`). Em 09/11/2026 a checagem existe nesta branch (9 casos no auto-teste local); o primeiro run dela no GitHub Actions ainda não foi lido. Ela protege a V1, que já está na `main`; migração nova e `.gitkeep` não são bloqueados.
     - O `AplicacaoSmokeTest` continua cobrindo a subida; a troca de `disabledWithoutDocker` foi feita em 06/11/2026, junto com os testes de banco ([plano-de-teste.md](../plano-de-teste.md), seção 3).
 - **Pendências:**
   - **D1 decidida** (Gustavo, 05/11/2026, seção 9 do plano): intervalo semiaberto `[início, fim)`; os limites do `tstzrange` na V1 seguem isso.
