@@ -5,7 +5,10 @@
   O destino da ação principal só é aceito se for um caminho deste site (regra única em CaminhoDoSite, exposta como ${caminhoDoSite}:
   "/<TAB>/x", "/\x", "//x", "%2f" etc. são recusados); qualquer outra coisa vira o início.
 */-->
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Erro</title>
+</head>
 <body>
 <section class="erro" th:fragment="erro(codigo, tom, titulo, mensagem, acaoRotulo, acaoHref, acao2Rotulo, acao2Href)">
     <p class="erro__codigo" th:classappend="'erro__codigo--' + ${tom}" data-testid="erro-codigo"
