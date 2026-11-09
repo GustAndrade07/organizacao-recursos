@@ -58,7 +58,7 @@ Não existe código de produção de auditoria ainda (o serviço é do Pedro). P
 | M3a | a auditoria passa a ser gravada em transação própria (`REQUIRES_NEW`) antes da mudança de estado que o banco recusa | 1 de 3 vermelhos: `mudancaDeEstadoRecusadaPeloBancoDesfazAAuditoriaJaGravada` (a auditoria sobrevive ao rollback: auditoria órfã) |
 | M3b | a mudança de estado passa a ser gravada em transação própria antes da auditoria que o banco recusa | 1 de 3 vermelhos: `auditoriaRecusadaPeloBancoDesfazAMudancaDeEstadoJaFeita` (o estado muda sem auditoria) |
 
-Este é também o "vermelho" do teste de rollback, que nasceu verde porque o rollback é do PostgreSQL (regra 10 do `AGENTS.md`).
+Este é também o "vermelho" do teste de rollback, que nasceu verde porque o rollback é do PostgreSQL (regra 11 do `AGENTS.md`).
 **Pendente (Pedro):** repetir a mutação de auditoria no serviço de reserva (gravar a auditoria fora da transação) e ver o teste do serviço falhar.
 
 ### M4 e M5 — consultas do relatório (RF-12), mutações a mais
