@@ -53,7 +53,9 @@ class ReservaE2ETest extends E2ETeste {
         // travar o botão, mas só uma requisição sai (medido em 11/11/2026; ver docs/frontend/README.md)
         assertThat(enviosDeFormulario()).isBetween(1, 2);
         assertThat(posts).hasSize(1);
-        assertThat(posts.get(0).postData()).isEqualTo("recursoId=7&data=2026-11-12&inicio=14%3A00&termino=15%3A30");
+        // Desde o PR #44 a cadeia das telas tem CSRF: o formulário manda o token antes dos campos (SegurancaConfig).
+        assertThat(posts.get(0).postData()).startsWith("_csrf=")
+                .endsWith("&recursoId=7&data=2026-11-12&inicio=14%3A00&termino=15%3A30");
     }
 
     @Test
@@ -141,6 +143,7 @@ class ReservaE2ETest extends E2ETeste {
         pagina.waitForRequest(r -> "POST".equals(r.method()), () -> testid("reserva-alterar-confirmar").click());
         assertThat(testid("reserva-alterar-confirmar")).hasText("Salvando…");
         assertThat(posts).hasSize(1);
-        assertThat(posts.get(0).postData()).isEqualTo("data=2026-11-13&inicio=16%3A00&termino=17%3A00");
+        assertThat(posts.get(0).postData()).startsWith("_csrf=")
+                .endsWith("&data=2026-11-13&inicio=16%3A00&termino=17%3A00");
     }
 }

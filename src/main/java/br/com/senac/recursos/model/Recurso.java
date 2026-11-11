@@ -42,11 +42,16 @@ public class Recurso {
 
     public Recurso(TipoRecurso tipo, String nome, Integer capacidade, boolean restrito) {
         this.tipo = tipo;
-        atualizar(nome, capacidade, restrito);
+        definir(nome, capacidade, restrito);
     }
 
     /** O tipo não muda depois do cadastro: trocar sala por professor mudaria o sentido das reservas existentes. */
-    public final void atualizar(String nome, Integer capacidade, boolean restrito) {
+    public void atualizar(String nome, Integer capacidade, boolean restrito) {
+        definir(nome, capacidade, restrito);
+    }
+
+    /** Privado para o construtor não chamar método sobrescrevível (o proxy do Hibernate estende a entidade). */
+    private void definir(String nome, Integer capacidade, boolean restrito) {
         this.nome = nome;
         this.capacidade = capacidade;
         this.restrito = restrito;

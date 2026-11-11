@@ -51,6 +51,7 @@ public class SegurancaConfig {
     private static final Logger LOG = LoggerFactory.getLogger(SegurancaConfig.class);
 
     private static final int TAMANHO_MINIMO_SEGREDO = 32;
+    private static final SecureRandom ALEATORIO = new SecureRandom();
 
     private static final String ADMINISTRADOR = "ADMINISTRADOR";
     private static final String RESPONSAVEL = "RESPONSAVEL";
@@ -62,8 +63,8 @@ public class SegurancaConfig {
         http
                 .securityMatcher("/api/**")
                 // API stateless: o token vai no cabeçalho Authorization, nunca em cookie; sem sessão não há o que
-                // um site de terceiros forjar (CSRF). Justificativa do hotspot em docs/seguranca/matriz-autorizacao.md.
-                .csrf(AbstractHttpConfigurer::disable)
+                // um site de terceiros forjar (CSRF). Justificativa da S4502 em docs/seguranca/matriz-autorizacao.md.
+                .csrf(AbstractHttpConfigurer::disable) // NOSONAR java:S4502 - API stateless com JWT no cabeçalho
                 .sessionManagement(sessao -> sessao.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
@@ -108,16 +109,13 @@ public class SegurancaConfig {
 
     /**
      * Telas, páginas de erro, arquivos estáticos e {@code /actuator/health}: abertos, como antes do back-end (D12
-     * pendente). CSRF desligado aqui também, para as telas ficarem exatamente como estavam: o pacote {@code web} não
-     * tem nenhuma rota que grave (só GET), não há sessão nem login de tela, então não há o que forjar; ligado, o
-     * Spring injetaria {@code _csrf} em todo formulário e mudaria o que as telas enviam (os E2E conferem o corpo). O
-     * CSRF volta ligado no PR que decidir a D12 e criar a primeira rota de tela que grave com sessão.
+     * pendente). CSRF ligado (padrão do Spring): todo formulário de tela leva o {@code _csrf}, então a primeira rota
+     * de tela que gravar com sessão (D12) já nasce protegida.
      */
     @Bean
     @Order(2)
     SecurityFilterChain cadeiaDasTelas(HttpSecurity http) throws Exception {
         http
-                .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(rota -> rota.anyRequest().permitAll())
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable);
@@ -142,7 +140,7 @@ public class SegurancaConfig {
             LOG.warn("JWT_SECRET não definido: usando chave aleatória; os tokens deixam de valer quando a aplicação "
                     + "reinicia. Defina JWT_SECRET fora do ambiente de desenvolvimento.");
             byte[] aleatoria = new byte[TAMANHO_MINIMO_SEGREDO];
-            new SecureRandom().nextBytes(aleatoria);
+            ALEATORIO.nextBytes(aleatoria);
             return new SecretKeySpec(aleatoria, "HmacSHA256");
         }
         byte[] bytes = segredo.getBytes(StandardCharsets.UTF_8);

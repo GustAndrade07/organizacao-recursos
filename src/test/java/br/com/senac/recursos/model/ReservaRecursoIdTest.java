@@ -30,7 +30,6 @@ class ReservaRecursoIdTest {
         ReservaRecursoId b = chave(1L, 2L);
 
         assertThat(a).isEqualTo(b).hasSameHashCodeAs(b);
-        assertThat(a).isEqualTo(a);
         assertThat(a.getReservaId()).isEqualTo(1L);
         assertThat(a.getRecursoId()).isEqualTo(2L);
     }
@@ -38,11 +37,12 @@ class ReservaRecursoIdTest {
     @Test
     void qualquerParteDiferenteEhOutraChave() throws Exception {
         ReservaRecursoId base = chave(1L, 2L);
+        Object outroTipo = "1-2";
 
         assertThat(base).isNotEqualTo(chave(1L, 3L))
                 .isNotEqualTo(chave(9L, 2L))
                 .isNotEqualTo(chave(null, 2L))
                 .isNotEqualTo(null)
-                .isNotEqualTo("1-2");
+                .isNotEqualTo(outroTipo);
     }
 }

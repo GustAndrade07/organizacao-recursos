@@ -6,6 +6,7 @@ import br.com.senac.recursos.exception.CredenciaisInvalidasException;
 import br.com.senac.recursos.model.Usuario;
 import br.com.senac.recursos.repository.UsuarioRepository;
 import java.util.Optional;
+import java.util.UUID;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,7 +24,8 @@ public class AutenticacaoService {
         this.usuarios = usuarios;
         this.codificadorDeSenha = codificadorDeSenha;
         this.tokens = tokens;
-        this.hashFalso = codificadorDeSenha.encode("senha-que-nao-pertence-a-ninguem");
+        // Valor aleatório a cada subida: não é senha de ninguém e não fica escrito no código.
+        this.hashFalso = codificadorDeSenha.encode(UUID.randomUUID().toString());
     }
 
     /**
