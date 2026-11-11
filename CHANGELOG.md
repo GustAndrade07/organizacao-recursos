@@ -1,6 +1,7 @@
 # Changelog
 
 ## [Não lançado]
+- Telas de minhas reservas (`GET /reservas/minhas`) e de detalhe da reserva (`GET /reservas/{id}`) em Thymeleaf: filtro por estado, estado vazio com atalho para a busca, Alterar e Cancelar só quando a reserva ainda pode mudar (pergunta D9 do plano), alteração de data e horário com erros de campo, conflito e manutenção, e cancelamento com confirmação que avisa que não pode ser desfeito. `reserva-form.js` passa a servir a nova reserva e a alteração (prefixo em `data-reserva-form`). A listagem, a alteração e o cancelamento continuam com o back-end.
 - CI vermelho proposital e recuperação (Etapa 4): o run #120 do PR #30 ficou vermelho com 2 falhas provocadas e o commit de correção as removeu; links e o que o run mostrou em "Histórico de CI vermelho proposital" do README. Nenhum código de produção alterado.
 - Estrutura inicial do repositório e documentação base.
 - Pranchas da seção 01 (login, menu por perfil e páginas de erro) em `docs/frontend/pranchas/secao-01/`, em 375 px e 1280 px, para aprovação antes da implementação dos estados novos.

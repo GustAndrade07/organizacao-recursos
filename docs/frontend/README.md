@@ -115,6 +115,47 @@ Envio: no evento `submit`, o `login.js` desabilita o botão Entrar, mostra "Entr
 - Erro de campo aparece junto ao campo e num resumo no topo (`role="alert"`), com link para o campo.
 - `reserva-form.js` bloqueia término igual ou anterior ao início antes do envio (RN-01) e desabilita o botão Confirmar durante o envio. Sem JavaScript o back-end valida.
 - Sucesso leva ao detalhe da reserva (tela 8), decisão do back-end.
+- `reserva-form.js` serve a esta tela e à alteração da tela 8: o formulário diz o prefixo dos ids em `data-reserva-form` (`reserva-form` aqui, `reserva-alterar` na tela 8). `GanchosDoScriptDeReserva` (teste) confere que todo seletor do script existe nas duas páginas.
+
+## Minhas reservas e detalhe
+
+Telas 7 e 8 do Solicitante (`ReservaController`, RF-04, RN-01, RN-05 e RN-07; spec 02 do Notion). **Não listam, alteram nem cancelam nada**; o controller só devolve o filtro e a ação pedida. Contrato com o back-end, a confirmar com o Pedro:
+
+| Rota | Template | Para quê |
+|---|---|---|
+| `GET /reservas/minhas?estado=` | `reservas-minhas.html` | Tela 7: lista do usuário logado com filtro por estado |
+| `GET /reservas/{id}` | `reserva-detalhe.html` | Tela 8: detalhe; `?acao=alterar` abre o formulário e `?acao=cancelar` abre a confirmação (outro valor é ignorado; `{id}` não numérico responde 400) |
+| `POST /reservas/{id}` | (back-end) | Altera data e horário (campos `data`, `inicio`, `termino`) |
+| `POST /reservas/{id}/cancelar` | (back-end) | Cancela, sem corpo |
+
+**Quando a reserva pode mudar.** Alterar e Cancelar só aparecem para `Solicitada` ou `Aprovada` com `iniciada` **exatamente** falso (nome exato, como nas telas 9 e 10; `iniciada` ausente conta como iniciada). Isso é a proposta da pergunta em aberto **D9** do plano (cancelar Solicitada, o que é "já iniciada" e se alterar uma Aprovada restrita volta a Solicitada); o back-end continua obrigado a recusar a transição inválida. Nos outros casos o detalhe diz "Esta reserva não pode mais ser alterada nem cancelada." e a lista mostra só "Ver detalhes".
+
+**Tela 7, lista (`reservas-minhas.html`)**
+
+| Atributo de modelo | Conteúdo | Sem ele |
+|---|---|---|
+| `filtro` | `todos` (padrão), `solicitada`, `aprovada`, `em-uso`, `concluida`, `rejeitada`, `cancelada` ou `nao-compareceu`; o controller preenche com `?estado=` (desconhecido vira `todos`) e o back-end filtra por ele | — |
+| `reservas` | do usuário logado, **já ordenadas com as próximas primeiro** (a tela não reordena): `id`, `recurso`, `local`, `data` e `horario` (texto pronto), `estado` (nome por extenso) e `iniciada` (booleano: o horário de início já chegou) | Vazia com `todos`: "Você ainda não tem reservas" e "Buscar recursos"; vazia com outro filtro: "Nenhuma reserva com esse estado" e "Ver todas as reservas" |
+
+- Cada linha tem "Ver detalhes" (`/reservas/{id}`) e, quando pode mudar, "Alterar" (`?acao=alterar`) e "Cancelar" (`?acao=cancelar`, que só abre a confirmação). Os três links têm nome acessível com o recurso e a data.
+- Tabela no desktop e cartões no mobile com o mesmo HTML (`data-rotulo`); o badge vem de `fragments/estado :: badge`.
+
+**Tela 8, detalhe (`reserva-detalhe.html`)**
+
+| Atributo de modelo | Conteúdo | Sem ele |
+|---|---|---|
+| `acao` | `alterar` ou `cancelar` (o controller preenche com `?acao=`). Ao recusar o `POST /reservas/{id}`, o back-end renderiza a view com `acao` = `alterar` | Só o resumo |
+| `reserva` | `id`, `recurso`, `local`, `data` (`LocalDate`), `inicio` e `termino` (`LocalTime`; a tela formata "14:00 às 15:30"), `estado`, `iniciada` e `motivo` (da rejeição, opcional; aparece só em `Rejeitada`) | A página mostra só o título e "Voltar para minhas reservas" |
+| `formulario` | `data`, `inicio`, `termino` que o usuário enviou na alteração recusada | O formulário vem com os valores da reserva |
+| `erros` | `LinkedHashMap` de `data`, `inicio` ou `termino` para texto pronto; outra chave entra no resumo como texto, sem link | Sem erros |
+| `conflito` | verdadeiro após o 409 de horário na alteração | Sem aviso |
+| `manutencao` | `inicio` e `fim` (`LocalDateTime`) após o 409 de manutenção | Sem aviso |
+| `confirmacao` | `titulo`, `reserva` e `estado` (fragmento `fragments/confirmacao`), depois de criar, alterar ou cancelar | Sem aviso |
+
+- `Solicitada` mostra "Aguardando a aprovação de um Responsável."
+- A alteração mantém o recurso e só troca data e horário; usa os mesmos campos, resumo de erros e avisos de conflito e manutenção da nova reserva, e `reserva-form.js` bloqueia término igual ou anterior ao início (RN-01) e desabilita "Salvar alterações" durante o envio. "Voltar sem alterar" volta a `/reservas/{id}`.
+- Cancelar abre o diálogo "Cancelar a reserva?" (mesmo padrão das telas 9 e 10: `<dialog open>` do servidor, `dialogo.js`, foco inicial em "Voltar"), que avisa que a ação não pode ser desfeita. "Sim, cancelar reserva" envia `POST /reservas/{id}/cancelar` uma vez só (`data-envio-unico`).
+- Onde fica o link para o histórico (tela 11) continua decisão do back-end; o Solicitante não o vê (RN-11).
 
 ## Recursos e bloqueio por manutenção
 
@@ -211,7 +252,7 @@ O back-end pode usar DTO próprio no lugar de `FormularioRecurso`, `FormularioBl
 - Reserva Aprovada com `horarioPassou` mostra a etiqueta "Horário já passou" e o botão "Marcar como não compareceu", que leva a `?estado={filtro}&naoCompareceu={id}` e abre um diálogo de confirmação (`role="alertdialog"`, foco em "Voltar"), porque a mudança não tem volta: Não compareceu é estado terminal (RN-05) e fica registrada para auditoria (RN-08). "Marcar como não compareceu" também é um link, pelo mesmo motivo de "Rejeitar". O prazo para marcar NAO_COMPARECEU ainda é decisão pendente do back-end: a tela mostra o botão quando ele disser `horarioPassou`. Reserva Em uso nunca mostra a etiqueta nem o botão.
 - Depois de cada ação o aviso `role="status"` diz o novo estado; o redirecionamento para `GET /retirada-devolucao` com `confirmacao` fica a cargo do back-end.
 
-### Diálogos (telas 9 e 10)
+### Diálogos (telas 8, 9 e 10)
 
 Os dois diálogos são `<dialog>` que o servidor entrega com o atributo `open`, e `dialogo.js` (só carregado quando há diálogo) troca `open` por `showModal()`: fundo escurecido, foco preso, Esc fecha e o endereço volta ao da lista. Sem JavaScript o `<dialog open>` fica não modal, aparece fixo sobre a lista sem o fundo escurecido e vem depois da tabela na ordem de tabulação (quem navega por teclado precisa passar pela lista para chegar a ele); "Voltar" é um link para a lista. Com JavaScript, ao fechar com Esc o foco volta ao link que abriu o diálogo (`data-origem` guarda o `data-testid` dele) e o endereço volta ao da lista. O foco inicial é o campo do motivo na rejeição e o botão "Voltar" na confirmação de não compareceu.
 
