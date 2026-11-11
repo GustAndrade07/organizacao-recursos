@@ -15,3 +15,18 @@
 **Não verificado:** os fluxos contra o back-end real (login, 409, 401 e 403); larguras de 768 e 1280 px (só à mão); contraste AA de todas as telas.
 
 **Run preso no GitHub (11/11/2026, 20:15 a 20:45 UTC).** O run 43094668839 (commit `67b247b`) terminou todos os passos com sucesso às 20:18:03: navegador em 26 s, "Build, testes e cobertura" em 66 s, SonarCloud em 55 s e "Complete job" com sucesso. Mesmo assim, o GitHub continuou mostrando o job e o run como `in_progress` e recusou as duas saídas pela API: cancelar ("409 Cannot cancel a workflow run that is not in progress") e reexecutar ("403 This workflow is already running"). Os testes e o código não tiveram nenhum papel nisso. O check obrigatório `verify` ficou pendente por causa desse registro, e o run seguinte (deste commit) substitui o preso, pelo `concurrency` com `cancel-in-progress` do `ci.yml`.
+
+**Autoria reescrita (11/11/2026, pedido do Leandro).** Os 10 commits do PR passaram a ter o Leandro como autor e committer, e as linhas de coautoria da ferramenta de IA saíram das mensagens (`git filter-branch` só no intervalo `origin/main..`, com force push). O conteúdo ficou idêntico (diff vazio entre a ponta antiga e a nova), e os 2 merges com a `main` continuam com os mesmos pais na `main`. **Os hashes citados neste arquivo, no relatório de qualidade, na RTM e no plano são os de antes da reescrita**, porque os runs do CI citados como evidência rodaram nesses commits e continuam visíveis no GitHub Actions. Correspondência:
+
+| Antes | Depois | Commit |
+|---|---|---|
+| `43f8890` | `62dc6cb` | docs(status): registra o run 43094668839 preso como in_progress no GitHub |
+| `67b247b` | `8b231b1` | docs(e2e): registra a falha intermitente do print no relatório e no README do front-end |
+| `3c573fe` | `18b99f3` | fix(e2e): print de página inteira espera um quadro desenhado antes de capturar |
+| `e15199a` | `bf38071` | docs(qualidade): relatório de qualidade, versão 1 (estrutura da Aula 13) |
+| `e66c000` | `8b5ec44` | docs(rtm): todos os requisitos do PRD com risco, teste, evidência e situação |
+| `4bf214c` | `4ffb1c4` | docs(e2e): tempo do navegador e do E2E no primeiro run do CI (run 43091027823) |
+| `3d63d72` | `0891dd8` | chore: merge origin/main e status e changelog no formato da regra 12 |
+| `3a8d85a` | `5e39c07` | test(e2e): Playwright em 375 px nas telas e nos fluxos (ADR-0004, RF-13) |
+| `c0f21ef` | `ba5b54d` | chore: merge origin/main nas telas 7 e 8 (resolve conflitos em CHANGELOG e plano) |
+| `b58380d` | `a81922a` | feat(frontend): telas de minhas reservas e detalhe da reserva (spec 02, RF-04) |

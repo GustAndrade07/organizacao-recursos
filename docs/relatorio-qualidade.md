@@ -10,7 +10,7 @@
 | Disciplina | Qualidade de Software 2026.2, Prof. Afonso, turma STADSCAS4ND |
 | Integrantes | Gustavo Oliveira Fernandes de Andrade (banco, CI, SonarCloud, arquitetura) · Pedro Henrique (back-end, PRD) · Leandro Sato (front-end, RTM, relatório, decisão de qualidade) |
 | Repositório | https://github.com/GustAndrade07/organizacao-recursos |
-| Commit avaliado | `e66c000`, ponta do PR #42 (branch `satoworktree/eloquent-turing-f9j5ey`). Contém a `main` até `8b18dd9` mais as telas 7 e 8, o E2E e a RTM. **Ainda não está na `main`** |
+| Commit avaliado | `e66c000` (hash de antes da reescrita de autoria de 11/11/2026; mesmo conteúdo que `8b5ec44`, correspondência em `docs/status/2026-11-11-satoworktree-eloquent-turing-f9j5ey.md`), ponta do PR #42 (branch `satoworktree/eloquent-turing-f9j5ey`). Contém a `main` até `8b18dd9` mais as telas 7 e 8, o E2E e a RTM. **Ainda não está na `main`** |
 | Data | 11/11/2026 |
 | Ambiente de CI | GitHub Actions, `ubuntu-latest`, Java 21 (Temurin), Maven Wrapper; PostgreSQL 16 em Testcontainers; Chromium 1243 pelo Playwright para Java 1.63.0 |
 | Pilha | Spring Boot 3.5.16, Thymeleaf, Flyway, JUnit 5, Testcontainers, Playwright, JaCoCo, SonarCloud |
