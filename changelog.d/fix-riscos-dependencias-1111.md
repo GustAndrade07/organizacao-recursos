@@ -1,0 +1,1 @@
+- `jsoup` (só teste) de 1.22.2 para 1.24.1 e revisão de 11/11/2026 em `docs/seguranca/riscos-dependencias.md` (Spring Framework 6.2.19 segue sem correção na linha; críticos aceitos com justificativa).

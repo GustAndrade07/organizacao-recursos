@@ -1,0 +1,1 @@
+- README: seção "Banco de dados" e checagem de migração e checks exigidos na seção de CI.
