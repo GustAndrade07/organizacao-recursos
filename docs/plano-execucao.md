@@ -174,7 +174,7 @@ Regras de trabalho valem para todas as etapas:
 **Equivale às Aulas 02, 04 e 05 (parte de inventário).**
 - [x] `docs/arquitetura.md`: C4 contexto/contêineres/componentes em Mermaid, sequências de "criar reserva" e "aprovar restrito", utility tree, cenários em 6 partes, sensibilidade, trade-off, riscos. — esqueleto em 05/11 (Etapa 1); em 05/11 os trade-offs apontam para os ADRs 0005 e 0006. Pacotes e rotas seguem como proposta a validar com Pedro e Leandro (pendência no fim do documento).
 - [x] ADRs em `docs/adr/`: autenticação (JWT), proteção de concorrência (constraint `EXCLUDE USING gist` em `tstzrange` vs lock pessimista), notificação via HTTP isolada, migrações com Flyway. — feito em 05/11: "Consequências" dos ADRs 0001 a 0004 (ganhamos, perdemos, exige de testes) e ADRs novos 0005 (notificação) e 0006 (Flyway), ambos com status **proposto** até a revisão. Os ADRs 0002, 0005 e 0006 registram D1, D2, D3 e D5 como decididas pelo Gustavo em 05/11 (ver seção 9); a D4 segue pendente do professor.
-- [ ] `docs/rtm.md` inicial: requisito → risco → teste (a escrever) → evidência.
+- [x] `docs/rtm.md` inicial: requisito → risco → teste (a escrever) → evidência. — feito em 11/11/2026 (Leandro, PR #42): RF-01 a RF-14, RN-01 a RN-13 e RNF-01 a RNF-03, cada um com risco, teste existente por camada (ou "a escrever"), evidência no run 43091027823 do CI e situação. A caixa de "100% dos críticos" (Etapa 5) continua aberta: o RF-01 não tem teste da regra.
 - [ ] `docs/testes/plano-tdd.md`: inventário de todas as regras com casos (feliz, limite, inválido, conflito, estado proibido).
 
 ### Etapa 3 — Testes e integração (Dias 3–5 · qua 04/11 – sex 06/11)
