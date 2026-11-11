@@ -5,7 +5,9 @@
 > **Entrega: sexta 13/11** (Aula 14), com meta interna de terminar antes. Prova oral: **sexta 20/11** (Semana 47).
 > Grupo (3): Gustavo Oliveira Fernandes de Andrade · Leandro Sato · Pedro Henrique (conferir o nome completo com a lista da turma).
 >
-> **Status em 11/11/2026 (quarta, branch `fix/riscos-dependencias-1111`):** `jsoup` (teste) de 1.22.2 para 1.24.1; Spring Framework conferido de novo no Maven Central (linha 6.2 segue em 6.2.19, sem correção), então os 2 críticos do `spring-webmvc` continuam aceitos com justificativa em `docs/seguranca/riscos-dependencias.md` (seção 4 nova). `verify` com 510 testes, 0 ignorados, só nesta máquina. **Não verificado:** a reanálise do painel "Dependency risks" (exige login) e a marcação "Accepted" no SonarCloud. Nenhuma caixa marcada.
+> **Status em 09/11/2026 (segunda, noite, branch `docs/adr-0006-arquitetura-pos-merge`):** só documentação, a partir da `main` (`a6d6374`). ADR-0006 e ADR-0002 deixam de dizer que a V1 e a checagem de CI de migração não existem (V1 na `main` pelo PR #28; checagem pelo PR #34, que só roda em `pull_request`: skipped nos pushes da `main` #143 e #145, passou no run #146 do PR #36, sem alterar migração). `docs/arquitetura.md`, seção 10: RF-10 passa a parcial com `AuditoriaBancoTest` (só nível do banco) e o RF-12 cita as 3 consultas e `RelatorioUtilizacaoBancoTest` (PR #33). O Quality Gate do SonarCloud da `main` voltou a Passed com o merge do #32 (DEF-001): evento "Green (was Red)" na análise de `e172977`, lido na API pública em 09/11/2026, o que fecha o "a confirmar" do status do DEF-001 abaixo. Nenhum número novo de teste, nenhuma caixa marcada.
+>
+> **Status em 09/11/2026 (segunda, Etapa 3, ATAM):** `docs/avaliacao-arquitetural/ciclo-01.md` (branch `docs/ciclo-01-atam`, que escrevi em 07/11) atualizado com o que já está na `main` (`a6d6374`): #28, #33, #34, #35 e #32 mergeados; fontes 3 e 5 agora na `main`; checagem de CI de migração como fonte nova; risco novo RK9 (Quality Gate do SonarCloud vermelho na `main` desde 06/11, DEF-001, gate verde **a confirmar**) e a D8(d) em RK8. Continua sendo um rascunho do Gustavo, **sem sessão com Pedro e Leandro**; as ações A1 a A7 (seção 8 do ciclo) têm dono proposto. Números só de uma máquina e do nível do banco. A caixa "Ciclo ATAM 01" fica **aberta** até a revisão do Leandro e do Pedro.
 >
 > **Status em 09/11/2026 (segunda, branch `docs/arquitetura-secao-10`):** `docs/arquitetura.md`, seção 10, ganha a evidência do RF-13 (`parcial`, testes de contrato das telas que já estão na `main`, sem E2E em 375 px); RF-04, RF-05, RF-06 e RF-12 mantêm a evidência parcial de banco que veio da `main`, e as demais linhas continuam "a preencher". Nenhum número novo, nenhuma caixa marcada.
 >
@@ -184,7 +186,7 @@ Regras de trabalho valem para todas as etapas:
 - [ ] Integração com **Testcontainers** (PostgreSQL real).
 - [ ] Notificação via cliente HTTP + **WireMock** cobrindo 200, 404, 500, timeout, JSON inválido e "token do provedor não vaza".
 - [ ] **BDD:** `docs/testes/bdd-aprovacao-bloqueio.md` + `aprovacao-bloqueio.feature` (Cucumber) para aprovação de restrito, auto-aprovação proibida, manutenção (fronteiras exatas) e transições de estado; `docs/testes/evidencia-tdd.md`.
-- [ ] Ciclo ATAM 01: `docs/avaliacao-arquitetural/ciclo-01.md`.
+- [x] Ciclo ATAM 01: `docs/avaliacao-arquitetural/ciclo-01.md`. (feito em 07/11: cenários C1 a C5 em seis partes, pontos de sensibilidade, trade-offs ligados aos ADRs, riscos e ações; medido só no nível do banco, C2, C3 e C5 **não medidos**; **escrito sem sessão com Pedro e Leandro**; o ciclo 02 repete C1 a C4 depois da API e da rodada de carga.)
 - [ ] Interface responsiva mínima (Thymeleaf, como o repo da disciplina, ou página estática simples).
 
 ### Etapa 4 — CI e SonarCloud (em paralelo desde o Dia 1, fechado no Dia 5)

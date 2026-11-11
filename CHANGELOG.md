@@ -1,7 +1,7 @@
 # Changelog
 
 ## [Não lançado]
-- `jsoup` (só teste) de 1.22.2 para 1.24.1 e revisão de 11/11/2026 em `docs/seguranca/riscos-dependencias.md` (Spring Framework 6.2.19 segue sem correção na linha; críticos aceitos com justificativa).
+- ADR-0006, ADR-0002 e `docs/arquitetura.md` (seção 10) atualizados depois dos merges de 09/11/2026: V1 (PR #28), auditoria e consultas do relatório no nível do banco (PR #33) e checagem de CI de migração (PR #34, só em `pull_request`) descritas como estão na `main`. Só documentação.
 - CI vermelho proposital e recuperação (Etapa 4): o run #120 do PR #30 ficou vermelho com 2 falhas provocadas e o commit de correção as removeu; links e o que o run mostrou em "Histórico de CI vermelho proposital" do README. Nenhum código de produção alterado.
 - Estrutura inicial do repositório e documentação base.
 - Pranchas da seção 01 (login, menu por perfil e páginas de erro) em `docs/frontend/pranchas/secao-01/`, em 375 px e 1280 px, para aprovação antes da implementação dos estados novos.
@@ -39,3 +39,4 @@
 - Etapa 5, nível banco (branch empilhada sobre `feat/banco-v1`): `AuditoriaBancoTest` (auditoria e mudança de estado na mesma transação, rollback nas duas direções); consultas do relatório RF-12 em `src/main/resources/db/consultas/` (horas por recurso, carga por professor, conflitos evitados) com `RelatorioUtilizacaoBancoTest` (6 testes, valores calculados à mão, TDD `test(red)` → `feat(green)`); `docs/testes/mutacao-manual.md` com a seção do banco (M1 a M5, medidas só nesta máquina); regra 11 do `AGENTS.md` (o `test(red)` é a única exceção ao `verify` verde); pergunta em aberto D8 no plano (critérios do relatório, sem decisão; em 09/11 ganhou o item (d), "professor" como docente alocado ou solicitante, e duas lacunas do contrato com a tela 12: contagem de reservas e total de horas sem dupla contagem).
 - `docs/entrega/roteiro-clone-limpo.md`: roteiro curto para Leandro ou Pedro (quem não escreveu o README) validarem o README em clone limpo; `docs/entrega/checklist.md` ganha a seção "Conferido sem clone" (existência de arquivos na `main`, com a fonte). O clone ainda não foi feito.
 - Correção do Quality Gate da `main` (DEF-001): páginas de erro 403, 404, 4xx, 500, 5xx e `fragments/erro` passam a declarar `<title>` e `lang` no arquivo (o Sonar lê o template, não a página renderizada); `TemplatesComTituloTest` agora varre todos os templates em vez de uma lista manual.
+- `docs/avaliacao-arquitetural/ciclo-01.md`: ciclo 01 da avaliação ATAM (utility tree, cenários C1 a C5 em seis partes, pontos de sensibilidade, trade-offs ligados aos ADRs 0001 a 0007, riscos, não riscos e ações com dono proposto). Rascunho sem sessão com o grupo; números só de uma máquina e do nível do banco; C2, C3 e C5 não medidos.
