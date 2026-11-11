@@ -7,6 +7,7 @@ import com.microsoft.playwright.BrowserContext;
 import com.microsoft.playwright.BrowserType;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.Playwright;
+import com.microsoft.playwright.PlaywrightException;
 import com.microsoft.playwright.Request;
 import com.microsoft.playwright.Route;
 import java.nio.file.Path;
@@ -139,8 +140,28 @@ abstract class E2ETeste {
         assertThat(larguraDoDocumento).as("largura do documento em %s", caminhoAtual()).isLessThanOrEqualTo(LARGURA);
     }
 
+    /**
+     * Print de evidência da página inteira. Antes de capturar, espera dois quadros de animação: no CI (run
+     * 43093990942, 11/11/2026) o Chromium respondeu "Page.captureScreenshot: Unable to capture screenshot" quando o
+     * print foi pedido antes de a página ter um quadro desenhado. Se essa falha aparecer mesmo assim, tenta uma vez
+     * mais depois de outros dois quadros. O print é evidência: as asserções da tela vêm antes dele e não mudam.
+     */
     void print(String nome) {
-        pagina.screenshot(new Page.ScreenshotOptions().setPath(PRINTS.resolve(nome + ".png")).setFullPage(true));
+        var opcoes = new Page.ScreenshotOptions().setPath(PRINTS.resolve(nome + ".png")).setFullPage(true);
+        esperarQuadroDesenhado();
+        try {
+            pagina.screenshot(opcoes);
+        } catch (PlaywrightException erro) {
+            if (erro.getMessage() == null || !erro.getMessage().contains("Unable to capture screenshot")) {
+                throw erro;
+            }
+            esperarQuadroDesenhado();
+            pagina.screenshot(opcoes);
+        }
+    }
+
+    private void esperarQuadroDesenhado() {
+        pagina.evaluate("() => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)))");
     }
 
     String focado() {
