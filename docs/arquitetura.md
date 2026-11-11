@@ -195,7 +195,7 @@ Outros cenários (esboço): **C4** mudança de estado sem auditoria → impossí
 | R8 | Histórico "fabricado" (red depois do green) | Perde pontos de autoria | Commits `test(red)` antes de `feat(green)`; merge com merge commit | `docs/testes/evidencia-tdd.md` |
 
 ## 10. Matriz requisito → decisão → componente → evidência (inicial)
-A coluna "Evidência" é preenchida conforme os testes existem (a RTM, `docs/rtm.md`, é o documento oficial de rastreabilidade). **Em 09/11/2026 a evidência na `main` é parcial:** RF-13 com testes de contrato das telas; RF-04, RF-05, RF-06 e RF-12 com testes só no nível do banco; as demais linhas seguem "a preencher". Teste de tela prova a tela, não a regra: `FilaAprovacaoTest`, `HistoricoPaginaTest` e `RelatorioPaginaTest` não são citados como evidência de RF-07, RF-10 e RF-12.
+A coluna "Evidência" é preenchida conforme os testes existem (a RTM, `docs/rtm.md`, é o documento oficial de rastreabilidade). **Em 09/11/2026 a evidência na `main` é parcial:** RF-13 com testes de contrato das telas; RF-04, RF-05, RF-06, RF-10 e RF-12 com testes só no nível do banco; as demais linhas seguem "a preencher". Teste de tela prova a tela, não a regra: `FilaAprovacaoTest`, `HistoricoPaginaTest` e `RelatorioPaginaTest` não são citados como evidência de RF-07, RF-10 e RF-12.
 
 | Requisito | Decisão | Componente | Evidência |
 |---|---|---|---|
@@ -204,9 +204,9 @@ A coluna "Evidência" é preenchida conforme os testes existem (a RTM, `docs/rtm
 | RF-06 reserva dupla | ADR-0002, ADR-0007 | banco (constraint) | parcial (06/11): `ConcorrenciaReservaBancoTest` (20 threads → 1 aceita e 19 recusadas, contagem no banco, recurso e professor, 5 rodadas); o 409 de ponta a ponta depende do serviço do Pedro |
 | RF-07 aprovação de restrito | máquina de estados | reserva, seguranca | a preencher |
 | RF-08 manutenção | intervalo semiaberto (D1, decidido em 05/11) | recurso, reserva | a preencher |
-| RF-10 histórico auditável | auditoria na mesma transação | auditoria | a preencher |
+| RF-10 histórico auditável | auditoria na mesma transação | auditoria, banco | parcial (09/11, PR #33): atomicidade no nível do banco em `AuditoriaBancoTest` (`commitGravaAMudancaDeEstadoEAAuditoriaJuntas`, `mudancaDeEstadoRecusadaPeloBancoDesfazAAuditoriaJaGravada`, `auditoriaRecusadaPeloBancoDesfazAMudancaDeEstadoJaFeita`); serviço que grava a auditoria, consulta do histórico, imutabilidade pela API (RN-10) e 403 do Solicitante (RN-11) ainda sem teste |
 | RF-11 notificação | adapter HTTP isolado (ADR-0005) | notificacao | a preencher |
-| RF-12 relatório | tentativa recusada gravada | relatorio, banco | parcial (06/11): tabela `tentativa_recusada` e gravação em transação própria em `TentativaRecusadaBancoTest`; a consulta do relatório ainda não existe |
+| RF-12 relatório | tentativa recusada gravada | relatorio, banco | parcial (06/11): tabela `tentativa_recusada` e gravação em transação própria em `TentativaRecusadaBancoTest`; as 3 consultas em `src/main/resources/db/consultas/` com `RelatorioUtilizacaoBancoTest` (6 testes, valores calculados à mão), na `main` desde 09/11 (PR #33), com premissas pendentes (D8); o endpoint do relatório ainda não existe |
 | RF-13 telas e erros claros | ADR-0003 | web | **parcial**: testes de contrato das telas na `main` (`LayoutBaseTest`, `PaginasDeErroTest`, `LoginPaginaTest`, `CaminhoDoSiteTest`, `CssSemValoresSoltosTest`; lista completa em [status-requisitos](status-requisitos.md)); falta o E2E Playwright em 375 px |
 
 ## 11. Pendências deste documento
@@ -214,8 +214,8 @@ A coluna "Evidência" é preenchida conforme os testes existem (a RTM, `docs/rtm
 - [x] Completar a seção "Consequências" dos ADRs 0001 a 0004 e escrever os ADRs de notificação e de Flyway (Etapa 2). — feito em 05/11: ADRs 0001 a 0004 com ganhos, perdas e testes exigidos; ADR-0005 (notificação) e ADR-0006 (Flyway) escritos com status **proposto**, a validar com o Pedro.
 - [x] Decidir o intervalo semiaberto (pergunta em aberto do BDD) e registrar no ADR-0002. — D1 decidida em 05/11 pelo Gustavo (`[início, fim)`), registrada no ADR-0002 e na seção 9 do [plano](plano-execucao.md); a confirmar com Pedro e Leandro na revisão.
 - [x] D2 (tentativa recusada em transação própria), D3 (409 para transição inválida) e D5 (estados que ocupam o horário), seção 9 do plano: decididas em 05/11 e registradas nos ADRs 0002, 0005 e 0006.
-- [ ] Preencher a coluna "Evidência" da seção 10 à medida que os testes de regra entram na `main` (hoje parciais: RF-04, RF-05, RF-06, RF-12 e RF-13); cada célula cita arquivo e nome do teste.
-- [x] Migração V1 e modelagem da proteção contra reserva dupla (professor como recurso, estado copiado por FK composta, trava por recurso). — feito em 06/11 no PR `feat/banco-v1`: D6 e D7 (seção 9 do plano) e [ADR-0007](adr/0007-modelagem-protecao-reserva-dupla.md), proposto; a confirmar com o Pedro.
+- [ ] Preencher a coluna "Evidência" da seção 10 à medida que os testes de regra entram na `main` (hoje parciais: RF-04, RF-05, RF-06, RF-10, RF-12 e RF-13); cada célula cita arquivo e nome do teste.
+- [x] Migração V1 e modelagem da proteção contra reserva dupla (professor como recurso, estado copiado por FK composta, trava por recurso). — feito em 06/11 (na `main` pelo PR #28, mergeado em 09/11/2026): D6 e D7 (seção 9 do plano) e [ADR-0007](adr/0007-modelagem-protecao-reserva-dupla.md), proposto; a confirmar com o Pedro.
 - [ ] Atualizar a tabela de fronteiras e a pergunta em aberto de `docs/testes/bdd-aprovacao-bloqueio.md` com a D1 (arquivo do Pedro; não alterado neste PR).
 - [ ] D4 (critério de "0 vulnerabilidades críticas"): resposta do professor ainda pendente.
 - [x] Ciclo 01 da avaliação arquitetural: [`docs/avaliacao-arquitetural/ciclo-01.md`](avaliacao-arquitetural/ciclo-01.md) (Etapa 3). — feito em 07/11: cenários C1 a C5, sensibilidades, trade-offs e riscos ligados aos ADRs; rascunho do Gustavo, a validar com Pedro e Leandro.
