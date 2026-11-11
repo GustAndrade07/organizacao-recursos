@@ -1,8 +1,6 @@
 # Changelog
 
 ## [Não lançado]
-- E2E Playwright em 375 px (ADR-0004, RF-13): 52 testes em `src/test/java/br/com/senac/recursos/e2e` com a aplicação real (porta aleatória, PostgreSQL em Testcontainers) e o Chromium sem tela. Cobrem as 28 telas e estados (sem rolagem horizontal, tabela vira cartão, alvo de toque ≥ 44 px), login, menu, páginas de erro, o fluxo da busca até o envio da reserva, diálogos, envio único, relatório e manutenção. Dependência `playwright` 1.63.0 no `pom.xml`; o CI instala o Chromium e guarda os prints no artifact `e2e-375`; prints de 11/11 em `docs/evidencias/e2e-375/`.
-- Telas de minhas reservas (`GET /reservas/minhas`) e de detalhe da reserva (`GET /reservas/{id}`) em Thymeleaf: filtro por estado, estado vazio com atalho para a busca, Alterar e Cancelar só quando a reserva ainda pode mudar (pergunta D9 do plano), alteração de data e horário com erros de campo, conflito e manutenção, e cancelamento com confirmação que avisa que não pode ser desfeito. `reserva-form.js` passa a servir a nova reserva e a alteração (prefixo em `data-reserva-form`). A listagem, a alteração e o cancelamento continuam com o back-end.
 - ADR-0006, ADR-0002 e `docs/arquitetura.md` (seção 10) atualizados depois dos merges de 09/11/2026: V1 (PR #28), auditoria e consultas do relatório no nível do banco (PR #33) e checagem de CI de migração (PR #34, só em `pull_request`) descritas como estão na `main`. Só documentação.
 - CI vermelho proposital e recuperação (Etapa 4): o run #120 do PR #30 ficou vermelho com 2 falhas provocadas e o commit de correção as removeu; links e o que o run mostrou em "Histórico de CI vermelho proposital" do README. Nenhum código de produção alterado.
 - Estrutura inicial do repositório e documentação base.

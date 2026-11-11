@@ -33,7 +33,7 @@
 
 ## Entregáveis finais
 - [ ] Tag anotada `v1.0.0-rc1` com CI verde **no commit da tag** (se corrigir depois: `rc2`; nunca mover tag já usada)
-- [ ] `CHANGELOG.md` com o que entra na versão
+- [ ] `CHANGELOG.md` com o que entra na versão (entradas de `changelog.d/` juntadas com `bash .github/scripts/juntar-changelog.sh`, num PR antes da tag)
 - [ ] `docs/evidencias/README.md`: índice com link do CI no commit da tag, JaCoCo (artifact), Quality Gate, `resultado-01.md`, `rtm.md`, `defeitos/` e `relatorio-qualidade.md`; nenhum link quebrado
 - [ ] `docs/decisao-qualidade.md`: liberar / liberar com ressalvas / bloquear; critérios e evidência de cada um; riscos aceitos **com impacto, justificativa e responsável**; declaração de cada integrante
 - [ ] Formulário de entrega enviado por **um** integrante: nomes completos (até 4) e link do repositório público
