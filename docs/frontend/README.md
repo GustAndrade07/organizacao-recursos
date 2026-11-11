@@ -218,7 +218,7 @@ O back-end pode usar DTO próprio no lugar de `FormularioRecurso`, `FormularioBl
 - Os formulários que gravam (cadastro, edição e bloqueio, inclusive "Confirmar bloqueio", que é um botão ligado ao formulário por `form=`) têm `data-envio-unico` (ver "Envio único de formulário"); o `name`/`value` do botão (`confirmar=true`) segue no `POST`, que sai uma vez só no clique duplo. O "Atualizar campos" é `GET` e não precisa.
 - `.situacao` (Ativo, Em manutenção) divide a base de estilo do `.estado` e só acrescenta borda e cores.
 
-**Testes e JavaScript.** Os testes de contrato só conferem que cada tela carrega o seu script; o comportamento dos scripts (`recurso-form.js`, `manutencao-form.js`) fica para o E2E Playwright em 375 px (RF-13).
+**Testes e JavaScript.** Os testes de contrato só conferem que cada tela carrega o seu script. O E2E em 375 px cobre o bloqueio de fim antes do início do `manutencao-form.js` (`ResponsavelEAdministradorE2ETest`); a troca de tipo do `recurso-form.js` continua sem E2E (ver "E2E em 375 px").
 ## Fila de aprovação
 
 `GET /aprovacoes` (`AprovacaoController`, template `aprovacoes.html`) é a tela 9, do Responsável (RF-07, RN-06). **Não lista nem decide pedidos**; o controller só devolve a view. Contrato com o back-end, a confirmar com o Pedro:
@@ -264,7 +264,7 @@ O badge do estado vem de `fragments/estado.html :: badge` (ver "Estado da reserv
 
 Todo formulário que envia uma ação (aprovar, rejeitar, retirar, devolver, confirmar não compareceu) tem `data-envio-unico` e um botão de envio, então `envio-unico.js` (carregado pelo layout) desabilita o botão no primeiro envio e a ação não sai duas vezes; ver "Envio único de formulário" abaixo. O formulário do filtro (GET) não precisa. O diálogo reaproveita `cartao__titulo`, `pagina__descricao` e `formulario__acoes`, e o "(você)" usa `tabela__nota`.
 
-Risco aberto: `dialogo.js` não tem teste automatizado (o teste de servidor só confere o HTML). O comportamento com JavaScript (modal, foco, Esc, endereço) foi conferido à mão no Chromium e depende do E2E Playwright em 375 px (RF-13) para ficar coberto.
+O comportamento de `dialogo.js` (modal, foco inicial, Esc, endereço e foco de volta ao gatilho) é coberto pelo E2E em 375 px nas telas 8, 9 e 10 (`ReservaE2ETest` e `ResponsavelEAdministradorE2ETest`).
 
 ## Estado da reserva (RN-05)
 
@@ -298,7 +298,7 @@ A classe sai de uma tabela fechada (`em uso` → `estado--em-uso`, `concluída` 
 
 Use em formulários que mudam estado no servidor e não têm script próprio: aprovar, rejeitar, cancelar, registrar retirada e devolução, bloquear e liberar recurso. O formulário precisa ter um botão de envio (`type="submit"`); sem ele o Enter nos campos não é barrado.
 
-**Risco aberto:** o comportamento no navegador (um único POST, restauração no `pageshow` e nos 30 s) foi conferido à mão com Playwright em página de teste, mas não está no repositório. Os testes de servidor só provam que o layout carrega o script e que a página marcada o referencia; o E2E de cada tela deve provar o POST único.
+O E2E em 375 px prova o POST único com clique duplo nas telas 8 e 10 (botão desabilitado, um só POST). **Observação medida em 11/11/2026 (Chromium 1243):** num clique duplo imediato (ou Enter duas vezes) o navegador dispara dois eventos `submit` antes de o `setTimeout(0)` travar o botão; mesmo assim só um POST sai, porque o Chromium troca a primeira navegação pela segunda. Em outros navegadores **não medido**. A restauração no `pageshow` e nos 30 s continua sem teste automatizado.
 
 ## Histórico da reserva
 
@@ -334,3 +334,21 @@ Use em formulários que mudam estado no servidor e não têm script próprio: ap
 - `relatorio-form.js` bloqueia fim anterior ao início antes do envio, com o mesmo texto do servidor (`#relatorio-fim-erro`, sempre presente no HTML e escondido quando não há erro), e leva o foco ao campo. Sem JavaScript o servidor devolve o erro. Parâmetros vazios ou só o início não são erro.
 - Tabelas no desktop e cartões no mobile com o mesmo HTML (cada célula traz o rótulo em `data-rotulo`).
 - Acessibilidade: rótulos visíveis ligados por `for`, erro em texto junto ao campo (`role="alert"`, `aria-invalid`, `aria-describedby`), `<caption>` em cada tabela e um único `<h1>`.
+
+## E2E em 375 px
+
+`src/test/java/br/com/senac/recursos/e2e` (ADR-0004, RF-13). Rodam no `./mvnw -B verify` como qualquer teste: sobem a aplicação real numa porta aleatória contra PostgreSQL em Testcontainers e abrem o Chromium do Playwright sem tela, em 375 × 812 px (`isMobile`).
+
+| Classe | O que prova |
+|---|---|
+| `Responsividade375E2ETest` | 28 telas e estados: sem rolagem horizontal, um único `h1`, tabela vira cartão (cabeçalho só para leitor de tela) e todo controle tocável com pelo menos 44 px de altura; um print por tela |
+| `AcessoE2ETest` | Avisos do login com foco, "Entrando…" durante o envio, menu recolhido que abre e fecha com Esc, itens só do perfil, páginas 401, 403, 404 e 500 com caminho para continuar e sem jargão técnico |
+| `ReservaE2ETest` | Busca → nova reserva → envio (RN-01 barrada, um POST com os campos certos), conflito 409 com foco, aviso de restrito, minhas reservas, alterar e cancelar (modal, Esc, clique duplo) |
+| `ResponsavelEAdministradorE2ETest` | Diálogos de rejeitar e de não compareceu, motivo obrigatório, envio único da retirada, fim antes do início no relatório e na manutenção, histórico sem ação de editar |
+
+- **Sem back-end:** as rotas reais só mostram o estado vazio. `TelasComDados` (só do teste, fora do component scan) renderiza os mesmos templates com dados de exemplo em `/e2e/...`, seguindo os contratos deste README. Os `POST` são interceptados no navegador, contados e respondidos com 204. Quando o back-end existir, os fluxos de login, 409 real, 401 e 403 devem passar a rodar contra ele.
+- **Navegador:** a versão vem da dependência `com.microsoft.playwright:playwright` do `pom.xml`. No CI o passo "Navegador do E2E" instala o Chromium com as bibliotecas do sistema; numa máquina de desenvolvimento o Playwright baixa o navegador na primeira execução (ou use `PLAYWRIGHT_BROWSERS_PATH` apontando para um Chromium da mesma versão).
+- **Esperas:** só as do Playwright (auto-wait, `waitForURL`, asserções); nada de `Thread.sleep`.
+- **Prints:** `target/e2e/375/*.png`, no artifact `e2e-375` do CI; amostra versionada em `docs/evidencias/e2e-375/`.
+- **Mutações conferidas em 11/11/2026:** tirar o bloqueio de RN-01 do `reserva-form.js`, trocar `showModal()` por `open` no `dialogo.js`, desligar a trava do `envio-unico.js`, deixar a tabela mais larga que a tela e abrir o menu ao carregar: cada uma deixou vermelho pelo menos um E2E.
+- **Fora do E2E por enquanto:** a troca de tipo do formulário de recurso (`recurso-form.js`), a restauração do `envio-unico.js` no `pageshow` e nos 30 s, e larguras de 768 e 1280 px (conferidas à mão).

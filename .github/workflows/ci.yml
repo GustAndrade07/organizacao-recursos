@@ -35,6 +35,10 @@ jobs:
           distribution: temurin
           java-version: '21'
           cache: maven
+      # ADR-0004: o E2E (Playwright para Java, src/test/java/.../e2e) roda dentro do verify e precisa do Chromium
+      # na versão da dependência do pom, com as bibliotecas do sistema.
+      - name: Navegador do E2E (Chromium do Playwright)
+        run: ./mvnw -B -q exec:java -Dexec.mainClass=com.microsoft.playwright.CLI -Dexec.args="install --with-deps chromium" -Dexec.classpathScope=test
       - name: Build, testes e cobertura (JaCoCo 80/70 configurado no pom)
         run: ./mvnw -B verify
       - name: Relatórios como artifact
@@ -45,6 +49,13 @@ jobs:
           path: |
             target/surefire-reports
             target/site/jacoco
+      # Prints de evidência do E2E em 375 px (RF-13), um por tela e por passo dos fluxos
+      - name: Prints do E2E como artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-375
+          path: target/e2e
       # PR vindo de fork não recebe secrets; nossos PRs saem de branches do próprio repositório.
       - name: SonarCloud
         if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
