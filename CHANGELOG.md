@@ -1,6 +1,7 @@
 # Changelog
 
 ## [Não lançado]
+- ADR-0006: `btree_gist` conferido também em `postgres:16-alpine` e `postgres:17` (11/11/2026, uma máquina); banco gerenciado segue não conferido.
 - CI vermelho proposital e recuperação (Etapa 4): o run #120 do PR #30 ficou vermelho com 2 falhas provocadas e o commit de correção as removeu; links e o que o run mostrou em "Histórico de CI vermelho proposital" do README. Nenhum código de produção alterado.
 - Estrutura inicial do repositório e documentação base.
 - Pranchas da seção 01 (login, menu por perfil e páginas de erro) em `docs/frontend/pranchas/secao-01/`, em 375 px e 1280 px, para aprovação antes da implementação dos estados novos.
