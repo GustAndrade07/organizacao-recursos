@@ -1,5 +1,7 @@
 # Qualidade de Software 2026.2 — Auditoria da matéria e plano de execução
 
+> **Status mais recente:** desde 11/11/2026, um arquivo por PR em [`docs/status/`](status/) (em ordem de data). Os parágrafos "Status em" abaixo são o histórico até 09/11.
+
 > Fonte: Hub de Aulas do Prof. Afonso (home, especificação do projeto, escopo da prova, página de entrega e materiais/slides das Aulas 01 a 17), lidos em 01/11/2026. Materiais das Aulas 09 a 15 e a especificação reconferidos em 04/11/2026 (https://afonsolelis.github.io/aulas_senac/pages/home_qualidade_2026_2.html).
 > Plano escrito no **domingo, 01/11 (fim da Semana 44)**. Turma **STADSCAS4ND (sexta, 19h10–22h45, salas C237 / D156)**.
 > **Entrega: sexta 13/11** (Aula 14), com meta interna de terminar antes. Prova oral: **sexta 20/11** (Semana 47).
@@ -274,6 +276,6 @@ Perguntas que o PRD não resolve e que **ninguém decidiu ainda**. Enquanto esti
 Quando uma decisão for tomada: anotar a data e quem decidiu na linha, ajustar o ADR ou documento afetado e acrescentar o que mudou na seção 9 do `AGENTS.md`, se virar regra.
 
 ## 10. Como este plano se mantém atualizado
-Regra do grupo (detalhes em `AGENTS.md`): **todo pull request atualiza este plano**. Na descrição do PR entra a seção "Plano de execução" (o que foi marcado ou mudou aqui) e, neste arquivo, as caixas da etapa, a linha de status do topo (com a data) e, se for o caso, `docs/status-requisitos.md`, `docs/rtm.md` e `CHANGELOG.md`. Quando um defeito, um feedback ou a revisão de um colega ensinar algo novo ao grupo, a regra correspondente entra no `AGENTS.md` com a indicação de onde ela é verificada.
+Regra do grupo (detalhes em `AGENTS.md`): **todo pull request atualiza este plano**. Na descrição do PR entra a seção "Plano de execução" (o que foi marcado ou mudou aqui) e, neste arquivo, as caixas da etapa e, se for o caso, `docs/status-requisitos.md` e `docs/rtm.md`. Desde 11/11/2026 o status de cada PR vai num arquivo próprio em [`docs/status/`](status/) e a entrada do changelog em `changelog.d/` (juntada no `CHANGELOG.md` antes da tag), e não mais num parágrafo novo no topo deste plano nem direto no `CHANGELOG.md`: todos os PRs inseriam no mesmo ponto e davam conflito a cada merge (regra 12 do `AGENTS.md`). Os parágrafos de status do topo ficam como histórico até 09/11. Quando um defeito, um feedback ou a revisão de um colega ensinar algo novo ao grupo, a regra correspondente entra no `AGENTS.md` com a indicação de onde ela é verificada.
 
 - [x] **Specs do Notion (regra de 06/11/2026):** toda mudança que toque requisito, regra de negócio, rota, modelo de dados, decisão ou estado de entrega atualiza a spec correspondente no Notion no mesmo PR ou em até 24 h (avisando na descrição). Cada pessoa cuida da spec da própria área (Gustavo: Banco e arquitetura; Pedro: Back-end; Leandro: Front-end) e da spec principal quando mudar escopo, KPI ou critério de aceite. A descrição do PR traz a linha "Specs atualizadas: `<link>` ou não se aplica, porque ...". — regra escrita no `AGENTS.md` (seção 4 item 5, seção 9 regra 7) e no modelo de PR; a conferência é a linha na descrição e a revisão. Ainda **não há** checagem automática disso.
