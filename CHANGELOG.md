@@ -1,6 +1,7 @@
 # Changelog
 
 ## [Não lançado]
+- `jsoup` (só teste) de 1.22.2 para 1.24.1 e revisão de 11/11/2026 em `docs/seguranca/riscos-dependencias.md` (Spring Framework 6.2.19 segue sem correção na linha; críticos aceitos com justificativa).
 - CI vermelho proposital e recuperação (Etapa 4): o run #120 do PR #30 ficou vermelho com 2 falhas provocadas e o commit de correção as removeu; links e o que o run mostrou em "Histórico de CI vermelho proposital" do README. Nenhum código de produção alterado.
 - Estrutura inicial do repositório e documentação base.
 - Pranchas da seção 01 (login, menu por perfil e páginas de erro) em `docs/frontend/pranchas/secao-01/`, em 375 px e 1280 px, para aprovação antes da implementação dos estados novos.
