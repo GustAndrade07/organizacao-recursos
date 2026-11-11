@@ -54,8 +54,13 @@ Spring Framework 6.2.19 é a **última** da linha 6.2 usada pelo Spring Boot 3.5
 
 Demais riscos do Spring Framework 6.2.19 (`spring-web`, `spring-beans`, `spring-expression`, `spring-webmvc`), do `spring-data-jpa` 3.5.13 e do `micrometer-core` 1.15.12: **sem versão mais nova na mesma linha** no Maven Central em 05/11/2026; avaliação caso a caso **não feita** (não medido o impacto real). A reanálise e a leitura de cada um fica como pendência abaixo.
 
-## 4. Pendências
-- [ ] Depois do merge, reabrir o painel e anotar aqui quantos riscos restam e quais são Critical e High.
+## 4. Revisão de 11/11/2026 (PR `fix/riscos-dependencias-1111`)
+- **Painel depois do merge do PR #12** (lido logado pelo Gustavo em 09/11/2026, branch `main`): **23 riscos em 123 dependências**; os 2 críticos (CVSS 9,8) do `spring-webmvc` 6.2.19 da seção 3 continuam abertos, e o `jsoup` 1.22.2 (teste) apareceu com um risco novo de CVSS 8,7. A lista completa por severidade não foi copiada (não medido aqui).
+- **`jsoup.version` 1.22.2 → 1.24.1**, a última publicada no Maven Central em 11/11/2026. Só é usado em testes de tela. `.\mvnw.cmd -B verify` na branch: 510 testes, 0 falhas, 0 ignorados, BUILD SUCCESS (só nesta máquina). Se o risco do jsoup some: **não medido** até a reanálise da `main` no painel (que exige login).
+- **Spring Framework conferido de novo no Maven Central em 11/11/2026:** a linha 6.2 continua parando em 6.2.19 e o Spring Boot 3.5 em 3.5.16. Sem correção na mesma linha, a seção 3 continua valendo. `grep` em `src/` em 11/11/2026: nenhum `XsltView`, `SseEmitter`, `ResponseBodyEmitter` nem `text/event-stream`, o que sustenta o "por que não nos atinge" dos dois críticos.
+
+## 5. Pendências
+- [ ] Depois do merge deste PR, reabrir o painel (logado) e anotar aqui quantos riscos restam e quais são Critical e High.
 - [ ] No SonarCloud, marcar os dois críticos do Spring como **Accepted** com o motivo da seção 3 (ação manual do Gustavo no painel).
 - [ ] Reler os riscos restantes que não têm correção e decidir (corrigir, aceitar com motivo ou migrar de linha).
 - [ ] Perguntar ao professor se "0 vulnerabilidades críticas" se mede pelo CVSS das dependências ou pelo Quality Gate/issues.

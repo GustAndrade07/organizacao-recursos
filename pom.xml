@@ -23,6 +23,8 @@
         <jacoco.version>0.8.16</jacoco.version>
         <jacoco.min.line>0.80</jacoco.min.line>
         <jacoco.min.branch>0.70</jacoco.min.branch>
+        <!-- jsoup só em teste; 1.24.1 é a última publicada no Maven Central em 11/11/2026 (1.22.2 tinha risco no SonarCloud). -->
+        <jsoup.version>1.24.1</jsoup.version>
 
         <!-- Dependências sobrescritas por risco no SonarCloud (Dependency risks, 05/11/2026).
              O Spring Boot 3.5.16 gerencia versões mais antigas; aqui subimos só o que tem correção publicada.
