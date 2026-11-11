@@ -79,7 +79,7 @@ class ConcorrenciaReservaApiTest extends ApiIntegracaoTest {
         try {
             List<Future<Integer>> futuros = new ArrayList<>();
             for (int i = 0; i < PEDIDOS; i++) {
-                HttpRequest requisicao = HttpRequest.newBuilder(URI.create("http://localhost:" + porta + "/reservas"))
+                HttpRequest requisicao = HttpRequest.newBuilder(URI.create("http://localhost:" + porta + "/api/reservas"))
                         .header("Content-Type", "application/json")
                         .header("Authorization", "Bearer " + tokens.get(i))
                         .POST(HttpRequest.BodyPublishers.ofString(corpo.apply(i)))

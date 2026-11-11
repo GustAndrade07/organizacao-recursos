@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<!--/*
+  Tela 13 do inventário (prefixo "recursos-"), RF-02 e RF-08. Atributos de modelo (docs/frontend/README.md):
+    tipo         : TipoRecurso da aba (o controller preenche a partir de ?tipo=; salas, materiais ou professores)
+    nome         : texto da busca por nome (o controller preenche a partir de ?nome=)
+    recursos     : lista de id, nome, capacidade, local, patrimonio, competencias, emManutencao,
+                   periodoManutencao, restrito                          (back-end; ausente = sem lista)
+    confirmacao  : titulo, texto, depois de salvar ou bloquear           (back-end; opcional)
+*/-->
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: pagina(titulo='Recursos', conteudo=~{::#conteudo-pagina})}">
+<head>
+    <title>Recursos</title>
+</head>
+<body>
+<div id="conteudo-pagina">
+    <div class="secao"
+         th:with="professores=${tipo.chave == 'professores'},
+                  cadastrar=@{/admin/recursos/novo(tipo=${tipo.chave})}">
+
+        <div class="alerta alerta--sucesso" role="status" data-testid="recursos-sucesso" th:if="${confirmacao != null}">
+            <strong class="alerta__titulo" th:text="${confirmacao.titulo}">Recurso salvo</strong>
+            <p class="alerta__texto" th:text="${confirmacao.texto}">Sala 203 foi atualizada.</p>
+        </div>
+
+        <header class="pagina__cabecalho pagina__cabecalho--acao">
+            <div class="pagina__cabecalho">
+                <h1 data-testid="recursos-titulo">Recursos</h1>
+                <p class="pagina__descricao">Mantenha o cadastro de salas, materiais e professores.</p>
+            </div>
+            <a class="botao botao--primario" th:href="${cadastrar}" data-testid="recursos-cadastrar">Cadastrar recurso</a>
+        </header>
+
+        <nav class="abas" aria-label="Tipo de recurso" data-testid="recursos-abas">
+            <a class="aba" th:href="@{/admin/recursos(tipo='salas')}" data-testid="recursos-aba-salas"
+               th:aria-current="${tipo.chave == 'salas'} ? 'page'">Salas</a>
+            <a class="aba" th:href="@{/admin/recursos(tipo='materiais')}" data-testid="recursos-aba-materiais"
+               th:aria-current="${tipo.chave == 'materiais'} ? 'page'">Materiais</a>
+            <a class="aba" th:href="@{/admin/recursos(tipo='professores')}" data-testid="recursos-aba-professores"
+               th:aria-current="${professores} ? 'page'">Professores</a>
+        </nav>
+
+        <form class="cartao" method="get" th:action="@{/admin/recursos}" role="search"
+              th:aria-label="${tipo.rotuloBusca}" data-testid="recursos-busca">
+            <input type="hidden" name="tipo" th:value="${tipo.chave}">
+            <div class="busca-nome">
+                <div class="campo">
+                    <label class="campo__rotulo" for="recursos-nome">Buscar por nome</label>
+                    <input class="campo__entrada" id="recursos-nome" name="nome" type="search"
+                           th:value="${nome}" data-testid="recursos-nome">
+                </div>
+                <button type="submit" class="botao botao--secundario" data-testid="recursos-buscar">Buscar</button>
+            </div>
+        </form>
+
+        <section class="vazio" aria-labelledby="recursos-vazio-titulo" data-testid="recursos-vazio"
+                 th:if="${recursos != null and #lists.isEmpty(recursos)}">
+            <h2 class="vazio__titulo" id="recursos-vazio-titulo"
+                th:text="${nome == null} ? ${tipo.semRecursos} : 'Nenhum resultado para “' + ${nome} + '”'">Nenhuma sala cadastrada</h2>
+            <th:block th:if="${nome == null}">
+                <p class="pagina__descricao">Cadastre o primeiro recurso para que ele apareça na busca de disponibilidade.</p>
+                <div><a class="botao botao--primario" th:href="${cadastrar}" data-testid="recursos-cadastrar-primeiro">Cadastrar o primeiro recurso</a></div>
+            </th:block>
+            <th:block th:unless="${nome == null}">
+                <p class="pagina__descricao">Confira a escrita ou limpe a busca para ver todos.</p>
+                <div><a class="botao botao--secundario" th:href="@{/admin/recursos(tipo=${tipo.chave})}" data-testid="recursos-limpar-busca">Limpar busca</a></div>
+            </th:block>
+        </section>
+
+        <table class="tabela" data-testid="recursos-tabela" th:if="${recursos != null and !#lists.isEmpty(recursos)}">
+            <caption class="so-leitor" th:text="${tipo.legenda}">Salas cadastradas</caption>
+            <thead>
+            <tr>
+                <th scope="col">Nome</th>
+                <th scope="col" th:if="${tipo.chave == 'salas'}">Capacidade</th>
+                <th scope="col" th:if="${tipo.chave == 'materiais'}">Patrimônio</th>
+                <th scope="col" th:unless="${professores}">Localização</th>
+                <th scope="col" th:if="${professores}">Competências</th>
+                <th scope="col">Situação</th>
+                <th scope="col"><span class="so-leitor">Ações</span></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="recurso : ${recursos}" th:attr="data-testid='recursos-linha-' + ${recurso.id}">
+                <th scope="row" class="tabela__nome" th:text="${recurso.nome}">Sala 203</th>
+                <td data-rotulo="Capacidade" th:if="${tipo.chave == 'salas'}" th:text="${recurso.capacidade}">40 lugares</td>
+                <td data-rotulo="Patrimônio" th:if="${tipo.chave == 'materiais'}" th:text="${recurso.patrimonio}">PAT-0042</td>
+                <td data-rotulo="Localização" th:unless="${professores}" th:text="${recurso.local}">Bloco B, 2º andar</td>
+                <td data-rotulo="Competências" th:if="${professores}" th:text="${recurso.competencias}">Química orgânica</td>
+                <td data-rotulo="Situação">
+                    <div class="situacoes">
+                        <span class="situacao situacao--manutencao" th:if="${!professores and recurso.emManutencao}"
+                              th:attr="data-testid='recursos-situacao-' + ${recurso.id}">Em manutenção</span>
+                        <span class="tabela__nota" th:if="${!professores and recurso.emManutencao and recurso.periodoManutencao != null}"
+                              th:attr="data-testid='recursos-periodo-' + ${recurso.id}" th:text="${recurso.periodoManutencao}">10/11/2026 a 20/11/2026</span>
+                        <span class="situacao situacao--ativo" th:unless="${!professores and recurso.emManutencao}"
+                              th:attr="data-testid='recursos-situacao-' + ${recurso.id}">Ativo</span>
+                        <span class="etiqueta" th:if="${!professores and recurso.restrito}"
+                              th:attr="data-testid='recursos-restrito-' + ${recurso.id}">Restrito</span>
+                    </div>
+                </td>
+                <td class="tabela__acao">
+                    <div class="botoes-linha">
+                        <a class="botao botao--secundario" th:href="@{/admin/recursos/{id}(id=${recurso.id},tipo=${tipo.chave})}"
+                           th:attr="data-testid='recursos-editar-' + ${recurso.id}, aria-label='Editar ' + ${recurso.nome}">Editar</a>
+                        <a class="botao botao--secundario" th:unless="${professores}"
+                           th:href="@{/admin/recursos/{id}/manutencao(id=${recurso.id},tipo=${tipo.chave})}"
+                           th:attr="data-testid='recursos-manutencao-' + ${recurso.id}, aria-label='Manutenção de ' + ${recurso.nome}">Manutenção</a>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>

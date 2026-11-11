@@ -1,0 +1,161 @@
+/*
+ * Design tokens — Organização de Recursos
+ * Fonte da verdade: arquivo Figma "Organização de Recursos — Design System"
+ * (variáveis Primitives, Color e Dimensions). Documentação: docs/frontend/design-tokens.md
+ *
+ * Regra: telas e componentes usam só os tokens semânticos (--color-*, --space-*, --radius-*, ...).
+ * As primitivas existem para alimentar os semânticos.
+ * Ao mudar um valor, mude no Figma e aqui no mesmo PR.
+ */
+
+:root {
+  /* ---------- Primitivas ---------- */
+  --white: #FFFFFF;
+
+  --gray-50: #F8FAFC;
+  --gray-100: #F1F5F9;
+  --gray-200: #E2E8F0;
+  --gray-300: #CBD5E1;
+  --gray-400: #94A3B8;
+  --gray-500: #64748B;
+  --gray-600: #475569;
+  --gray-700: #334155;
+  --gray-800: #1E293B;
+  --gray-900: #0F172A;
+
+  --blue-50: #EFF6FF;
+  --blue-100: #DBEAFE;
+  --blue-200: #BFDBFE;
+  --blue-500: #3B82F6;
+  --blue-600: #2563EB;
+  --blue-700: #1D4ED8;
+  --blue-800: #1E40AF;
+
+  --green-50: #F0FDF4;
+  --green-100: #DCFCE7;
+  --green-600: #16A34A;
+  --green-700: #15803D;
+  --green-800: #166534;
+
+  --amber-50: #FFFBEB;
+  --amber-100: #FEF3C7;
+  --amber-600: #D97706;
+  --amber-700: #B45309;
+  --amber-800: #92400E;
+
+  --red-50: #FEF2F2;
+  --red-100: #FEE2E2;
+  --red-600: #DC2626;
+  --red-700: #B91C1C;
+  --red-800: #991B1B;
+
+  --violet-100: #EDE9FE;
+  --violet-800: #5B21B6;
+
+  --orange-100: #FFEDD5;
+  --orange-800: #9A3412;
+
+  /* ---------- Cor: fundo ---------- */
+  --color-bg-page: var(--gray-50);
+  --color-bg-surface: var(--white);
+  --color-bg-subtle: var(--gray-100);
+  --color-bg-disabled: var(--gray-200);
+  --color-bg-brand: var(--blue-600);
+  --color-bg-brand-hover: var(--blue-700);
+  --color-bg-danger: var(--red-600);
+  --color-bg-danger-hover: var(--red-700);
+  --color-bg-info-subtle: var(--blue-50);
+  --color-bg-success-subtle: var(--green-50);
+  --color-bg-warning-subtle: var(--amber-50);
+  --color-bg-danger-subtle: var(--red-50);
+
+  /* ---------- Cor: texto ---------- */
+  --color-text-primary: var(--gray-900);
+  --color-text-secondary: var(--gray-600);
+  --color-text-muted: var(--gray-500);
+  --color-text-disabled: var(--gray-400);
+  --color-text-on-brand: var(--white);
+  --color-text-brand: var(--blue-700);
+  --color-text-info: var(--blue-800);
+  --color-text-success: var(--green-700);
+  --color-text-warning: var(--amber-800);
+  --color-text-danger: var(--red-700);
+
+  /* ---------- Cor: borda ---------- */
+  --color-border-subtle: var(--gray-200);
+  --color-border-default: var(--gray-300);
+  --color-border-input: var(--gray-500);
+  --color-border-focus: var(--blue-600);
+  --color-border-info: var(--blue-600);
+  --color-border-success: var(--green-600);
+  --color-border-warning: var(--amber-600);
+  --color-border-danger: var(--red-600);
+
+  /* ---------- Cor: estados da reserva (RN-05) ---------- */
+  --color-status-solicitada-bg: var(--amber-100);
+  --color-status-solicitada-fg: var(--amber-800);
+  --color-status-aprovada-bg: var(--blue-100);
+  --color-status-aprovada-fg: var(--blue-800);
+  --color-status-em-uso-bg: var(--violet-100);
+  --color-status-em-uso-fg: var(--violet-800);
+  --color-status-concluida-bg: var(--green-100);
+  --color-status-concluida-fg: var(--green-800);
+  --color-status-rejeitada-bg: var(--red-100);
+  --color-status-rejeitada-fg: var(--red-800);
+  --color-status-cancelada-bg: var(--gray-200);
+  --color-status-cancelada-fg: var(--gray-700);
+  --color-status-nao-compareceu-bg: var(--orange-100);
+  --color-status-nao-compareceu-fg: var(--orange-800);
+
+  /* ---------- Espaçamento (escala de 4 px) ---------- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* ---------- Raio ---------- */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-full: 9999px;
+
+  /* ---------- Borda ---------- */
+  --border-width-default: 1px;
+  --border-width-focus: 2px;
+
+  /* ---------- Tamanhos ---------- */
+  --size-control-sm: 36px;
+  --size-control-md: 44px; /* alvo de toque mínimo */
+  --size-icon: 20px;
+
+  /* ---------- Breakpoints (referência; media queries não aceitam var()) ---------- */
+  --breakpoint-mobile: 375px;
+  --breakpoint-tablet: 768px;
+  --breakpoint-desktop: 1280px;
+
+  /* ---------- Tipografia ---------- */
+  --font-family-sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
+  --font-heading-h1: 700 28px/36px var(--font-family-sans);
+  --font-heading-h2: 600 22px/28px var(--font-family-sans);
+  --font-heading-h3: 600 18px/24px var(--font-family-sans);
+  --font-body-default: 400 16px/24px var(--font-family-sans);
+  --font-body-small: 400 14px/20px var(--font-family-sans);
+  --font-label-default: 500 14px/20px var(--font-family-sans);
+  --font-label-small: 500 12px/16px var(--font-family-sans);
+  --font-caption: 400 12px/16px var(--font-family-sans);
+
+  --letter-spacing-heading-h1: -0.4px;
+  --letter-spacing-heading-h2: -0.2px;
+  --letter-spacing-label-small: 0.2px;
+
+  /* ---------- Sombra ---------- */
+  --shadow-card: 0 1px 2px rgba(15, 23, 41, 0.06), 0 1px 3px rgba(15, 23, 41, 0.04);
+  --shadow-overlay: 0 10px 15px -3px rgba(15, 23, 41, 0.10), 0 4px 6px -2px rgba(15, 23, 41, 0.05);
+}

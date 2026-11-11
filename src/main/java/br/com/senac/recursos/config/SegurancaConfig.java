@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -32,11 +33,16 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtGra
 import org.springframework.security.web.SecurityFilterChain;
 
 /**
- * Autenticação por JWT (ADR-0001) e autorização por perfil. As regras de URL abaixo SÃO a matriz de autorização
- * ({@code docs/seguranca/matriz-autorizacao.md}); {@code MatrizAutorizacaoTest} lê a matriz e confere cada célula, e
- * falha se surgir rota que não está nela. Regra de posse (dono da reserva, RN-06) é do serviço.
- *
- * <p>Rota fora da lista é recusada ({@code denyAll}): esquecer de cadastrar uma rota fecha o acesso em vez de abrir.
+ * Duas cadeias de segurança, porque o projeto tem dois públicos (ADR-0008):
+ * <ol>
+ *   <li><b>API REST ({@code /api/**})</b>: JWT (ADR-0001), stateless, autorização por perfil. As regras de URL abaixo SÃO
+ *       a matriz de autorização ({@code docs/seguranca/matriz-autorizacao.md}); {@code MatrizAutorizacaoTest} lê a
+ *       matriz e confere cada célula, e falha se surgir rota que não está nela. Rota da API fora da lista é recusada
+ *       ({@code denyAll}). Regra de posse (dono da reserva, RN-06) é do serviço.</li>
+ *   <li><b>Telas Thymeleaf (todo o resto)</b>: abertas, como estavam antes do back-end (as telas ainda não leem nem
+ *       gravam dados; a gravação é da API). Como as telas vão autenticar (formulário com sessão ou o mesmo JWT em
+ *       cookie) é a decisão pendente D12 da seção 9 do plano; até lá, nenhuma tela deve exibir dado real.</li>
+ * </ol>
  */
 @Configuration(proxyBeanMethods = false)
 @EnableConfigurationProperties({JwtPropriedades.class, AdministradorInicialPropriedades.class})
@@ -50,9 +56,11 @@ public class SegurancaConfig {
     private static final String RESPONSAVEL = "RESPONSAVEL";
 
     @Bean
-    SecurityFilterChain cadeiaDeSeguranca(HttpSecurity http, JwtAuthenticationConverter conversorDeToken,
+    @Order(1)
+    SecurityFilterChain cadeiaDaApi(HttpSecurity http, JwtAuthenticationConverter conversorDeToken,
             RespostaDeErroDeSeguranca respostaDeErro) throws Exception {
         http
+                .securityMatcher("/api/**")
                 // API stateless: o token vai no cabeçalho Authorization, nunca em cookie; sem sessão não há o que
                 // um site de terceiros forjar (CSRF). Justificativa do hotspot em docs/seguranca/matriz-autorizacao.md.
                 .csrf(AbstractHttpConfigurer::disable)
@@ -61,28 +69,31 @@ public class SegurancaConfig {
                 .formLogin(AbstractHttpConfigurer::disable)
                 .logout(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(rota -> rota
-                        .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/actuator/health").permitAll()
-                        .requestMatchers("/error").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
 
-                        .requestMatchers(HttpMethod.GET, "/usuarios/me").authenticated()
-                        .requestMatchers(HttpMethod.GET, "/usuarios").hasRole(ADMINISTRADOR)
-                        .requestMatchers(HttpMethod.POST, "/usuarios").hasRole(ADMINISTRADOR)
+                        .requestMatchers(HttpMethod.GET, "/api/usuarios/me").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/usuarios").hasRole(ADMINISTRADOR)
+                        .requestMatchers(HttpMethod.POST, "/api/usuarios").hasRole(ADMINISTRADOR)
 
-                        .requestMatchers(HttpMethod.GET, "/recursos", "/recursos/disponiveis", "/recursos/*",
-                                "/recursos/*/manutencoes").authenticated()
-                        .requestMatchers(HttpMethod.POST, "/recursos", "/recursos/*/manutencoes").hasRole(ADMINISTRADOR)
-                        .requestMatchers(HttpMethod.PUT, "/recursos/*").hasRole(ADMINISTRADOR)
+                        .requestMatchers(HttpMethod.GET, "/api/recursos", "/api/recursos/disponiveis",
+                                "/api/recursos/*", "/api/recursos/*/manutencoes").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/recursos", "/api/recursos/*/manutencoes")
+                        .hasRole(ADMINISTRADOR)
+                        .requestMatchers(HttpMethod.PUT, "/api/recursos/*").hasRole(ADMINISTRADOR)
 
-                        .requestMatchers(HttpMethod.GET, "/reservas/*/historico").hasAnyRole(RESPONSAVEL, ADMINISTRADOR)
-                        .requestMatchers(HttpMethod.GET, "/reservas", "/reservas/*").authenticated()
-                        .requestMatchers(HttpMethod.POST, "/reservas", "/reservas/*/cancelamento").authenticated()
-                        .requestMatchers(HttpMethod.PUT, "/reservas/*/periodo").authenticated()
-                        .requestMatchers(HttpMethod.POST, "/reservas/*/aprovacao", "/reservas/*/rejeicao",
-                                "/reservas/*/retirada", "/reservas/*/devolucao", "/reservas/*/nao-comparecimento")
+                        .requestMatchers(HttpMethod.GET, "/api/reservas/*/historico")
+                        .hasAnyRole(RESPONSAVEL, ADMINISTRADOR)
+                        .requestMatchers(HttpMethod.GET, "/api/reservas", "/api/reservas/*").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/reservas", "/api/reservas/*/cancelamento")
+                        .authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/api/reservas/*/periodo").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/reservas/*/aprovacao", "/api/reservas/*/rejeicao",
+                                "/api/reservas/*/retirada", "/api/reservas/*/devolucao",
+                                "/api/reservas/*/nao-comparecimento")
                         .hasRole(RESPONSAVEL)
 
-                        .requestMatchers(HttpMethod.GET, "/relatorios/utilizacao").hasAnyRole(RESPONSAVEL, ADMINISTRADOR)
+                        .requestMatchers(HttpMethod.GET, "/api/relatorios/utilizacao")
+                        .hasAnyRole(RESPONSAVEL, ADMINISTRADOR)
 
                         .anyRequest().denyAll())
                 .oauth2ResourceServer(servidor -> servidor
@@ -92,6 +103,24 @@ public class SegurancaConfig {
                 .exceptionHandling(erro -> erro
                         .authenticationEntryPoint(respostaDeErro)
                         .accessDeniedHandler(respostaDeErro));
+        return http.build();
+    }
+
+    /**
+     * Telas, páginas de erro, arquivos estáticos e {@code /actuator/health}: abertos, como antes do back-end (D12
+     * pendente). CSRF desligado aqui também, para as telas ficarem exatamente como estavam: o pacote {@code web} não
+     * tem nenhuma rota que grave (só GET), não há sessão nem login de tela, então não há o que forjar; ligado, o
+     * Spring injetaria {@code _csrf} em todo formulário e mudaria o que as telas enviam (os E2E conferem o corpo). O
+     * CSRF volta ligado no PR que decidir a D12 e criar a primeira rota de tela que grave com sessão.
+     */
+    @Bean
+    @Order(2)
+    SecurityFilterChain cadeiaDasTelas(HttpSecurity http) throws Exception {
+        http
+                .csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(rota -> rota.anyRequest().permitAll())
+                .httpBasic(AbstractHttpConfigurer::disable)
+                .formLogin(AbstractHttpConfigurer::disable);
         return http.build();
     }
 

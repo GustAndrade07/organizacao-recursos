@@ -110,8 +110,8 @@ class MatrizAutorizacaoTest extends ApiIntegracaoTest {
             boolean naPropria) throws Exception {
         PerfilUsuario perfil = perfilNome.equals("ANONIMO") ? null : PerfilUsuario.valueOf(perfilNome);
         long reserva = naPropria ? reservaPropria.get(perfil) : reservaDeOutro;
-        String url = rota.replace("{id}", Long.toString(rota.startsWith("/recursos") ? salaId : reserva))
-                + (rota.equals("/recursos/disponiveis") || rota.startsWith("/relatorios") ? JANELA : "");
+        String url = rota.replace("{id}", Long.toString(rota.startsWith("/api/recursos") ? salaId : reserva))
+                + (rota.equals("/api/recursos/disponiveis") || rota.startsWith("/api/relatorios") ? JANELA : "");
 
         MockHttpServletRequestBuilder requisicao = comToken(request(metodo, url),
                 perfil == null ? null : tokens.get(perfil));
@@ -133,12 +133,13 @@ class MatrizAutorizacaoTest extends ApiIntegracaoTest {
         }
     }
 
-    /** Toda rota do código está na matriz, e toda linha da matriz existe no código. */
+    /** Toda rota do código (API e telas) está na matriz, e toda linha da matriz existe no código (regra 13). */
     @Test
     void matrizCobreExatamenteAsRotasDoCodigo() throws IOException {
         Set<String> doCodigo = new TreeSet<>();
         mapeamentos.getHandlerMethods().forEach((info, metodo) -> {
-            if (metodo.getBeanType().getPackageName().startsWith("br.com.senac.recursos.controller")) {
+            String pacote = metodo.getBeanType().getPackageName();
+            if (pacote.equals("br.com.senac.recursos.controller") || pacote.equals("br.com.senac.recursos.web")) {
                 info.getMethodsCondition().getMethods().forEach(verbo -> info.getPatternValues()
                         .forEach(rota -> doCodigo.add(verbo.name() + " " + rota)));
             }
@@ -151,25 +152,25 @@ class MatrizAutorizacaoTest extends ApiIntegracaoTest {
 
     @Test
     void rotaForaDaMatrizEhNegada() throws Exception {
-        assertThat(mvc.perform(comToken(request(HttpMethod.GET, "/nao-existe"), null)).andReturn()
+        assertThat(mvc.perform(comToken(request(HttpMethod.GET, "/api/nao-existe"), null)).andReturn()
                 .getResponse().getStatus()).isEqualTo(401);
-        assertThat(mvc.perform(comToken(request(HttpMethod.DELETE, "/reservas/1"),
+        assertThat(mvc.perform(comToken(request(HttpMethod.DELETE, "/api/reservas/1"),
                 tokens.get(PerfilUsuario.ADMINISTRADOR))).andReturn().getResponse().getStatus()).isEqualTo(403);
     }
 
     /** Corpo válido para cada rota de escrita, para a resposta refletir a autorização e não um 400. */
     private static String corpo(String chave, PerfilUsuario perfil) {
         return switch (chave) {
-            case "POST /auth/login" -> "{\"login\":\"" + (perfil == null ? "solicitante" : perfil.name().toLowerCase())
+            case "POST /api/auth/login" -> "{\"login\":\"" + (perfil == null ? "solicitante" : perfil.name().toLowerCase())
                     + "\",\"senha\":\"" + SENHA + "\"}";
-            case "POST /usuarios" ->
+            case "POST /api/usuarios" ->
                     "{\"nome\":\"Novo\",\"login\":\"novo\",\"senha\":\"senha-nova-123\",\"perfil\":\"SOLICITANTE\"}";
-            case "POST /recursos" -> "{\"tipo\":\"MATERIAL\",\"nome\":\"Projetor\",\"restrito\":false}";
-            case "PUT /recursos/{id}" -> "{\"nome\":\"Sala renomeada\",\"capacidade\":10,\"restrito\":false}";
-            case "POST /recursos/{id}/manutencoes" -> corpoPeriodo("2026-12-01T10:00:00Z", "2026-12-01T12:00:00Z");
-            case "POST /reservas" -> "{\"recursoIds\":[1],\"inicio\":\"" + dia("20:00") + "\",\"fim\":\""
+            case "POST /api/recursos" -> "{\"tipo\":\"MATERIAL\",\"nome\":\"Projetor\",\"restrito\":false}";
+            case "PUT /api/recursos/{id}" -> "{\"nome\":\"Sala renomeada\",\"capacidade\":10,\"restrito\":false}";
+            case "POST /api/recursos/{id}/manutencoes" -> corpoPeriodo("2026-12-01T10:00:00Z", "2026-12-01T12:00:00Z");
+            case "POST /api/reservas" -> "{\"recursoIds\":[1],\"inicio\":\"" + dia("20:00") + "\",\"fim\":\""
                     + dia("21:00") + "\"}";
-            case "PUT /reservas/{id}/periodo" -> corpoPeriodo(dia("22:00"), dia("23:00"));
+            case "PUT /api/reservas/{id}/periodo" -> corpoPeriodo(dia("22:00"), dia("23:00"));
             default -> null;
         };
     }

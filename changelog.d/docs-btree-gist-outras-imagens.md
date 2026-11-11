@@ -1,0 +1,1 @@
+- ADR-0006: `btree_gist` conferido também em `postgres:16-alpine` e `postgres:17` (11/11/2026, uma máquina); banco gerenciado segue não conferido.

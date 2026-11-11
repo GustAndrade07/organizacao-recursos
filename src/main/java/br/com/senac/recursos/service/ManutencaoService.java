@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Bloqueio de recurso por manutenção (RF-08). A partir daqui, nenhuma reserva nova sobrepõe o período (RN-04, conferido
- * em {@link ReservaService}). O que acontece com reservas que já existiam no período é decisão pendente do grupo (D10
+ * em {@link ReservaService}). O que acontece com reservas que já existiam no período é decisão pendente do grupo (D11
  * do plano): hoje elas continuam como estão.
  */
 @Service

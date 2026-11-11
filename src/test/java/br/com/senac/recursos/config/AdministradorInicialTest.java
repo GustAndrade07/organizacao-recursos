@@ -29,7 +29,7 @@ class AdministradorInicialTest extends ApiIntegracaoTest {
 
         assertThat(contar("select count(*) from usuario where login = 'chefe' and perfil = 'ADMINISTRADOR' "
                 + "and nome = 'Administrador'")).isOne();
-        enviar(null, "/auth/login", "{\"login\":\"chefe\",\"senha\":\"senha-do-chefe-123\"}")
+        enviar(null, "/api/auth/login", "{\"login\":\"chefe\",\"senha\":\"senha-do-chefe-123\"}")
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.token").isNotEmpty());
     }

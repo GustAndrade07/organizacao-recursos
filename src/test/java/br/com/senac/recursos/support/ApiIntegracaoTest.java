@@ -144,7 +144,7 @@ public abstract class ApiIntegracaoTest {
 
     /** Cria a reserva pela API e devolve o id; falha se não vier 201. */
     protected long reservar(String token, String inicio, String fim, long... recursoIds) throws Exception {
-        MvcResult resultado = mvc.perform(comToken(post("/reservas"), token)
+        MvcResult resultado = mvc.perform(comToken(post("/api/reservas"), token)
                         .content(corpoReserva(inicio, fim, recursoIds)))
                 .andExpect(status().isCreated())
                 .andReturn();

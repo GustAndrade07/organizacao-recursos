@@ -25,6 +25,7 @@
         <jacoco.min.branch>0.70</jacoco.min.branch>
         <!-- jsoup só em teste; 1.24.1 é a última publicada no Maven Central em 11/11/2026 (1.22.2 tinha risco no SonarCloud). -->
         <jsoup.version>1.24.1</jsoup.version>
+        <playwright.version>1.63.0</playwright.version>
 
         <!-- Dependências sobrescritas por risco no SonarCloud (Dependency risks, 05/11/2026).
              O Spring Boot 3.5.16 gerencia versões mais antigas; aqui subimos só o que tem correção publicada.
@@ -39,9 +40,11 @@
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
         <sonar.organization>gustandrade07</sonar.organization>
         <sonar.projectKey>GustAndrade07_organizacao-recursos</sonar.projectKey>
+        <!-- Inclui os templates Thymeleaf para o Sonar procurar XSS (aviso "templates not indexed") -->
         <sonar.sources>src/main/java,src/main/resources</sonar.sources>
         <sonar.coverage.jacoco.xmlReportPaths>target/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
-        <sonar.coverage.exclusions>**/RecursosApplication.java</sonar.coverage.exclusions>
+        <!-- O JaCoCo só mede Java: os scripts de tela (static/js) contariam como não cobertos no código novo -->
+        <sonar.coverage.exclusions>**/RecursosApplication.java,**/static/js/**</sonar.coverage.exclusions>
     </properties>
 
     <dependencies>
@@ -52,6 +55,10 @@
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-thymeleaf</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
         <dependency>
@@ -59,7 +66,7 @@
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
 
-        <!-- Segurança: o login devolve um JWT assinado (HS256) e cada requisição o valida (ADR-0001) -->
+        <!-- Segurança da API (/api/**): o login devolve um JWT assinado (HS256) e cada requisição o valida (ADR-0001) -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
@@ -97,6 +104,20 @@
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!-- Lê o HTML renderizado nos testes das telas (não depende da ordem dos atributos) -->
+        <dependency>
+            <groupId>org.jsoup</groupId>
+            <artifactId>jsoup</artifactId>
+            <version>${jsoup.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- E2E em 375 px (ADR-0004): Chromium sem tela; no CI o navegador é instalado no passo "Navegador do E2E" -->
+        <dependency>
+            <groupId>com.microsoft.playwright</groupId>
+            <artifactId>playwright</artifactId>
+            <version>${playwright.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>

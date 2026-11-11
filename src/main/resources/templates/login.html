@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<!--/*
+  Tela 1 do inventário (prefixo "login-"), RF-01. Atributos de modelo (docs/frontend/README.md):
+    falhou   : true quando veio /login?erro (credenciais inválidas)
+    expirou  : true quando veio /login?expirou (sessão expirada); o aviso de credencial prevalece sobre ele
+    email    : e-mail digitado, devolvido pelo back-end depois de uma falha (a senha nunca volta)
+    destino  : para onde voltar depois de entrar; o controller só passa o valor se for caminho deste site (CaminhoDoSite)
+*/-->
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: pagina(titulo='Entrar', conteudo=~{::#conteudo-pagina})}">
+<head>
+    <title>Entrar</title>
+</head>
+<body>
+<div id="conteudo-pagina">
+    <section class="cartao cartao--estreito">
+        <header class="cartao__cabecalho">
+            <h1 class="cartao__titulo" data-testid="login-titulo">Entrar</h1>
+            <p class="cartao__descricao" data-testid="login-descricao">Use seu e-mail e senha para acessar o sistema de reservas.</p>
+        </header>
+
+        <p class="alerta alerta--perigo" role="alert" tabindex="-1" data-testid="login-erro" th:if="${falhou}">
+            E-mail ou senha incorretos. Confira os dados e tente novamente.
+        </p>
+
+        <p class="alerta alerta--aviso" role="alert" tabindex="-1" data-testid="login-sessao-expirada"
+           th:if="${expirou and !falhou}">
+            Sua sessão expirou. Entre novamente.
+        </p>
+
+        <form class="formulario" method="post" th:action="@{/login}" data-testid="login-formulario">
+            <!--/* o controller só passa destino já validado (CaminhoDoSite); o back-end revalida no POST */-->
+            <input type="hidden" name="destino" th:value="${destino}" data-testid="login-destino"
+                   th:if="${destino != null}">
+            <div class="campo">
+                <label class="campo__rotulo" for="email">E-mail</label>
+                <input class="campo__entrada" id="email" name="email" type="email" data-testid="login-email"
+                       autocomplete="username" placeholder="nome@exemplo.com" th:value="${email}" required>
+            </div>
+            <div class="campo">
+                <label class="campo__rotulo" for="senha">Senha</label>
+                <input class="campo__entrada" id="senha" name="senha" type="password" data-testid="login-senha"
+                       autocomplete="current-password" placeholder="Digite sua senha" required>
+            </div>
+            <button class="botao botao--primario botao--bloco" type="submit" data-enviando="Entrando…"
+                    data-testid="login-entrar">Entrar</button>
+        </form>
+    </section>
+    <script th:src="@{/js/login.js}" defer></script>
+</div>
+</body>
+</html>

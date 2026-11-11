@@ -1,0 +1,8 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: pagina(titulo='Erro no sistema', conteudo=~{fragments/erro :: erro(${status}, 'perigo', 'Algo deu errado do nosso lado', 'Não foi possível concluir a operação. Tente novamente em instantes. Se o problema continuar, fale com o suporte.', 'Tentar novamente', ${path}, 'Voltar ao início', @{/})})}">
+<head>
+    <title>Erro no sistema</title>
+</head>
+<body></body>
+</html>

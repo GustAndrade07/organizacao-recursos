@@ -37,8 +37,11 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
  * Todo erro da API sai como {@code ProblemDetail} (RFC 9457) com mensagem para o usuário. Regra (AGENTS.md, seção 5):
  * a resposta nunca traz stack trace, SQL, nome de classe interna nem o valor rejeitado (que poderia ser uma senha).
  * O detalhe técnico vai só para o log.
+ *
+ * <p>Vale só para a API ({@code br.com.senac.recursos.controller}): as telas ({@code web}) continuam com as
+ * páginas de erro do Thymeleaf.
  */
-@RestControllerAdvice
+@RestControllerAdvice(basePackages = "br.com.senac.recursos.controller")
 public class TratadorDeErros extends ResponseEntityExceptionHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(TratadorDeErros.class);

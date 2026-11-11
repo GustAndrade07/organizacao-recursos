@@ -83,7 +83,7 @@ public class ReservaService {
 
     /**
      * Cria a reserva (RF-04). Recurso restrito nasce SOLICITADA e espera o Responsável (RF-07); sem recurso restrito,
-     * nasce APROVADA (proposta do back-end, pendente de confirmação do grupo: D9 do plano).
+     * nasce APROVADA (proposta do back-end, pendente de confirmação do grupo: D10 do plano).
      */
     public ReservaResponse criar(List<Long> recursoIds, Periodo periodo, UsuarioAutenticado quem) {
         List<Long> ids = semRepeticao(recursoIds);
@@ -258,7 +258,11 @@ public class ReservaService {
         return encontrados;
     }
 
-    /** RN-04. Conferido no serviço (não há constraint entre manutenção e reserva na V1). */
+    /**
+     * RN-04. Conferido no serviço, porque a V1 não tem constraint entre manutenção e reserva. É "consulta e depois
+     * grava": uma manutenção criada entre esta consulta e o commit da reserva passa. Risco registrado no ADR-0008 e
+     * na D13 do plano (aceitar ou proteger no banco), apontado na revisão do PR #44.
+     */
     private void exigirForaDeManutencao(List<Long> recursoIds, Periodo periodo) {
         List<Long> emManutencao = manutencoes.recursosEmManutencao(recursoIds, periodo.comoTstzrange());
         if (!emManutencao.isEmpty()) {

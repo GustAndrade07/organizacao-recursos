@@ -1,0 +1,1204 @@
+/*
+ * Estilos das telas. Só tokens semânticos de tokens.css (docs/frontend/design-tokens.md):
+ * nada de cor, espaçamento, raio ou fonte solta. Mobile primeiro; números só em media query.
+ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+[hidden] {
+  display: none;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-bg-page);
+  color: var(--color-text-primary);
+  font: var(--font-body-default);
+}
+
+h1 {
+  margin: 0 0 var(--space-4);
+  font: var(--font-heading-h1);
+}
+
+a {
+  color: var(--color-text-brand);
+}
+
+:focus-visible {
+  outline: var(--border-width-focus) solid var(--color-border-focus);
+  outline-offset: var(--border-width-focus);
+}
+
+/* Link para pular ao conteúdo: só aparece com o foco do teclado */
+.pular-conteudo {
+  position: absolute;
+  left: var(--space-4);
+  top: var(--space-2);
+  z-index: 1;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-surface);
+  box-shadow: var(--shadow-overlay);
+  transform: translateY(-200%);
+}
+
+.pular-conteudo:focus {
+  transform: translateY(0);
+}
+
+/* Botões */
+.botao {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--size-control-md);
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-md);
+  font: var(--font-label-default);
+  cursor: pointer;
+}
+
+.botao--secundario {
+  border: var(--border-width-default) solid var(--color-border-input);
+  background: var(--color-bg-surface);
+  color: var(--color-text-primary);
+}
+
+.botao--secundario:hover {
+  background: var(--color-bg-subtle);
+}
+
+/* Barra superior e menu */
+.barra {
+  background: var(--color-bg-surface);
+  border-bottom: var(--border-width-default) solid var(--color-border-subtle);
+}
+
+.barra__linha {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  max-width: var(--breakpoint-desktop);
+  min-height: calc(var(--size-control-md) + var(--space-3));
+  margin: 0 auto;
+  padding: 0 var(--space-4);
+}
+
+.barra__marca {
+  color: var(--color-text-primary);
+  font: var(--font-heading-h3);
+  text-decoration: none;
+}
+
+.menu__botao {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  width: var(--size-control-md);
+  height: var(--size-control-md);
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: transparent;
+  cursor: pointer;
+}
+
+.menu__barra {
+  display: block;
+  width: var(--size-icon);
+  height: var(--border-width-focus);
+  background: var(--color-text-primary);
+}
+
+.menu__painel {
+  flex-basis: 100%;
+}
+
+.menu__lista {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: 0;
+  padding: var(--space-2) 0;
+  list-style: none;
+}
+
+.menu__item {
+  display: flex;
+  align-items: center;
+  min-height: var(--size-control-md);
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-md);
+  color: var(--color-text-primary);
+  font: var(--font-label-default);
+  text-decoration: none;
+}
+
+.menu__item:hover {
+  background: var(--color-bg-subtle);
+}
+
+.menu__item[aria-current="page"] {
+  background: var(--color-bg-info-subtle);
+  color: var(--color-text-brand);
+}
+
+.menu__rodape {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4) 0;
+  border-top: var(--border-width-default) solid var(--color-border-subtle);
+}
+
+.menu__usuario {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: 0;
+}
+
+.menu__nome {
+  font: var(--font-label-default);
+}
+
+.menu__perfil {
+  color: var(--color-text-secondary);
+  font: var(--font-caption);
+}
+
+.menu__rodape form {
+  margin: 0;
+}
+
+.menu__rodape .botao {
+  width: 100%;
+}
+
+/* Conteúdo da tela */
+.conteudo {
+  flex: 1;
+  width: 100%;
+  max-width: var(--breakpoint-desktop);
+  margin: 0 auto;
+  padding: var(--space-6) var(--space-4);
+}
+
+.conteudo:focus {
+  outline: none;
+}
+
+/* Mobile: com JavaScript o painel começa fechado; sem JavaScript fica sempre visível */
+@media (max-width: 767px) {
+  .js .barra[data-aberto="false"] .menu__painel {
+    display: none;
+  }
+}
+
+/* Tablet e desktop: menu horizontal, sem botão */
+@media (min-width: 768px) {
+  .barra__linha {
+    flex-wrap: nowrap;
+    padding: 0 var(--space-8);
+  }
+
+  .menu__botao {
+    display: none;
+  }
+
+  .menu__painel {
+    display: flex;
+    flex: 1;
+    flex-basis: auto;
+    align-items: center;
+    justify-content: space-between;
+    margin-left: var(--space-8);
+  }
+
+  .menu__lista {
+    flex-direction: row;
+    padding: 0;
+  }
+
+  .menu__rodape {
+    flex-direction: row;
+    align-items: center;
+    gap: var(--space-4);
+    padding: 0;
+    border-top: 0;
+  }
+
+  .menu__usuario {
+    align-items: flex-end;
+  }
+
+  .menu__rodape .botao {
+    width: auto;
+  }
+
+  .conteudo {
+    padding: var(--space-8);
+  }
+}
+
+/* Páginas de erro (tela 3) */
+.botao {
+  text-decoration: none;
+}
+
+.botao--primario {
+  border: var(--border-width-default) solid transparent;
+  background: var(--color-bg-brand);
+  color: var(--color-text-on-brand);
+}
+
+.botao--primario:hover {
+  background: var(--color-bg-brand-hover);
+}
+
+.botao--bloco {
+  width: 100%;
+}
+
+.erro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-6);
+  max-width: calc(var(--space-16) * 7);
+  margin: 0 auto;
+  padding: var(--space-10) 0;
+  text-align: center;
+}
+
+.erro__codigo {
+  margin: 0;
+  padding: var(--space-1) var(--space-3);
+  border: var(--border-width-default) solid;
+  border-radius: var(--radius-full);
+  font: var(--font-label-default);
+}
+
+.erro__codigo--aviso {
+  background: var(--color-bg-warning-subtle);
+  border-color: var(--color-border-warning);
+  color: var(--color-text-warning);
+}
+
+.erro__codigo--info {
+  background: var(--color-bg-info-subtle);
+  border-color: var(--color-border-info);
+  color: var(--color-text-info);
+}
+
+.erro__codigo--perigo {
+  background: var(--color-bg-danger-subtle);
+  border-color: var(--color-border-danger);
+  color: var(--color-text-danger);
+}
+
+.erro__texto {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.erro__titulo {
+  margin: 0;
+  font: var(--font-heading-h2);
+}
+
+.erro__mensagem {
+  margin: 0;
+  color: var(--color-text-secondary);
+}
+
+.erro__acoes {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .erro__acoes {
+    flex-direction: row;
+    justify-content: center;
+    width: auto;
+  }
+
+  .botao--bloco {
+    width: auto;
+  }
+}
+
+/* Cartão, aviso e formulário (tela 1: login) */
+.cartao {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  padding: var(--space-6);
+  border: var(--border-width-default) solid var(--color-border-default);
+  border-radius: var(--radius-lg);
+  background: var(--color-bg-surface);
+  box-shadow: var(--shadow-card);
+}
+
+.cartao--estreito {
+  max-width: calc(var(--space-16) * 7);
+  margin: 0 auto;
+}
+
+.cartao__cabecalho {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.cartao__titulo {
+  margin: 0;
+  font: var(--font-heading-h2);
+}
+
+.cartao__descricao {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font: var(--font-body-small);
+}
+
+.alerta {
+  margin: 0;
+  padding: var(--space-3);
+  border: var(--border-width-default) solid;
+  border-radius: var(--radius-md);
+  font: var(--font-body-small);
+}
+
+.alerta--perigo {
+  background: var(--color-bg-danger-subtle);
+  border-color: var(--color-border-danger);
+  color: var(--color-text-danger);
+}
+
+.formulario {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.campo__rotulo {
+  font: var(--font-label-default);
+}
+
+.campo__entrada {
+  width: 100%;
+  min-height: var(--size-control-md);
+  padding: 0 var(--space-3);
+  border: var(--border-width-default) solid var(--color-border-input);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-surface);
+  color: var(--color-text-primary);
+  font: var(--font-body-default);
+}
+
+.campo__entrada::placeholder {
+  color: var(--color-text-muted);
+}
+
+/* Busca e resultados (telas 4 e 5) */
+.secao {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.pagina__cabecalho {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.pagina__cabecalho h1 {
+  margin: 0;
+}
+
+.pagina__descricao {
+  margin: 0;
+  color: var(--color-text-secondary);
+}
+
+.pagina__descricao a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--size-control-md);
+}
+
+.campo__ajuda {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font: var(--font-caption);
+}
+
+.grade-campos {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-4);
+}
+
+.formulario__acoes {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.etiqueta {
+  display: inline-flex;
+  padding: var(--space-1) var(--space-2);
+  border: var(--border-width-default) solid var(--color-border-warning);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-warning-subtle);
+  color: var(--color-text-warning);
+  font: var(--font-label-small);
+}
+
+.resumo-busca {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: var(--border-width-default) solid var(--color-border-default);
+  border-radius: var(--radius-lg);
+  background: var(--color-bg-surface);
+}
+
+.resumo-busca p {
+  margin: 0;
+}
+
+.vazio {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-6);
+  border: var(--border-width-default) solid var(--color-border-default);
+  border-radius: var(--radius-lg);
+  background: var(--color-bg-surface);
+}
+
+.vazio__titulo {
+  margin: 0;
+  font: var(--font-heading-h3);
+}
+
+.vazio__lista {
+  margin: 0;
+  padding-left: var(--space-5);
+  color: var(--color-text-secondary);
+}
+
+/* Só para leitor de tela */
+.so-leitor {
+  position: absolute;
+  width: var(--border-width-default);
+  height: var(--border-width-default);
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Tabela no desktop, cards no mobile: o mesmo HTML. Cada célula traz o rótulo em data-rotulo. */
+.tabela,
+.tabela tbody,
+.tabela tr,
+.tabela td {
+  display: block;
+}
+
+.tabela thead {
+  position: absolute;
+  width: var(--border-width-default);
+  height: var(--border-width-default);
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+.tabela tbody {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.tabela tr {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  border: var(--border-width-default) solid var(--color-border-default);
+  border-radius: var(--radius-lg);
+  background: var(--color-bg-surface);
+  box-shadow: var(--shadow-card);
+}
+
+.tabela td {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.tabela td::before {
+  content: attr(data-rotulo);
+  color: var(--color-text-secondary);
+  font: var(--font-label-small);
+}
+
+.tabela .tabela__nome {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-1);
+  font: var(--font-heading-h3);
+  text-align: left;
+}
+
+.tabela .tabela__acao::before {
+  content: none;
+}
+
+.tabela .tabela__acao {
+  margin-top: var(--space-2);
+}
+
+.tabela__acao .botao {
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .grade-campos {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .formulario__acoes {
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+
+  .resumo-busca {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .tabela {
+    display: table;
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    overflow: hidden;
+    border: var(--border-width-default) solid var(--color-border-default);
+    border-radius: var(--radius-lg);
+    background: var(--color-bg-surface);
+    box-shadow: var(--shadow-card);
+  }
+
+  .tabela thead {
+    position: static;
+    display: table-header-group;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    clip-path: none;
+  }
+
+  .tabela tbody {
+    display: table-row-group;
+  }
+
+  .tabela tr {
+    display: table-row;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .tabela th,
+  .tabela td {
+    display: table-cell;
+    padding: var(--space-3) var(--space-4);
+    border-bottom: var(--border-width-default) solid var(--color-border-subtle);
+    vertical-align: middle;
+    text-align: left;
+  }
+
+  .tabela th {
+    background: var(--color-bg-subtle);
+    color: var(--color-text-secondary);
+    font: var(--font-label-small);
+  }
+
+  .tabela tbody tr:last-child > * {
+    border-bottom: 0;
+  }
+
+  .tabela td::before {
+    content: none;
+  }
+
+  .tabela tbody .tabela__nome {
+    display: table-cell;
+    background: transparent;
+    color: var(--color-text-primary);
+    font: var(--font-label-default);
+  }
+
+  .tabela .tabela__acao {
+    margin-top: 0;
+    text-align: right;
+  }
+
+  .tabela__acao .botao {
+    width: auto;
+  }
+}
+
+@media (min-width: 1024px) {
+  .grade-campos--busca {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* Nova reserva (tela 6): avisos, erros de campo, estado e dados em lista */
+.botao:disabled {
+  border-color: transparent;
+  background: var(--color-bg-disabled);
+  color: var(--color-text-secondary);
+  cursor: not-allowed;
+}
+
+.campo__entrada--erro {
+  border-color: var(--color-border-danger);
+  border-width: var(--border-width-focus);
+}
+
+.campo__erro {
+  margin: 0;
+  color: var(--color-text-danger);
+  font: var(--font-body-small);
+}
+
+.campo-par {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.alerta__titulo {
+  display: block;
+  font: var(--font-label-default);
+}
+
+.alerta__texto {
+  margin: 0;
+}
+
+.alerta__lista {
+  margin: var(--space-2) 0 0;
+  padding-left: var(--space-5);
+}
+
+.alerta__lista a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--size-control-md);
+}
+
+.alerta__acoes {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: var(--space-3);
+}
+
+.alerta--aviso {
+  background: var(--color-bg-warning-subtle);
+  border-color: var(--color-border-warning);
+  color: var(--color-text-warning);
+}
+
+/* Estado da reserva (RN-05) e situação do recurso: o nome sempre aparece escrito, além da cor */
+.estado,
+.situacao {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-full);
+  background: var(--color-bg-subtle);
+  color: var(--color-text-secondary);
+  font: var(--font-label-small);
+  white-space: nowrap;
+}
+
+.estado--solicitada {
+  background: var(--color-status-solicitada-bg);
+  color: var(--color-status-solicitada-fg);
+}
+
+.alerta .estado {
+  padding-block: 0;
+}
+
+.lista-dados {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: baseline;
+  gap: var(--space-3) var(--space-6);
+  margin: 0;
+}
+
+.lista-dados dt {
+  color: var(--color-text-secondary);
+  font: var(--font-label-default);
+}
+
+.lista-dados dd {
+  margin: 0;
+}
+
+.cartao__linha {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+@media (min-width: 768px) {
+  .alerta__acoes {
+    flex-direction: row;
+  }
+
+  .cartao__linha {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+/* Componentes compartilhados das telas de Responsável e Administrador (seções 03 a 05) */
+.campo__entrada:disabled {
+  background: var(--color-bg-disabled);
+  color: var(--color-text-disabled);
+  cursor: not-allowed;
+}
+
+.campo__entrada--area {
+  min-height: calc(var(--size-control-md) * 2);
+  padding: var(--space-3);
+  resize: vertical;
+}
+
+.botao--perigo {
+  border: var(--border-width-default) solid transparent;
+  background: var(--color-bg-danger);
+  color: var(--color-text-on-brand);
+}
+
+.botao--perigo:hover {
+  background: var(--color-bg-danger-hover);
+}
+
+.alerta--info {
+  background: var(--color-bg-info-subtle);
+  border-color: var(--color-border-info);
+  color: var(--color-text-info);
+}
+
+.alerta--sucesso {
+  background: var(--color-bg-success-subtle);
+  border-color: var(--color-border-success);
+  color: var(--color-text-success);
+}
+
+/* Estados da reserva (RN-05): os demais estados, além de SOLICITADA; o nome sempre aparece escrito */
+.estado--aprovada {
+  background: var(--color-status-aprovada-bg);
+  color: var(--color-status-aprovada-fg);
+}
+
+.estado--em-uso {
+  background: var(--color-status-em-uso-bg);
+  color: var(--color-status-em-uso-fg);
+}
+
+.estado--concluida {
+  background: var(--color-status-concluida-bg);
+  color: var(--color-status-concluida-fg);
+}
+
+.estado--rejeitada {
+  background: var(--color-status-rejeitada-bg);
+  color: var(--color-status-rejeitada-fg);
+}
+
+.estado--cancelada {
+  background: var(--color-status-cancelada-bg);
+  color: var(--color-status-cancelada-fg);
+}
+
+.estado--nao-compareceu {
+  background: var(--color-status-nao-compareceu-bg);
+  color: var(--color-status-nao-compareceu-fg);
+}
+
+/* O badge não estica na largura do cartão no mobile */
+.cartao__linha .estado,
+.cartao__linha .situacao {
+  align-self: flex-start;
+}
+
+/* Várias ações na mesma linha da tabela: empilhadas até 1023 px, lado a lado no desktop */
+.botoes-linha {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.tabela__nota {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font: var(--font-body-small);
+}
+
+@media (min-width: 768px) {
+  .botoes-linha {
+    align-items: stretch;
+  }
+}
+
+@media (min-width: 1024px) {
+  .botoes-linha {
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+}
+
+/* Histórico e relatório (telas 11 e 12): linha do tempo somente leitura, blocos e métrica do relatório */
+.linha-tempo {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.linha-tempo__item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: 0 0 var(--space-6) var(--space-8);
+}
+
+.linha-tempo__item:last-child {
+  padding-bottom: 0;
+}
+
+.linha-tempo__item::before {
+  content: "";
+  position: absolute;
+  top: var(--space-1);
+  left: 0;
+  width: var(--space-3);
+  height: var(--space-3);
+  border-radius: var(--radius-full);
+  background: var(--color-border-input);
+}
+
+.linha-tempo__item::after {
+  content: "";
+  position: absolute;
+  top: var(--space-5);
+  bottom: 0;
+  left: calc(var(--space-3) / 2);
+  width: var(--border-width-default);
+  background: var(--color-border-default);
+}
+
+.linha-tempo__item:last-child::after {
+  content: none;
+}
+
+.linha-tempo__data {
+  color: var(--color-text-secondary);
+  font: var(--font-label-default);
+}
+
+.linha-tempo__troca {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+}
+
+.linha-tempo__ponte {
+  color: var(--color-text-secondary);
+  font: var(--font-body-small);
+}
+
+.linha-tempo__corpo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.bloco {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.metrica {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: 0;
+}
+
+.metrica__valor {
+  font: var(--font-heading-h1);
+}
+
+.metrica__rotulo {
+  color: var(--color-text-secondary);
+}
+
+@media (min-width: 768px) {
+  .linha-tempo__item {
+    display: grid;
+    grid-template-columns: calc(var(--space-16) * 3) minmax(0, 1fr);
+    gap: var(--space-6);
+  }
+
+  .tabela .tabela__num {
+    text-align: right;
+  }
+}
+
+/* Login (tela 1): botão Entrar em envio. .botao:disabled e .alerta--aviso já existem acima. */
+.botao--carregando {
+  gap: var(--space-2);
+}
+
+.carregando {
+  display: inline-block;
+  width: var(--size-icon);
+  height: var(--size-icon);
+  border: var(--border-width-focus) solid var(--color-text-secondary);
+  border-top-color: transparent;
+  border-radius: var(--radius-full);
+}
+
+/* Fila de aprovação e retirada e devolução (telas 9 e 10): texto dos botões em linha e diálogo de confirmação */
+.botoes-linha .botao {
+  text-align: center;
+}
+
+/* <dialog> aberto pelo servidor: sem JavaScript fica fixo sobre a lista; com JavaScript vira modal.
+   Sem display aqui, o diálogo fechado continua escondido pelo navegador. */
+.dialogo {
+  position: fixed;
+  top: var(--space-16);
+  right: auto;
+  bottom: auto;
+  left: 50%;
+  width: calc(100% - var(--space-8));
+  max-width: calc(var(--space-16) * 7);
+  max-height: calc(100% - var(--space-16) - var(--space-4));
+  margin: 0;
+  padding: var(--space-6);
+  overflow: auto;
+  transform: translateX(-50%);
+  border: 0;
+  border-radius: var(--radius-lg);
+  background: var(--color-bg-surface);
+  color: var(--color-text-primary);
+  box-shadow: var(--shadow-overlay);
+}
+
+.dialogo::backdrop {
+  background: var(--color-text-primary);
+  opacity: 0.5;
+}
+
+.dialogo > form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+/* Cadastro de recursos e bloqueio por manutenção (telas 13 a 15) */
+.pagina__cabecalho--acao {
+  gap: var(--space-4);
+}
+
+/* Abas por tipo: links com aria-current, sem JavaScript */
+.abas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.aba {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--size-control-md);
+  padding: 0 var(--space-4);
+  border: var(--border-width-default) solid transparent;
+  border-radius: var(--radius-md);
+  color: var(--color-text-primary);
+  font: var(--font-label-default);
+  text-decoration: none;
+}
+
+.aba:hover {
+  background: var(--color-bg-subtle);
+}
+
+.aba[aria-current="page"] {
+  border-color: var(--color-border-info);
+  background: var(--color-bg-info-subtle);
+  color: var(--color-text-brand);
+}
+
+.busca-nome {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/* Situação do recurso: a base é a do .estado; aqui ficam a borda e as cores */
+.situacao {
+  border: var(--border-width-default) solid;
+}
+
+.situacao--ativo {
+  background: var(--color-bg-success-subtle);
+  border-color: var(--color-border-success);
+  color: var(--color-text-success);
+}
+
+.situacao--manutencao {
+  background: var(--color-bg-danger-subtle);
+  border-color: var(--color-border-danger);
+  color: var(--color-text-danger);
+}
+
+.situacoes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* Formulário de recurso e de bloqueio */
+.campo__obrig {
+  color: var(--color-text-secondary);
+  font: var(--font-body-small);
+}
+
+.campo__acao {
+  align-self: flex-start;
+}
+
+/* Valor só para conferir (reservas afetadas pelo bloqueio): o ajuste é por "Voltar e ajustar o período" */
+.campo__entrada[readonly] {
+  background: var(--color-bg-subtle);
+}
+
+.opcao {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border: var(--border-width-default) solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-subtle);
+}
+
+.opcao input {
+  flex: none;
+  width: var(--size-icon);
+  height: var(--size-icon);
+  margin: var(--space-3) 0 0;
+  accent-color: var(--color-bg-brand);
+}
+
+.opcao__texto {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.opcao__rotulo {
+  display: flex;
+  align-items: center;
+  min-height: var(--size-control-md);
+  font: var(--font-label-default);
+}
+
+.opcao .campo__ajuda {
+  color: var(--color-text-secondary);
+}
+
+/* Reservas afetadas pelo bloqueio, dentro do aviso */
+.reservas-afetadas {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: var(--space-3) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.reservas-afetadas li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+@media (min-width: 768px) {
+  .pagina__cabecalho--acao {
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+  }
+
+  .busca-nome {
+    flex-direction: row;
+    align-items: flex-end;
+  }
+
+  .busca-nome .campo {
+    flex: 1;
+  }
+}

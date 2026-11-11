@@ -18,7 +18,7 @@ Dar **evidência objetiva** de que o sistema cumpre os 14 requisitos funcionais 
 | BDD | Cucumber-JVM (`.feature`) | Aprovação de restrito, auto-aprovação proibida, manutenção, transições de estado | Pedro | CI | cenários escritos em `docs/testes/bdd-aprovacao-bloqueio.md`; `.feature` a fazer |
 | Integração externa | WireMock | Notificação: 200, 404, 500, timeout, JSON inválido, token que não vaza | Pedro | CI | a fazer |
 | Concorrência | JUnit 5 + Testcontainers + `ExecutorService`/`CountDownLatch` | 20 pedidos simultâneos: 1 aceito, 19 × 409, contagem **no banco**; também agenda do professor | Gustavo | CI | a fazer |
-| Ponta a ponta (E2E) | Playwright para Java ([ADR-0004](adr/0004-playwright.md)) | Fluxos de tela, 375 px, mensagens de erro | Leandro | CI (sem tela) | a fazer |
+| Ponta a ponta (E2E) | Playwright para Java ([ADR-0004](adr/0004-playwright.md)) | Fluxos de tela, 375 px, mensagens de erro | Leandro | CI (sem tela) | feito em 11/11/2026 com dados de teste (52 testes em `src/test/java/br/com/senac/recursos/e2e`); falta contra o back-end real |
 | Desempenho | JMeter 5.6 (somente CLI, aplicação local) | Disponibilidade e criação de reserva sob carga | Leandro | local | a fazer; plano em `perf/` |
 | Mutação manual | `git restore` após quebrar a regra | Prova de que o teste crítico detecta a quebra | todos | local | a fazer (`docs/testes/mutacao-manual.md`) |
 
