@@ -6,4 +6,6 @@
 
 **Verificado:** `./mvnw -B verify` com 636 testes, 0 falhas, 0 ignorados, nesta máquina (container de nuvem, `postgres:16` de `mirror.gcr.io`, Chromium 1243 já instalado).
 
-**Não verificado:** o passo de instalação do navegador no GitHub Actions (só o `--dry-run` local); os fluxos contra o back-end real (login, 409, 401 e 403); larguras de 768 e 1280 px (só à mão); contraste AA de todas as telas.
+**Verificado no CI:** run 43091027823 (GitHub Actions, commit `3d63d72`) verde com 636 testes, 0 ignorados; o passo "Navegador do E2E" instalou o Chromium 1243 em cerca de 38 s e as 4 classes E2E somaram cerca de 25 s.
+
+**Não verificado:** os fluxos contra o back-end real (login, 409, 401 e 403); larguras de 768 e 1280 px (só à mão); contraste AA de todas as telas.
