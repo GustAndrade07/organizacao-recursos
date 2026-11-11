@@ -74,6 +74,8 @@
 - **Deadlock (`40P01`) nos 20 pedidos simultâneos (06/11/2026).** Foi achado e corrigido antes do merge da V1, com a trava por recurso. Ficou registrado como decisão D7 e regra 9 do `AGENTS.md`, não como DEF.
 - **Clique duplo no envio único (11/11/2026).** O Chromium dispara dois `submit` antes de o `envio-unico.js` travar o botão, mas só um POST sai. O contrato (um POST) se manteve no navegador medido. Em outros navegadores, **não medido**. Registrado em `docs/frontend/README.md`.
 
+- **Print do E2E que falhou no CI (11/11/2026).** No run 43093990942, um caso de `Responsividade375E2ETest` (`/admin/recursos` vazia) passou nas asserções, mas falhou ao tirar o print de evidência ("Unable to capture screenshot"). O mesmo caso tinha passado nos dois runs anteriores. Foi corrigido no próprio PR #42 (`3c573fe`): o print espera um quadro desenhado e tenta mais uma vez só para essa falha. Ficou fora dos DEF porque não chegou à `main`, e é a única intermitência observada no E2E até agora.
+
 **Limite:** defeito achado e corrigido dentro do próprio PR, antes do merge, não foi registrado como DEF. A contagem acima é a do que chegou à `main` ou foi registrado.
 
 ## 6. Riscos residuais

@@ -348,7 +348,7 @@ O E2E em 375 px prova o POST único com clique duplo nas telas 8 e 10 (botão de
 
 - **Sem back-end:** as rotas reais só mostram o estado vazio. `TelasComDados` (só do teste, fora do component scan) renderiza os mesmos templates com dados de exemplo em `/e2e/...`, seguindo os contratos deste README. Os `POST` são interceptados no navegador, contados e respondidos com 204. Quando o back-end existir, os fluxos de login, 409 real, 401 e 403 devem passar a rodar contra ele.
 - **Navegador:** a versão vem da dependência `com.microsoft.playwright:playwright` do `pom.xml`. No CI o passo "Navegador do E2E" instala o Chromium com as bibliotecas do sistema; numa máquina de desenvolvimento o Playwright baixa o navegador na primeira execução (ou use `PLAYWRIGHT_BROWSERS_PATH` apontando para um Chromium da mesma versão).
-- **Esperas:** só as do Playwright (auto-wait, `waitForURL`, asserções); nada de `Thread.sleep`.
+- **Esperas:** só as do Playwright (auto-wait, `waitForURL`, asserções); nada de `Thread.sleep`. O print espera dois quadros de animação antes de capturar e tenta mais uma vez só se o Chromium responder "Unable to capture screenshot" (falha vista uma vez no CI, run 43093990942).
 - **Prints:** `target/e2e/375/*.png`, no artifact `e2e-375` do CI; amostra versionada em `docs/evidencias/e2e-375/`.
 - **Mutações conferidas em 11/11/2026**, cada uma deixou vermelho pelo menos um E2E e foi desfeita:
   - E1: tirar o bloqueio de RN-01 do `reserva-form.js`;
