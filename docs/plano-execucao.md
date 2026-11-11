@@ -5,6 +5,8 @@
 > **Entrega: sexta 13/11** (Aula 14), com meta interna de terminar antes. Prova oral: **sexta 20/11** (Semana 47).
 > Grupo (3): Gustavo Oliveira Fernandes de Andrade · Leandro Sato · Pedro Henrique (conferir o nome completo com a lista da turma).
 >
+> **Status em 09/11/2026 (segunda, Etapa 3, ATAM):** `docs/avaliacao-arquitetural/ciclo-01.md` (branch `docs/ciclo-01-atam`, que escrevi em 07/11) atualizado com o que já está na `main` (`a6d6374`): #28, #33, #34, #35 e #32 mergeados; fontes 3 e 5 agora na `main`; checagem de CI de migração como fonte nova; risco novo RK9 (Quality Gate do SonarCloud vermelho na `main` desde 06/11, DEF-001, gate verde **a confirmar**) e a D8(d) em RK8. Continua sendo um rascunho do Gustavo, **sem sessão com Pedro e Leandro**; as ações A1 a A7 (seção 8 do ciclo) têm dono proposto. Números só de uma máquina e do nível do banco. A caixa "Ciclo ATAM 01" fica **aberta** até a revisão do Leandro e do Pedro.
+>
 > **Status em 09/11/2026 (segunda, branch `docs/arquitetura-secao-10`):** `docs/arquitetura.md`, seção 10, ganha a evidência do RF-13 (`parcial`, testes de contrato das telas que já estão na `main`, sem E2E em 375 px); RF-04, RF-05, RF-06 e RF-12 mantêm a evidência parcial de banco que veio da `main`, e as demais linhas continuam "a preencher". Nenhum número novo, nenhuma caixa marcada.
 >
 > **Status em 09/11/2026 (segunda, branch `ci/migracao-imutavel`, T6 do ADR-0006):** checagem de CI que falha se uma migração `V<n>__*.sql` já existente em `db/migration` for modificada, apagada ou renomeada em relação à base do PR (`.github/scripts/verificar-migracoes-imutaveis.sh` e dois passos no `ci.yml`), com auto-teste de 9 casos (`.github/scripts/testar-verificacao-migracoes.sh`; duas mutações do script deixaram 3 e 1 casos vermelhos, só nesta máquina). **Não verificado:** o run do GitHub Actions e a checagem contra a alteração de uma migração real (a V1 entrou na `main` pelo PR #28 depois que o script foi escrito). Nenhuma caixa marcada.
@@ -182,7 +184,7 @@ Regras de trabalho valem para todas as etapas:
 - [ ] Integração com **Testcontainers** (PostgreSQL real).
 - [ ] Notificação via cliente HTTP + **WireMock** cobrindo 200, 404, 500, timeout, JSON inválido e "token do provedor não vaza".
 - [ ] **BDD:** `docs/testes/bdd-aprovacao-bloqueio.md` + `aprovacao-bloqueio.feature` (Cucumber) para aprovação de restrito, auto-aprovação proibida, manutenção (fronteiras exatas) e transições de estado; `docs/testes/evidencia-tdd.md`.
-- [ ] Ciclo ATAM 01: `docs/avaliacao-arquitetural/ciclo-01.md`.
+- [x] Ciclo ATAM 01: `docs/avaliacao-arquitetural/ciclo-01.md`. (feito em 07/11: cenários C1 a C5 em seis partes, pontos de sensibilidade, trade-offs ligados aos ADRs, riscos e ações; medido só no nível do banco, C2, C3 e C5 **não medidos**; **escrito sem sessão com Pedro e Leandro**; o ciclo 02 repete C1 a C4 depois da API e da rodada de carga.)
 - [ ] Interface responsiva mínima (Thymeleaf, como o repo da disciplina, ou página estática simples).
 
 ### Etapa 4 — CI e SonarCloud (em paralelo desde o Dia 1, fechado no Dia 5)

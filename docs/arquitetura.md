@@ -1,6 +1,6 @@
 # Arquitetura — Organização de Recursos
 
-> **Esqueleto da Etapa 1 (Aulas 03 e 04).** Estrutura completa e primeiras versões dos diagramas, escritas a partir do [PRD](prd.md), dos [ADRs](adr/) e do [plano](plano-execucao.md). Última atualização: 05/11/2026 (seção 10: coluna de evidência do RF-13 em 09/11/2026).
+> **Esqueleto da Etapa 1 (Aulas 03 e 04).** Estrutura completa e primeiras versões dos diagramas, escritas a partir do [PRD](prd.md), dos [ADRs](adr/) e do [plano](plano-execucao.md). Última atualização: 05/11/2026 (seção 10: coluna de evidência do RF-13 em 09/11/2026; ciclo 01 da avaliação ligado em 07/11/2026).
 > **O que é fato e o que é proposta:** o que existe no código hoje está marcado como *existe*. O resto é **proposta** (de Gustavo, dono da arquitetura) para o Pedro (back-end) e o Leandro (front-end) validarem antes da implementação. Números vêm do PRD e continuam "a validar" até serem medidos: o que não foi medido está escrito **"não medido"**.
 > Os diagramas usam Mermaid e aparecem renderizados no GitHub.
 
@@ -218,4 +218,4 @@ A coluna "Evidência" é preenchida conforme os testes existem (a RTM, `docs/rtm
 - [x] Migração V1 e modelagem da proteção contra reserva dupla (professor como recurso, estado copiado por FK composta, trava por recurso). — feito em 06/11 no PR `feat/banco-v1`: D6 e D7 (seção 9 do plano) e [ADR-0007](adr/0007-modelagem-protecao-reserva-dupla.md), proposto; a confirmar com o Pedro.
 - [ ] Atualizar a tabela de fronteiras e a pergunta em aberto de `docs/testes/bdd-aprovacao-bloqueio.md` com a D1 (arquivo do Pedro; não alterado neste PR).
 - [ ] D4 (critério de "0 vulnerabilidades críticas"): resposta do professor ainda pendente.
-- [ ] Ciclo 01 da avaliação arquitetural: `docs/avaliacao-arquitetural/ciclo-01.md` (Etapa 3).
+- [x] Ciclo 01 da avaliação arquitetural: [`docs/avaliacao-arquitetural/ciclo-01.md`](avaliacao-arquitetural/ciclo-01.md) (Etapa 3). — feito em 07/11: cenários C1 a C5, sensibilidades, trade-offs e riscos ligados aos ADRs; rascunho do Gustavo, a validar com Pedro e Leandro.
