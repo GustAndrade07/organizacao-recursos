@@ -27,7 +27,7 @@
 | RNF de desempenho (escrito antes da rodada) | não | não | `docs/performance/rnf.md` |
 | Resultado do teste de carga | não | não | `docs/performance/resultado-01.md` + `perf/resultados/rodada-01.jtl` |
 | Registro de defeitos | parcial | não | `docs/defeitos/` |
-| Relatório final de qualidade (fonte de cada número) | não | não | `docs/relatorio-qualidade.md` |
+| Relatório final de qualidade (fonte de cada número) | sim (versão 1, 11/11/2026, PR #42) | não (refazer os números no commit da tag) | `docs/relatorio-qualidade.md` |
 | Banco de perguntas e ensaio da prova oral | parcial | não | `docs/prova-oral/perguntas.md`, `docs/prova-oral/ensaio.md` |
 | Apresentação e demonstração do sistema (entregável da especificação; roteiro de 8 min com demo ensaiada) | não | não | `docs/prova-oral/ensaio.md` (a demo é a etapa 3 do roteiro) |
 
@@ -61,7 +61,7 @@
 | `docs/testes/plano-tdd.md`, `docs/testes/evidencia-tdd.md`, `docs/testes/mutacao-manual.md` | **não existem** |
 | `docs/seguranca/matriz-autorizacao.md` | **não existe** |
 | `perf/reservas.jmx`, `docs/performance/rnf.md`, `docs/performance/resultado-01.md` | **não existem** |
-| `docs/relatorio-qualidade.md`, `docs/decisao-qualidade.md`, `docs/evidencias/README.md` | **não existem** |
+| `docs/decisao-qualidade.md`, `docs/evidencias/README.md` | **não existem** (o `docs/relatorio-qualidade.md` entrou na versão 1 em 11/11/2026, PR #42) |
 | `docs/avaliacao-arquitetural/ciclo-01.md`, `docs/banco/schema.sql` | **não existem** (em PRs abertos) |
 | Arquivos `.feature` (BDD), OpenAPI/Swagger | **não existem** |
 | `docs/defeitos/` | só `TEMPLATE.md` (nenhum defeito registrado) |

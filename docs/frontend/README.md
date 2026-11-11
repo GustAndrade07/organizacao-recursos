@@ -350,5 +350,10 @@ O E2E em 375 px prova o POST único com clique duplo nas telas 8 e 10 (botão de
 - **Navegador:** a versão vem da dependência `com.microsoft.playwright:playwright` do `pom.xml`. No CI o passo "Navegador do E2E" instala o Chromium com as bibliotecas do sistema; numa máquina de desenvolvimento o Playwright baixa o navegador na primeira execução (ou use `PLAYWRIGHT_BROWSERS_PATH` apontando para um Chromium da mesma versão).
 - **Esperas:** só as do Playwright (auto-wait, `waitForURL`, asserções); nada de `Thread.sleep`.
 - **Prints:** `target/e2e/375/*.png`, no artifact `e2e-375` do CI; amostra versionada em `docs/evidencias/e2e-375/`.
-- **Mutações conferidas em 11/11/2026:** tirar o bloqueio de RN-01 do `reserva-form.js`, trocar `showModal()` por `open` no `dialogo.js`, desligar a trava do `envio-unico.js`, deixar a tabela mais larga que a tela e abrir o menu ao carregar: cada uma deixou vermelho pelo menos um E2E.
+- **Mutações conferidas em 11/11/2026**, cada uma deixou vermelho pelo menos um E2E e foi desfeita:
+  - E1: tirar o bloqueio de RN-01 do `reserva-form.js`;
+  - E2: trocar `showModal()` por `open` no `dialogo.js`;
+  - E3: desligar a trava do `envio-unico.js`;
+  - E4: deixar a tabela mais larga que a tela;
+  - E5: abrir o menu ao carregar.
 - **Fora do E2E por enquanto:** a troca de tipo do formulário de recurso (`recurso-form.js`), a restauração do `envio-unico.js` no `pageshow` e nos 30 s, e larguras de 768 e 1280 px (conferidas à mão).
