@@ -13,3 +13,5 @@
 **Verificado no CI:** run 43091027823 (GitHub Actions, commit `3d63d72`) verde com 636 testes, 0 ignorados; o passo "Navegador do E2E" instalou o Chromium 1243 em cerca de 38 s e as 4 classes E2E somaram cerca de 25 s.
 
 **Não verificado:** os fluxos contra o back-end real (login, 409, 401 e 403); larguras de 768 e 1280 px (só à mão); contraste AA de todas as telas.
+
+**Run preso no GitHub (11/11/2026, 20:15 a 20:45 UTC).** O run 43094668839 (commit `67b247b`) terminou todos os passos com sucesso às 20:18:03: navegador em 26 s, "Build, testes e cobertura" em 66 s, SonarCloud em 55 s e "Complete job" com sucesso. Mesmo assim, o GitHub continuou mostrando o job e o run como `in_progress` e recusou as duas saídas pela API: cancelar ("409 Cannot cancel a workflow run that is not in progress") e reexecutar ("403 This workflow is already running"). Os testes e o código não tiveram nenhum papel nisso. O check obrigatório `verify` ficou pendente por causa desse registro, e o run seguinte (deste commit) substitui o preso, pelo `concurrency` com `cancel-in-progress` do `ci.yml`.
