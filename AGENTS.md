@@ -44,7 +44,7 @@ Conferência: PR sem alteração em `docs/plano-execucao.md` precisa dizer na de
 | Mock só em teste de unidade isolado; persistência e integrações externas com Testcontainers ou WireMock | Revisão do PR |
 | `Clock` injetado nas regras de tempo; nunca `Instant.now()` solto nem `Thread.sleep` em teste | Revisão; teste das regras de manutenção e auditoria |
 | Reserva dupla é barrada **no banco** (`EXCLUDE USING gist` sobre `tstzrange`, extensão `btree_gist`); qualquer mudança em reservas exige o teste de concorrência (20 pedidos → 1 aceito, 19 × 409, contagem feita no banco) | Teste de concorrência verde; vermelho sem a proteção |
-| Quem grava uma reserva com vários recursos insere as linhas de `reserva_recurso` em ordem crescente de `recurso_id`, e o serviço traduz `23P01` em 409 (ver ADR-0007) | `ConcorrenciaReservaBancoTest` e, quando existir, o teste de API do Pedro |
+| Quem grava uma reserva com vários recursos insere as linhas de `reserva_recurso` em ordem crescente de `recurso_id`, e o serviço traduz `23P01` em 409 (ver ADR-0007) | Revisão do PR e, quando existir, o teste do serviço e de API do Pedro. **Nenhum teste confere a ordem hoje:** `ConcorrenciaReservaBancoTest` prova 1 aceito e 19 recusados com a trava da D7, mas grava a sala antes do professor, que tem o id menor (conferido em 11/11/2026) |
 | Erros viram `ProblemDetail`; resposta de erro **nunca** traz stack trace, SQL ou nome de classe interna | Teste de validação 400 e matriz de autorização |
 | Toda rota nova entra em `docs/seguranca/matriz-autorizacao.md` e no teste parametrizado | Teste da matriz |
 | Cobertura mínima 80% de linhas e 70% de branches; **nunca baixar a meta** nem escrever teste trivial só para subir número | Gate do JaCoCo no `verify`; Quality Gate do SonarCloud |
