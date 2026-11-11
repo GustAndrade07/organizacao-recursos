@@ -9,8 +9,11 @@ permissions:
   contents: read
 
 # Um novo push na mesma branch/PR cancela a execução anterior ainda em andamento.
+# A chave usa o nome da branch do PR (head_ref) e, fora de PR, a ref. Em 11/11/2026 o run 43094668839 do PR #42
+# terminou todos os passos, mas ficou preso como in_progress no GitHub (a API recusou cancelar e reexecutar);
+# com a chave antiga (github.ref = refs/pull/42/merge), todo run novo do PR ficou na fila esperando por ele.
 concurrency:
-  group: ci-${{ github.workflow }}-${{ github.ref }}
+  group: ci-${{ github.workflow }}-${{ github.head_ref || github.ref }}
   cancel-in-progress: true
 
 jobs:

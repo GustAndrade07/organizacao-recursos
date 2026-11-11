@@ -30,3 +30,5 @@
 | `3a8d85a` | `5e39c07` | test(e2e): Playwright em 375 px nas telas e nos fluxos (ADR-0004, RF-13) |
 | `c0f21ef` | `ba5b54d` | chore: merge origin/main nas telas 7 e 8 (resolve conflitos em CHANGELOG e plano) |
 | `b58380d` | `a81922a` | feat(frontend): telas de minhas reservas e detalhe da reserva (spec 02, RF-04) |
+
+**Fila do CI destravada (11/11/2026, 20:55 UTC).** Os runs 43098174406 e 43098470818 ficaram em `queued` sem criar o job, porque o grupo de concorrência do `ci.yml` (`github.ref`, igual a `refs/pull/42/merge`) continuava ocupado pelo run preso 43094668839, que o GitHub não deixa cancelar. A chave do grupo passou a ser `github.head_ref || github.ref` (o nome da branch no PR). O comportamento continua o mesmo: um run por PR ou branch, e o push novo cancela o anterior. O `ci.yml` é da área do Gustavo; ele precisa revisar essa mudança.
