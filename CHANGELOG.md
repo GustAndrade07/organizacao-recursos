@@ -1,6 +1,7 @@
 # Changelog
 
 ## [Não lançado]
+- ADR-0006, ADR-0002 e `docs/arquitetura.md` (seção 10) atualizados depois dos merges de 09/11/2026: V1 (PR #28), auditoria e consultas do relatório no nível do banco (PR #33) e checagem de CI de migração (PR #34, só em `pull_request`) descritas como estão na `main`. Só documentação.
 - CI vermelho proposital e recuperação (Etapa 4): o run #120 do PR #30 ficou vermelho com 2 falhas provocadas e o commit de correção as removeu; links e o que o run mostrou em "Histórico de CI vermelho proposital" do README. Nenhum código de produção alterado.
 - Estrutura inicial do repositório e documentação base.
 - Pranchas da seção 01 (login, menu por perfil e páginas de erro) em `docs/frontend/pranchas/secao-01/`, em 375 px e 1280 px, para aprovação antes da implementação dos estados novos.
