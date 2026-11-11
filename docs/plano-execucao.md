@@ -5,6 +5,8 @@
 > **Entrega: sexta 13/11** (Aula 14), com meta interna de terminar antes. Prova oral: **sexta 20/11** (Semana 47).
 > Grupo (3): Gustavo Oliveira Fernandes de Andrade · Leandro Sato · Pedro Henrique (conferir o nome completo com a lista da turma).
 >
+> **Status em 11/11/2026 (quarta, branch `docs/readme-banco-ci`):** README ganha a seção "Banco de dados" (Flyway como dono do esquema, migração imutável, constraint anti reserva dupla, onde ficam schema, consultas e testes) e a seção de CI passa a citar a checagem de migração e os dois checks exigidos na `main`. O "como subir" não muda e continua **não validado em clone limpo**. Só documentação; nenhuma caixa marcada.
+>
 > **Status em 09/11/2026 (segunda, branch `docs/arquitetura-secao-10`):** `docs/arquitetura.md`, seção 10, ganha a evidência do RF-13 (`parcial`, testes de contrato das telas que já estão na `main`, sem E2E em 375 px); RF-04, RF-05, RF-06 e RF-12 mantêm a evidência parcial de banco que veio da `main`, e as demais linhas continuam "a preencher". Nenhum número novo, nenhuma caixa marcada.
 >
 > **Status em 09/11/2026 (segunda, branch `ci/migracao-imutavel`, T6 do ADR-0006):** checagem de CI que falha se uma migração `V<n>__*.sql` já existente em `db/migration` for modificada, apagada ou renomeada em relação à base do PR (`.github/scripts/verificar-migracoes-imutaveis.sh` e dois passos no `ci.yml`), com auto-teste de 9 casos (`.github/scripts/testar-verificacao-migracoes.sh`; duas mutações do script deixaram 3 e 1 casos vermelhos, só nesta máquina). **Não verificado:** o run do GitHub Actions e a checagem contra a alteração de uma migração real (a V1 entrou na `main` pelo PR #28 depois que o script foi escrito). Nenhuma caixa marcada.

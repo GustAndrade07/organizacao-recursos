@@ -32,6 +32,14 @@ No Windows (PowerShell) use `.\mvnw.cmd` no lugar de `./mvnw`.
 Os testes de integração usam Testcontainers (PostgreSQL 16 de verdade) e precisam do Docker rodando. Sem Docker eles **falham** (não são ignorados), para o `verify` mostrar sempre `Skipped: 0`.
 Relatório de cobertura: `target/site/jacoco/index.html`.
 
+## Banco de dados
+- **Esquema só por migração Flyway** em `src/main/resources/db/migration` (hoje a `V1__nucleo_da_reserva.sql`); o Hibernate roda com `ddl-auto: validate` e nunca altera tabela ([ADR-0006](docs/adr/0006-flyway-dono-do-esquema.md)).
+- **Migração já mergeada não se edita:** erro vira a próxima versão (`V2__...`). O CI barra PR que modifica, apaga ou renomeia uma migração existente.
+- **Reserva dupla é barrada no próprio PostgreSQL** por uma constraint `EXCLUDE USING gist` sobre `tstzrange` (extensão `btree_gist`), com intervalo semiaberto `[início, fim)` ([ADR-0002](docs/adr/0002-anti-reserva-dupla.md), [ADR-0007](docs/adr/0007-modelagem-protecao-reserva-dupla.md)).
+- Esquema consolidado para leitura: `docs/banco/schema.sql` (documentação, não migração). Consultas do relatório: `src/main/resources/db/consultas/`.
+- Testes do banco em `src/test/java/br/com/senac/recursos/banco/` (PostgreSQL real via Testcontainers).
+- Banco local que aplicou uma migração depois alterada: `docker compose down -v` apaga os dados e o próximo `up` recria do zero.
+
 ## Regras do dia a dia
 - Nunca commitar direto na `main`: branch → pull request → revisão de outra pessoa → merge.
 - Revisão em roda: Gustavo revisa Pedro, Pedro revisa Leandro, Leandro revisa Gustavo.
@@ -43,10 +51,10 @@ Relatório de cobertura: `target/site/jacoco/index.html`.
 `AGENTS.md` (regras do grupo e da IA; todo PR atualiza o plano) · `docs/plano-execucao.md` · `docs/prd.md` · `docs/frontend/` (design system, tokens e inventário de telas) · `docs/rtm.md` · `docs/status-requisitos.md` · `docs/adr/` · `docs/defeitos/` · `docs/testes/` · `docs/performance/` · `perf/` (plano JMeter) · `docs/entrega/checklist.md` · `docs/prova-oral/`
 
 ## Qualidade e CI
-- **CI:** GitHub Actions (`.github/workflows/ci.yml`) roda `./mvnw -B verify` em todo pull request e em push na `main`; os relatórios do Surefire e do JaCoCo ficam como artifact.
+- **CI:** GitHub Actions (`.github/workflows/ci.yml`) roda `./mvnw -B verify` em todo pull request e em push na `main`; os relatórios do Surefire e do JaCoCo ficam como artifact. Em pull request, um passo antes do build falha se uma migração `V<n>__*.sql` já existente for alterada (`.github/scripts/verificar-migracoes-imutaveis.sh`, com auto-teste que roda sempre).
 - **Cobertura:** JaCoCo com gate de 80% de linhas e 70% de branches no `verify`.
 - **Análise estática:** SonarCloud, projeto [GustAndrade07_organizacao-recursos](https://sonarcloud.io/project/overview?id=GustAndrade07_organizacao-recursos). O token fica só no secret `SONAR_TOKEN` do GitHub.
-- A `main` é protegida: só recebe código por pull request aprovado por outra pessoa, com o check `verify` verde.
+- A `main` é protegida: só recebe código por pull request aprovado por outra pessoa, com os checks `verify` e `SonarCloud Code Analysis` verdes e a branch atualizada.
 
 ## Histórico de CI vermelho proposital
 Etapa 4 do plano: provar que o pipeline barra código quebrado e que ele se recupera. Feito no [PR #30](https://github.com/GustAndrade07/organizacao-recursos/pull/30) (branch `ci/run-vermelho-proposital`), em 07/11/2026.
