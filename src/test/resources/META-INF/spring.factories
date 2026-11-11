@@ -1,0 +1,2 @@
+# Recortes @WebMvcTest das telas sem os controllers da API (ver RecorteDasTelasSemApi e ADR-0008).
+org.springframework.test.context.ContextCustomizerFactory=br.com.senac.recursos.support.RecorteDasTelasSemApi

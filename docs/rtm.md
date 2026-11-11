@@ -70,3 +70,21 @@ A meta do plano, "100% dos críticos ligados a teste e run do CI", ainda **não*
 | RNF-01 Busca: p95 ≤ 300 ms com 50 usuários (a validar) | Busca lenta no horário de pico | **A escrever:** `perf/reservas.jmx` (JMeter em modo CLI, local); `docs/performance/rnf.md` antes da rodada | **Não medido:** o plano JMeter e a busca no back-end ainda não existem (`perf/` só tem o README) | ausente | Leandro |
 | RNF-02 Cobertura ≥ 80% de linhas e ≥ 70% de branches | Código sem teste | Gate do JaCoCo no `pom.xml` (o build falha abaixo da meta) | Run 43091027823: "All coverage checks have been met". `target/site/jacoco/jacoco.csv` local do `verify` de `3d63d72` (11/11/2026): 100,0% das linhas (106 de 106) e 94,0% dos branches (79 de 84). **Limite:** hoje o código de produção é só a camada de tela (controllers); o número vai mudar quando o back-end entrar | feito | Gustavo |
 | RNF-03 Criação de reserva sob carga: só 201 ou 409, nunca 500 | Erro 500 sob disputa | **A escrever:** asserção no plano JMeter | **Não medido:** o plano JMeter e o `POST /reservas` ainda não existem | ausente | Leandro |
+
+## Testes do back-end (PR #44) — a incorporar nas linhas acima
+
+> Seção acrescentada pelo Pedro no PR #44 (11/11/2026). As linhas acima são do Leandro e **não** foram alteradas: a escala de situação delas pede o run do CI, que este PR ainda não tem. Depois do run, o dono do RTM troca os "A escrever" pelos testes abaixo e atualiza a situação e o resumo. Camada [API]: MockMvc com token de cada perfil (ou HTTP real, no teste de concorrência) contra PostgreSQL em Testcontainers, `src/test/java/br/com/senac/recursos/controller`; [serviço] e [unidade]: `service`, `model`, `enums`, `converter`.
+
+| Requisito | Teste do back-end | Evidência |
+|---|---|---|
+| RF-01, RN-11, RN-13 | [API] `AutenticacaoApiControllerTest` (token certo, credencial errada sem revelar o login, sem token, token expirado pelo `Clock`, token adulterado); `MatrizAutorizacaoTest` (cada célula de `docs/seguranca/matriz-autorizacao.md`, API e telas, e falha com rota fora da matriz) | local, ver `docs/status/2026-11-11-feat-backend-camadas.md`; run do CI a anotar |
+| RF-02 | [API] `RecursoApiControllerTest` (cadastro, alteração sem trocar o tipo, 404, filtros), `UsuarioApiControllerTest` | idem |
+| RF-03 | [API] `RecursoApiControllerTest.disponiveisExcluiReservaQueOcupaEManutencaoMasNaoACancelada` (tipo, capacidade e disponibilidade; localização e competência dependem da V2) | idem |
+| RF-04, RN-01, RN-07 | [API] `ReservaApiControllerTest` (`Criar`, `Alterar`, `Cancelar`: término antes do início, só o dono, reserva iniciada recusada na fronteira de 1 s); [unidade] `PeriodoTest` | idem |
+| RF-05, RN-02 | [API] `ReservaApiControllerTest.Sobreposicao` (trinca de fronteiras da D1, professor em outra sala, cancelar libera) | idem |
+| RF-06, RN-03, RNF-03 | [API] `ConcorrenciaReservaApiTest` (20 pedidos HTTP → 1 × 201 e 19 × 409, nunca 500, contagem no banco, sala e professor, 5 rodadas cada) | idem |
+| RF-07, RN-06 | [API] `ReservaApiControllerTest.Aprovacao` (Responsável aprova; ninguém aprova a própria reserva: 403 e a reserva continua SOLICITADA) | idem |
+| RF-08, RN-04 | [API] `ReservaApiControllerTest.Manutencao` (trinca de fronteiras 10:00 a 12:00, 409 de tipo próprio) | idem |
+| RF-09, RN-05 | [API] `ReservaApiControllerTest.CicloDeUso` (APROVADA → EM_USO → CONCLUIDA, transição inválida 409 da D3); [unidade] `EstadoReservaTest` (49 pares) | idem |
+| RF-10, RN-08, RN-09, RN-10, RN-12 | [serviço] `AuditoriaServiceTest` (auditoria fora de transação recusada; rollback leva a auditoria junto); [API] histórico com quem, quando e motivo em `ReservaApiControllerTest.Aprovacao`; RN-10: a API não tem rota de escrita na auditoria (`MatrizAutorizacaoTest.matrizCobreExatamenteAsRotasDoCodigo`) e o repositório não tem `delete` | idem |
+| RF-12 | [API] `RelatorioApiControllerTest` (valores calculados à mão: borda, cancelada, conflito dentro e fora da janela, período vazio, 401 e 403); premissas pendentes (D8) | idem |

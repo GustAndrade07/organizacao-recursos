@@ -6,7 +6,7 @@ Projeto de Qualidade de Software (Senac, 2026.2, Prof. Afonso) — o foco é a *
 **Grupo:** Gustavo (banco de dados) · Pedro (back-end) · Leandro (front-end)
 
 ## Stack
-Java 21 · Spring Boot 3 · Maven Wrapper · Thymeleaf · PostgreSQL 16 + Flyway · JUnit 5, Testcontainers, WireMock, Cucumber, Playwright · GitHub Actions, JaCoCo, SonarCloud, JMeter
+Java 21 · Spring Boot 3 · Maven Wrapper · Thymeleaf · Spring Security (JWT na API) · PostgreSQL 16 + Flyway · JUnit 5, Testcontainers, WireMock, Cucumber, Playwright · GitHub Actions, JaCoCo, SonarCloud, JMeter
 
 ## Pré-requisitos
 - **JDK 21** (o `JAVA_HOME` precisa apontar para ele; conferir com `java -version`)
@@ -22,6 +22,15 @@ docker compose up -d          # PostgreSQL 16 em localhost:5432
 ```
 Conferir que subiu: abrir http://localhost:8080/actuator/health (deve responder `{"status":"UP"}`).
 No Windows (PowerShell) use `.\mvnw.cmd` no lugar de `./mvnw`.
+
+### API REST e primeiro acesso
+As telas ficam em `http://localhost:8080/login` e demais rotas do inventário; a API REST fica sob `/api/**` (ADR-0008). Para usar a API, crie o primeiro Administrador: suba a aplicação com duas variáveis de ambiente (escolha a senha na hora, nunca a escreva no repositório):
+```bash
+ADMIN_LOGIN=admin ADMIN_SENHA='<sua senha>' ./mvnw spring-boot:run
+curl -s -X POST localhost:8080/api/auth/login -H 'Content-Type: application/json' \
+     -d '{"login":"admin","senha":"<sua senha>"}'     # devolve {"token": ...}
+```
+Mande o token em cada requisição: `Authorization: Bearer <token>`. Rotas e permissões: `docs/seguranca/matriz-autorizacao.md`. Fora do desenvolvimento, defina também `JWT_SECRET` (32 bytes ou mais); sem ele, os tokens deixam de valer quando a aplicação reinicia.
 
 > Passo a passo ainda **não validado em clone limpo** por outra pessoa (etapa 6 do plano).
 

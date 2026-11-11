@@ -1,0 +1,6 @@
+# Testes de tela (@WebMvcTest) carregam a segurança real do projeto, e não a padrão do Spring Boot (que exigiria
+# login em toda rota). Sem isto, os testes do pacote web receberiam 401. Ver SegurancaConfig e ADR-0008.
+br.com.senac.recursos.config.SegurancaConfig
+br.com.senac.recursos.config.RelogioConfig
+br.com.senac.recursos.config.RespostaDeErroDeSeguranca
+br.com.senac.recursos.converter.UsuarioAutenticadoConverter
