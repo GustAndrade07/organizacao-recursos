@@ -4,15 +4,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.nio.charset.StandardCharsets;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.web.servlet.MockMvc;
 
 /**
@@ -131,27 +127,10 @@ class NovaReservaPaginaTest {
 
     @Test
     void todoSeletorEIdCitadoPeloScriptExisteNaPaginaERenderizada() throws Exception {
-        String js = new String(new ClassPathResource("static/js/reserva-form.js").getInputStream().readAllBytes(), StandardCharsets.UTF_8);
         Document doc = pagina(ROTA);
 
-        Matcher testids = Pattern.compile("\\[data-testid=\"([^\"]+)\"\\]").matcher(js);
-        int achados = 0;
-        while (testids.find()) {
-            achados++;
-            assertThat(doc.select("[data-testid=" + testids.group(1) + "]")).as(testids.group(1)).isNotEmpty();
-        }
-        Matcher ids = Pattern.compile("getElementById\\('([^']+)'\\)").matcher(js);
-        while (ids.find()) {
-            achados++;
-            assertThat(doc.getElementById(ids.group(1))).as(ids.group(1)).isNotNull();
-        }
-        Matcher dados = Pattern.compile("\\[(data-resumo-[a-z]+)\\]").matcher(js);
-        while (dados.find()) {
-            achados++;
-            assertThat(doc.select("[" + dados.group(1) + "]")).as(dados.group(1)).isNotEmpty();
-        }
-        assertThat(achados).isGreaterThanOrEqualTo(6);
-        assertThat(js).contains("O término precisa ser depois do início");
+        assertThat(doc.selectFirst("form[data-testid=reserva-form]").attr("data-reserva-form")).isEqualTo("reserva-form");
+        GanchosDoScriptDeReserva.conferir(doc);
     }
 
     @Test

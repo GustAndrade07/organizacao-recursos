@@ -17,5 +17,5 @@
     - Fluxos mínimos: login, criação de reserva, conflito de horário com mensagem clara, 401 e 403 nas telas, tudo também em 375 px.
     - No CI, prints e traces como artifact com `if: always()` (como o `ci.yml` já faz com os relatórios); sem tela (headless).
     - Os E2E contam como `Skipped: 0`: não pode haver `disabledWithoutDocker` neles.
-- **Pendências:** nenhuma decisão do grupo (D1 a D4) depende deste ADR. A inclusão da dependência e do passo de instalação dos navegadores no CI é do Leandro (dono do E2E).
+- **Pendências:** nenhuma decisão do grupo (D1 a D4) depende deste ADR. A dependência (Playwright 1.63.0) e o passo de instalação do Chromium no CI entraram em 11/11/2026 (Leandro, PR #42); no primeiro run com eles (GitHub Actions, run 43091027823, 11/11/2026) a instalação do Chromium levou cerca de 38 s e os 52 E2E cerca de 25 s (soma do "Time elapsed" das 4 classes no log). Um run só; não é média.
 - **Fonte:** `docs/plano-de-teste.md` (seções 2, 3 e 6), `.github/workflows/ci.yml`, `pom.xml`, `docs/prd.md` (RF-13).

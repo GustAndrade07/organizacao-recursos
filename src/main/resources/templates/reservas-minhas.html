@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<!--/*
+  Tela 7 do inventário (prefixo "minhas-"), RF-04, RN-05 e RN-07. Atributos de modelo (docs/frontend/README.md):
+    filtro   : todos | solicitada | aprovada | em-uso | concluida | rejeitada | cancelada | nao-compareceu
+               (o controller preenche; valor desconhecido vira todos)
+    reservas : lista do usuário logado, já filtrada e com as próximas primeiro (a tela não reordena), com id,
+               recurso, local, data e horario (texto já formatado), estado (nome por extenso) e iniciada
+               (verdadeiro se o horário de início já chegou). Vazia ou ausente = estado vazio.
+  Alterar e Cancelar só aparecem para Solicitada ou Aprovada com iniciada falso (RN-07; ver D9 no plano).
+*/-->
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: pagina(titulo='Minhas reservas', conteudo=~{::#conteudo-pagina})}">
+<head>
+    <title>Minhas reservas</title>
+</head>
+<body>
+<div id="conteudo-pagina">
+    <div class="secao">
+        <header class="pagina__cabecalho">
+            <h1 data-testid="minhas-titulo">Minhas reservas</h1>
+            <p class="pagina__descricao">As reservas mais próximas aparecem primeiro.</p>
+        </header>
+
+        <form class="cartao formulario" method="get" th:action="@{/reservas/minhas}" data-testid="minhas-filtros">
+            <div class="grade-campos">
+                <div class="campo">
+                    <label class="campo__rotulo" for="minhas-estado">Estado</label>
+                    <select class="campo__entrada" id="minhas-estado" name="estado" data-testid="minhas-estado">
+                        <option value="todos" th:selected="${filtro == 'todos'}">Todos os estados</option>
+                        <option value="solicitada" th:selected="${filtro == 'solicitada'}">Solicitada</option>
+                        <option value="aprovada" th:selected="${filtro == 'aprovada'}">Aprovada</option>
+                        <option value="em-uso" th:selected="${filtro == 'em-uso'}">Em uso</option>
+                        <option value="concluida" th:selected="${filtro == 'concluida'}">Concluída</option>
+                        <option value="rejeitada" th:selected="${filtro == 'rejeitada'}">Rejeitada</option>
+                        <option value="cancelada" th:selected="${filtro == 'cancelada'}">Cancelada</option>
+                        <option value="nao-compareceu" th:selected="${filtro == 'nao-compareceu'}">Não compareceu</option>
+                    </select>
+                </div>
+            </div>
+            <div class="formulario__acoes">
+                <button type="submit" class="botao botao--primario" data-testid="minhas-filtrar">Aplicar</button>
+            </div>
+        </form>
+
+        <section class="vazio" aria-labelledby="minhas-vazio-titulo" data-testid="minhas-vazio"
+                 th:if="${#lists.isEmpty(reservas) and (filtro == null or filtro == 'todos')}">
+            <h2 class="vazio__titulo" id="minhas-vazio-titulo">Você ainda não tem reservas</h2>
+            <p class="pagina__descricao">Busque um recurso livre no horário da sua aula para fazer a primeira.</p>
+            <a class="botao botao--primario" th:href="@{/recursos/disponiveis}" data-testid="minhas-vazio-buscar">Buscar recursos</a>
+        </section>
+
+        <section class="vazio" aria-labelledby="minhas-vazio-filtro-titulo" data-testid="minhas-vazio-filtro"
+                 th:if="${#lists.isEmpty(reservas) and filtro != null and filtro != 'todos'}">
+            <h2 class="vazio__titulo" id="minhas-vazio-filtro-titulo">Nenhuma reserva com esse estado</h2>
+            <a class="botao botao--secundario" th:href="@{/reservas/minhas}" data-testid="minhas-vazio-todas">Ver todas as reservas</a>
+        </section>
+
+        <table class="tabela" data-testid="minhas-tabela" th:unless="${#lists.isEmpty(reservas)}">
+            <caption class="so-leitor">Minhas reservas</caption>
+            <thead>
+            <tr>
+                <th scope="col">Recurso</th>
+                <th scope="col">Local</th>
+                <th scope="col">Data</th>
+                <th scope="col">Horário</th>
+                <th scope="col">Estado</th>
+                <th scope="col"><span class="so-leitor">Ações</span></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="reserva : ${reservas}" th:attr="data-testid='minhas-linha-' + ${reserva.id}"
+                th:with="podeMudar=${(reserva.estado == 'Solicitada' or reserva.estado == 'Aprovada') and reserva.iniciada == false}">
+                <th scope="row" class="tabela__nome" th:text="${reserva.recurso}">Sala 203</th>
+                <td data-rotulo="Local" th:text="${reserva.local}">Bloco B, 2º andar</td>
+                <td data-rotulo="Data" th:text="${reserva.data}">12/11/2026</td>
+                <td data-rotulo="Horário" th:text="${reserva.horario}">14:00 às 15:30</td>
+                <td data-rotulo="Estado">
+                    <span th:replace="~{fragments/estado :: badge(${reserva.estado}, 'minhas-estado-' + ${reserva.id})}">Aprovada</span>
+                </td>
+                <td class="tabela__acao">
+                    <div class="botoes-linha">
+                        <a class="botao botao--secundario" th:href="@{/reservas/{id}(id=${reserva.id})}"
+                           th:attr="data-testid='minhas-detalhe-' + ${reserva.id}, aria-label='Ver detalhes da reserva de ' + ${reserva.recurso} + ' em ' + ${reserva.data}">Ver detalhes</a>
+                        <a class="botao botao--secundario" th:if="${podeMudar}" th:href="@{/reservas/{id}(id=${reserva.id},acao='alterar')}"
+                           th:attr="data-testid='minhas-alterar-' + ${reserva.id}, aria-label='Alterar a reserva de ' + ${reserva.recurso} + ' em ' + ${reserva.data}">Alterar</a>
+                        <a class="botao botao--perigo" th:if="${podeMudar}" th:href="@{/reservas/{id}(id=${reserva.id},acao='cancelar')}"
+                           th:attr="data-testid='minhas-cancelar-' + ${reserva.id}, aria-label='Cancelar a reserva de ' + ${reserva.recurso} + ' em ' + ${reserva.data}">Cancelar</a>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>
