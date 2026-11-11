@@ -76,6 +76,12 @@
 
 - **Print do E2E que falhou no CI (11/11/2026).** No run 43093990942, um caso de `Responsividade375E2ETest` (`/admin/recursos` vazia) passou nas asserções, mas falhou ao tirar o print de evidência ("Unable to capture screenshot"). O mesmo caso tinha passado nos dois runs anteriores. Foi corrigido no próprio PR #42 (`3c573fe`): o print espera um quadro desenhado e tenta mais uma vez só para essa falha. Ficou fora dos DEF porque não chegou à `main`, e é a única intermitência observada no E2E até agora.
 
+**Desvio de processo** (ressalva da revisão do Gustavo no PR #42, 11/11/2026):
+- **Telas 7 e 8 sem o `test(red)` antes.** Os testes `MinhasReservasPaginaTest` (36) e `ReservaDetalhePaginaTest` (38) entraram no mesmo commit que o código das telas: `b58380d`, que é `a81922a` depois da reescrita de autoria. Não houve um commit vermelho antes.
+- **Motivo:** a regra 11 do `AGENTS.md` exige o OK explícito do dono da área antes do commit vermelho, e esse OK não foi pedido.
+- **Evidência que existe:** a mutação manual de RN-07 (tirar `reserva.iniciada == false` das duas telas) deixou 5 testes vermelhos, e o código foi restaurado. Isso mostra que os testes pegam a regra quando ela é quebrada.
+- **Limite:** não há prova de que esses testes falhavam antes de as telas existirem, porque o `git log` não tem o vermelho antes do verde. O E2E não é TDD (foi escrito sobre telas que já existiam). Para as outras telas e para os testes de banco, este relatório não conferiu, commit a commit, se o vermelho veio antes.
+
 **Limite:** defeito achado e corrigido dentro do próprio PR, antes do merge, não foi registrado como DEF. A contagem acima é a do que chegou à `main` ou foi registrado.
 
 ## 6. Riscos residuais

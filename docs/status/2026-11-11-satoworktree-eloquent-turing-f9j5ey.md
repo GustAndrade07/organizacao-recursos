@@ -32,3 +32,5 @@
 | `b58380d` | `a81922a` | feat(frontend): telas de minhas reservas e detalhe da reserva (spec 02, RF-04) |
 
 **Fila do CI destravada (11/11/2026, 20:55 UTC).** Os runs 43098174406 e 43098470818 ficaram em `queued` sem criar o job, porque o grupo de concorrência do `ci.yml` (`github.ref`, igual a `refs/pull/42/merge`) continuava ocupado pelo run preso 43094668839, que o GitHub não deixa cancelar. A chave do grupo passou a ser `github.head_ref || github.ref` (o nome da branch no PR). O comportamento continua o mesmo: um run por PR ou branch, e o push novo cancela o anterior. O `ci.yml` é da área do Gustavo; ele precisa revisar essa mudança.
+
+**Ressalva 1 da revisão do Gustavo registrada (11/11/2026).** O Gustavo aprovou com ressalvas (review de 21:27 UTC). A ressalva 1 (telas 7 e 8 sem o `test(red)` antes) entrou em `docs/relatorio-qualidade.md`, seção 5, "Desvio de processo", com o motivo, a evidência (mutação de RN-07: 5 vermelhos) e o limite. As ressalvas 2 (hashes antigos, mapeados acima) e 3 (E2E com dados de teste, já dito na RTM) não pediram mudança. O commit novo derruba a aprovação ("dismiss stale approvals"), e o PR precisa da reaprovação do Gustavo.
