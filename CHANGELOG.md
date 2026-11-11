@@ -1,6 +1,9 @@
 # Changelog
 
 ## [Não lançado]
+- **Back-end em camadas (11/11/2026, PR `feat/backend-camadas`)**: pacotes `config`, `controller`, `converter`, `dto`, `enums`, `exception`, `model`, `repository` e `service` sobre a V1 (sem migração nova). API REST: `POST /auth/login` (JWT HS256), `/usuarios`, `/recursos` (cadastro, filtros, `/disponiveis`, `/manutencoes`), `/reservas` (criar, alterar período, cancelar, aprovar, rejeitar, retirada, devolução, não comparecimento, histórico) e `GET /relatorios/utilizacao` (consultas de `db/consultas`). Violação `23P01` vira 409 com a tentativa recusada gravada em transação própria (D2); transição inválida vira 409 de tipo próprio (D3); auditoria na mesma transação (RN-12); erros em `ProblemDetail` sem detalhe interno. Primeiro administrador por `ADMIN_LOGIN`/`ADMIN_SENHA`; segredo do token por `JWT_SECRET`.
+- Matriz de autorização em `docs/seguranca/matriz-autorizacao.md`, lida por `MatrizAutorizacaoTest`, que também falha com rota fora da matriz.
+- **Removidos** o pacote `web`, os templates, o CSS/JS e os testes de tela; Thymeleaf e jsoup saem do `pom.xml` (ADR-0008, proposto, substitui o ADR-0003). RF-13 volta a `ausente`.
 - CI vermelho proposital e recuperação (Etapa 4): o run #120 do PR #30 ficou vermelho com 2 falhas provocadas e o commit de correção as removeu; links e o que o run mostrou em "Histórico de CI vermelho proposital" do README. Nenhum código de produção alterado.
 - Estrutura inicial do repositório e documentação base.
 - Pranchas da seção 01 (login, menu por perfil e páginas de erro) em `docs/frontend/pranchas/secao-01/`, em 375 px e 1280 px, para aprovação antes da implementação dos estados novos.

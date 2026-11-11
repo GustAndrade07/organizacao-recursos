@@ -1,5 +1,5 @@
 # ADR-0003 — Telas com Thymeleaf no mesmo projeto Spring
-- **Status:** aceito
+- **Status:** aceito; **a ser substituído pelo [ADR-0008](0008-backend-api-rest-em-camadas.md)** (proposto em 11/11/2026, telas removidas no PR `feat/backend-camadas`). Este registro fica como histórico da decisão original.
 - **Contexto:** a especificação só pede tela responsiva e erro claro.
 - **Decisão:** Thymeleaf, sem front separado.
 - **Consequências:**

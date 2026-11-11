@@ -1,9 +1,0 @@
-<!DOCTYPE html>
-<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"
-      th:replace="~{layout :: pagina(titulo='Estado de teste', conteudo=~{::#conteudo-pagina})}">
-<body>
-<div id="conteudo-pagina">
-    <p id="caixa" data-testid="teste-caixa"><span th:replace="~{fragments/estado :: badge(${estado}, ${testid})}">Solicitada</span></p>
-</div>
-</body>
-</html>

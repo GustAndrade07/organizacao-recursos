@@ -1,0 +1,24 @@
+# ADR-0008 — Back-end como API REST em camadas, sem telas no mesmo projeto
+- **Status:** proposto (Pedro, 11/11/2026). Vira **aceito** só na revisão do PR (regra 6 do `AGENTS.md`). Substitui o [ADR-0003](0003-thymeleaf.md), que continua no repositório.
+- **Contexto:** o ADR-0003 previa telas Thymeleaf no mesmo projeto. Até 11/11 o pacote `web` tinha só as telas (sem regra de negócio: os controllers devolviam a view e deixavam o contrato para o back-end) e o back-end não existia. A dois dias da entrega, o dono do back-end decidiu concentrar o projeto na API e remover as telas do repositório; a decisão de excluir o front-end foi tomada pelo Pedro nesta sessão e **precisa ser confirmada com o Leandro (dono do front-end) na revisão do PR**.
+- **Decisão:**
+  - Remover `src/main/java/.../web`, `templates`, `static` e os testes de tela (`src/test/java/.../web`, `src/test/resources/templates`); remover as dependências Thymeleaf e jsoup.
+  - Back-end em camadas, um pacote por responsabilidade: `config` (segurança, relógio, propriedades), `controller` (REST, mais `controller.handler` com o tratador de erros), `converter` (DTO ↔ modelo e o tipo Hibernate de `tstzrange`), `dto` (`request`, `response`, usuário autenticado), `model` (entidades JPA espelhando a V1), `repository`, `service`, `enums` e `exception` (exceções de negócio, traduzidas em HTTP num só lugar).
+  - Rotas sem prefixo (`/auth/login`, `/recursos`, `/reservas`, `/relatorios/utilizacao`, `/usuarios`); erros sempre em `ProblemDetail` (RFC 9457) com `type` próprio por regra.
+  - Autenticação JWT HS256 (ADR-0001) com Spring Security resource server; validade padrão de 1 hora (`JWT_VALIDADE`), segredo só por variável de ambiente (`JWT_SECRET`).
+- **Consequências:**
+  - **Ganhamos:**
+    - Um único jeito de responder erro (`ProblemDetail`), o que fecha a "segunda forma de erro" apontada no ADR-0003.
+    - Uma única cadeia de segurança stateless (sem sessão nem cookie), testada célula a célula por `MatrizAutorizacaoTest` a partir de `docs/seguranca/matriz-autorizacao.md`.
+    - Regras fora dos controllers (utility tree: manutenibilidade): o controller só converte e delega.
+  - **Perdemos:**
+    - **RF-13 (telas responsivas e mensagens de erro claras) fica sem tela.** As mensagens de erro claras continuam na API (`detail` em português), mas a interface responsiva deixa de existir neste repositório. RF-13 volta para `ausente` em `docs/status-requisitos.md`, e a evidência de tela (testes de contrato do Leandro) sai junto. **Risco para a nota (RF-13 é obrigatório na especificação): a decidir pelo grupo antes da tag.**
+    - O E2E com Playwright (ADR-0004) perde o alvo; a regra 10 do `AGENTS.md` (templates com título) deixa de ter o que verificar.
+    - O trabalho de tela já feito (seções 01 a 05) continua no histórico do Git e nas pranchas de `docs/frontend/`, mas não roda mais.
+  - **Exige de testes:**
+    - Teste de API caixa-preta (MockMvc com token de cada perfil) para cada regra, contra PostgreSQL real (Testcontainers).
+    - Teste de concorrência de ponta a ponta por HTTP (20 pedidos → 1 × 201 e 19 × 409, contagem no banco).
+    - Matriz de autorização como teste parametrizado que também falha quando surge rota fora da matriz.
+    - Respostas de erro sem stack trace, SQL, nome de classe nem valor rejeitado.
+- **Pendências:** confirmação do Leandro sobre a remoção das telas; D9 e D10 (seção 9 do plano). A D8 continua pendente e as consultas do relatório seguem as premissas registradas nelas.
+- **Fonte:** `src/main/java/br/com/senac/recursos/`, `docs/seguranca/matriz-autorizacao.md`, `docs/plano-execucao.md` (seção 9), PR `feat/backend-camadas`.
