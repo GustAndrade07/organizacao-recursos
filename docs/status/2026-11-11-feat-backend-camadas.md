@@ -14,7 +14,7 @@ Back-end em camadas (`config`, `controller`, `converter`, `dto`, `enums`, `excep
 - Quality Gate do SonarCloud vermelho no primeiro run (Reliability D, Security E, 7 issues): corrigidos o hash falso do login com texto fixo (S6437, agora aleatório), `SecureRandom` recriado (S2119), método `final` em entidade (S8947), duas asserções de `ReservaRecursoIdTest` (S5863, S5845) e o CSRF das telas (S4502, agora ligado; o `ReservaE2ETest` passa a conferir o `_csrf` no corpo). O CSRF desligado da API (S4502) fica com `NOSONAR` e justificativa escrita na matriz de autorização.
 
 ## Verificado
-Nesta máquina (Windows, Docker Desktop, Testcontainers com `postgres:16`), depois do merge de `origin/main`: `.\mvnw.cmd -B clean verify` com **965 testes, 0 falhas, 0 erros, 0 ignorados**, `BUILD SUCCESS` e o gate do JaCoCo atendido; cobertura de **97,9% das linhas e 89,6% dos branches** (somando `target/site/jacoco/jacoco.csv`).
+Nesta máquina (Windows, Docker Desktop, Testcontainers com `postgres:16`), depois do merge de `origin/main` e das correções do SonarCloud: `.\mvnw.cmd -B clean verify` com **965 testes, 0 falhas, 0 erros, 0 ignorados**, `BUILD SUCCESS` e o gate do JaCoCo atendido; cobertura de **97,9% das linhas e 89,2% dos branches** (somando `target/site/jacoco/jacoco.csv`).
 
 ## Não verificado
 - Run do CI e Quality Gate do SonarCloud deste PR.
