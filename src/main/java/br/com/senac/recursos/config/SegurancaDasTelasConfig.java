@@ -15,8 +15,8 @@ import org.springframework.security.web.SecurityFilterChain;
  * CSRF ligado e perfil conferido por rota. As regras de URL abaixo SÃO a tabela "Telas" de
  * {@code docs/seguranca/matriz-autorizacao.md}, conferida célula a célula por {@code MatrizAutorizacaoTest}; espelham
  * a tabela da API (quem não pode chamar a API também não vê a tela). A posse (dono da reserva, RN-06) continua no
- * serviço. Fora da lista, só com login (para a URL inexistente mostrar a página 404); rota nova que não esteja na
- * matriz faz o {@code MatrizAutorizacaoTest} falhar.
+ * serviço. Rota de tela fora da lista é negada ({@code denyAll}, regra 13 do {@code AGENTS.md}): esquecer uma rota
+ * fecha o acesso em vez de abrir.
  *
  * <ul>
  *   <li>Sem sessão: redireciona para {@code /login} (com {@code ?expirou} se o cookie de sessão venceu e
@@ -66,10 +66,9 @@ public class SegurancaDasTelasConfig {
                         .requestMatchers(HttpMethod.POST, "/admin/recursos", "/admin/recursos/*",
                                 "/admin/recursos/*/manutencao").hasRole(ADMINISTRADOR)
 
-                        // Fora da lista: exige login. Com sessão, a URL que não existe mostra a página 404 (e não
-                        // um 403 que esconderia o erro); rota nova esquecida aqui não chega à main, porque
-                        // MatrizAutorizacaoTest falha quando há rota no código que não está na matriz.
-                        .anyRequest().authenticated())
+                        // Fora da lista: negada (regra 13 do AGENTS.md), como na API. Sem sessão leva ao login;
+                        // com sessão, 403. Esquecer uma rota aqui fecha o acesso em vez de abrir.
+                        .anyRequest().denyAll())
                 .formLogin(login -> login
                         .loginPage("/login")
                         .loginProcessingUrl("/login")

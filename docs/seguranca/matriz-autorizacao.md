@@ -77,7 +77,7 @@ Decisão **D12, opção (a)** (12/11/2026, ADR-0009): formulário em `/login` co
 | GET | /admin/recursos/{id}/manutencao | login | 403 | 403 | ok | RF-08 |
 | POST | /admin/recursos/{id}/manutencao | login | 403 | 403 | ok | RF-08 |
 
-URL de tela fora desta tabela: exige login (para quem está logado, a URL que não existe mostra a página 404). Rota nova no código que não esteja aqui faz o `MatrizAutorizacaoTest` falhar, então ela não chega à `main` sem a sua linha.
+URL de tela fora desta tabela: **negada** (`denyAll`, regra 13 do `AGENTS.md`): sem sessão leva ao login, com sessão 403. Esquecer de cadastrar uma rota fecha o acesso em vez de abrir. A página 404 aparece para recurso ou reserva que não existe numa rota da tabela.
 
 ## Fora da matriz (não são rotas de negócio)
 - `POST /login` e `POST /logout`: atendidos pelo filtro do Spring Security, não por um controller (o login é aberto; o logout encerra a sessão e volta a `/login`).

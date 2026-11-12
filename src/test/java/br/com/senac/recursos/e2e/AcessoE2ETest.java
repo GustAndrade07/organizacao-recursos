@@ -154,11 +154,11 @@ class AcessoE2ETest extends E2ETeste {
     @CsvSource({
             "401, /e2e/erro/401, Você precisa entrar,                               /login?expirou",
             "403, /e2e/erro/403, Você não tem permissão para acessar esta página,   /",
-            "404, /nao-existe,   Página não encontrada,                             /",
+            "404, /reservas/999999, Página não encontrada,                             /",
             "500, /e2e/erro/500, Algo deu errado,                                   /e2e/erro/500"
     })
     void paginaDeErroTemMensagemPropriaECaminhoParaContinuar(String codigo, String caminho, String titulo, String destino) {
-        // Logado: sem sessão, a URL que não existe leva ao login (ver loginRealLevaDeVoltaAPaginaPedida)
+        // Logado: sem sessão as telas levam ao login; o 404 é de uma reserva que não existe
         entrarComo(PerfilUsuario.SOLICITANTE);
         var resposta = pagina.navigate(url(caminho));
 

@@ -27,8 +27,8 @@ import org.testcontainers.junit.jupiter.Testcontainers;
  * template, inclusive o login da tela (D12, opção (a)), com CSRF, cookie de sessão e redirecionamento.
  * <ul>
  *   <li>sem sessão, uma URL que não existe leva ao login, com a URL pedida em {@code ?destino=};</li>
- *   <li>depois do login, a mesma URL devolve a página 404 do sistema (com o menu de quem entrou), e não a página
- *       padrão do Spring.</li>
+ *   <li>depois do login, URL fora da matriz devolve a página 403 (regra 13) e reserva que não existe, a página 404
+ *       do sistema (com o menu de quem entrou), e não a página padrão do Spring.</li>
  * </ul>
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -66,11 +66,24 @@ class PaginaNaoEncontradaIntegracaoTest {
         assertThat(resposta.headers().firstValue("Location").orElseThrow()).endsWith("/login?destino=%2Fnao-existe");
     }
 
+    /** URL fora da matriz é negada (regra 13 do AGENTS.md): com sessão, a página 403 do sistema. */
     @Test
-    void logadoUrlInexistenteDevolve404ComAPaginaDoSistema() throws Exception {
+    void logadoUrlForaDaMatrizDevolve403ComAPaginaDoSistema() throws Exception {
         entrar();
 
         HttpResponse<String> resposta = abrir("/nao-existe");
+        Document doc = Jsoup.parse(resposta.body());
+
+        assertThat(resposta.statusCode()).isEqualTo(403);
+        assertThat(doc.selectFirst("[data-testid=erro-codigo]").text()).isEqualTo("Erro 403");
+        assertThat(doc.text()).doesNotContain("Whitelabel");
+    }
+
+    @Test
+    void reservaQueNaoExisteDevolve404ComAPaginaDoSistema() throws Exception {
+        entrar();
+
+        HttpResponse<String> resposta = abrir("/reservas/999999");
         Document doc = Jsoup.parse(resposta.body());
 
         assertThat(resposta.statusCode()).isEqualTo(404);

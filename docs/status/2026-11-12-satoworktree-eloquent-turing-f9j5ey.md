@@ -12,7 +12,7 @@
 **Testes novos ou mudados.**
 - `TelasComBancoTest`: 21 testes, cada tela contra PostgreSQL real, conferindo HTML e banco.
 - `MatrizAutorizacaoTest`: 210 casos; as telas são conferidas com o usuário na sessão e CSRF.
-- `PaginaNaoEncontradaIntegracaoTest`: login com servidor real (senha errada, destino revalidado, 404 com sessão).
+- `PaginaNaoEncontradaIntegracaoTest`: login com servidor real (senha errada, destino revalidado, 403 para URL fora da matriz e 404 de reserva inexistente com sessão). URL de tela fora da matriz é negada (`denyAll`), como manda a regra 13 do `AGENTS.md`.
 - E2E com login de verdade (57 testes, eram 52).
 - Os recortes `@WebMvcTest` usam services dublês sem resposta (`support/TelasNoRecorte`) e `@ComoUsuario`.
 - Testes de tela que conferiam "rota real sem dados" passaram a programar a resposta do service, ou foram para rotas `/teste/...`. Nenhum deixou de conferir o template.
@@ -22,3 +22,8 @@
 **Não verificado:** o run do CI deste PR (ainda não rodou ao escrever); as larguras de 768 e 1280 px (só à mão, como antes); sessão com mais de uma instância; contraste AA de todas as telas.
 
 **Specs atualizadas:** Notion, Specs do Front-end (seção "Ligação com o back-end" e critérios de aceite), 12/11/2026.
+
+**Segundo commit (12/11/2026).**
+- O Quality Gate da SonarCloud no PR #48 reprovou por `java:S2254` (vulnerabilidade crítica, nota de segurança D): `PortaDeEntradaDasTelas` usava `getRequestedSessionId()`. A tela agora confere só se o cookie de sessão veio e se a sessão não vale mais, com o mesmo comportamento; teste novo em `PortaDeEntradaDasTelasTest` (4 casos).
+- URL de tela fora da matriz passou a ser negada (`denyAll`), como manda a regra 13 do `AGENTS.md`.
+- `./mvnw -B verify` nesta máquina: 1059 testes, 0 falhas, 0 ignorados, "All coverage checks have been met".
