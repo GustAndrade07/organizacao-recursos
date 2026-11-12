@@ -154,7 +154,26 @@ O trade-off decisivo do ciclo é **T1**: a decisão que protege o limitador de m
 | RK6 | Dependências com CVSS crítico: 2 críticos do Spring Framework 6.2.19 sem correção na linha 3.5 | Meta "0 vulnerabilidades críticas" (critério da D4 ainda sem resposta do professor) | N2 | Justificativa em `docs/seguranca/riscos-dependencias.md`; pergunta ao professor | Gustavo |
 | RK7 | Fronteira do BDD desatualizada em relação à D1 | Teste e banco discordam | S1 | Atualizar `docs/testes/bdd-aprovacao-bloqueio.md` | Pedro |
 | RK8 | Premissas do relatório (D8) sem confirmação, incluindo (d): "professor" no relatório é o docente alocado (consultas do banco) ou o solicitante (spec do Front-end) | Valores do RF-12 sem definição fechada | C1, RF-12 | Confirmar D8 na seção 9 do plano | Grupo |
-| RK9 | Quality Gate do SonarCloud vermelho na `main` desde o merge do PR #12 (06/11/2026): `Web:PageWithoutTitleCheck` em páginas de erro (DEF-001); correção no PR #32. **Gate verde na `main` a confirmar** (painel privado; lista de issues não lida) | **Limitador de nota** "pipeline vermelho" | N2 | Reanalisar a `main` e ler o gate; regra 10 do `AGENTS.md` | Gustavo (Sonar), Leandro (DEF-001) |
+| RK9 | Quality Gate do SonarCloud vermelho na `main` desde o merge do PR #12 (06/11/2026): `Web:PageWithoutTitleCheck` em páginas de erro (DEF-001); correção no PR #32. **Fechado em 12/11/2026:** gate OK na `main` em `2610d6a`, com 0 bugs, 0 vulnerabilidades e 0 hotspots (seção 8.1, fonte 11) | **Limitador de nota** "pipeline vermelho" | N2 | Reanalisar a `main` e ler o gate; regra 10 do `AGENTS.md`. O check `SonarCloud Code Analysis` é obrigatório no ruleset da `main` | Gustavo (Sonar), Leandro (DEF-001) |
+
+### 8.1 Medidas de JaCoCo e SonarCloud (Aula 07, Prompt 2; acrescentado em 12/11/2026)
+
+Medidas da `main` em `2610d6a` (merge do PR #50), CI verde no run 211 (ID 43289513820). O passo "Build, testes e cobertura (JaCoCo 80/70 configurado no pom)" passou, ou seja, o `check` do JaCoCo não derrubou o `verify`. Os percentuais abaixo vêm do SonarCloud, que lê o `jacoco.xml` gerado nesse mesmo run (fonte 11).
+
+| Medida | Valor | Meta | Leitura |
+|---|---|---|---|
+| Cobertura de linhas | 95,7% | ≥ 80% (gate do JaCoCo no `pom.xml`) | Atende |
+| Cobertura de branches | 80,3% | ≥ 70% (gate do JaCoCo) | Atende; é a medida mais perto do limite |
+| Cobertura geral (Sonar) | 91,9% | ≥ 80% no código novo (Quality Gate "Sonar way") | Atende |
+| Bugs / vulnerabilidades | 0 / 0 | 0 críticos (especificação) | Atende pelo Quality Gate; o CVSS das dependências é a D4 (RK6) |
+| Security Hotspots | 0 (100% revisados) | 100% revisados | Atende |
+| Code smells | 1 | — | Sem meta |
+| Duplicação | 0,0% | ≤ 3% no código novo | Atende |
+| Quality Gate | OK | OK | Atende; fecha o RK9 |
+
+Efeito sobre os cenários:
+- **C4 (testabilidade):** a cobertura atende as metas com folga nas linhas. Os branches, com 80,3%, ficam perto da condição de 80% do gate do Sonar no código novo: um PR com muitos `if` sem teste pode derrubar o gate.
+- **Não medido:** cobertura por pacote, que diria onde estão os branches sem teste. O relatório HTML do JaCoCo está no artifact `relatorios` do run 211, mas não foi lido.
 
 ### Não riscos (com a ressalva do nível)
 
@@ -195,3 +214,4 @@ O trade-off decisivo do ciclo é **T1**: a decisão que protege o limitador de m
 8. `verify` de 07/11/2026 na pilha `feat/banco-auditoria-relatorio`: 510 testes, 0 falhas, 0 ignorados (máquina do Gustavo).
 9. `.\mvnw.cmd -B verify` desta branch, depois do merge da `main` (`a6d6374`) em 09/11/2026: 510 testes, 0 falhas, 0 ignorados, "All coverage checks have been met", BUILD SUCCESS (só na máquina do Gustavo; o run do CI do PR é a fonte oficial).
 10. [`.github/scripts/verificar-migracoes-imutaveis.sh`](../../.github/scripts/verificar-migracoes-imutaveis.sh) e [`testar-verificacao-migracoes.sh`](../../.github/scripts/testar-verificacao-migracoes.sh): auto-teste de 9 casos, 0 falhas no run do PR #34 (job 129396491011, lido em 09/11/2026); o run da `main` correspondente é o CI #143. Caso "migração existente alterada" provado só pelo auto-teste, não contra a V1 real.
+11. SonarCloud, projeto `GustAndrade07_organizacao-recursos`, análise da revisão `2610d6a` (12/11/2026, 19:26 UTC), lida na API pública (`api/measures/component` e `api/qualitygates/project_status`) em 12/11/2026. CI da `main`: run 211, ID [43289513820](https://github.com/GustAndrade07/organizacao-recursos/actions/runs/43289513820), `success`.
