@@ -1,0 +1,1 @@
+- Login das telas com limite de tentativas: 5 falhas do mesmo login em 15 minutos bloqueiam esse login por 15 minutos, com a mesma resposta de uma senha errada (ressalva 1 do PR #48, ADR-0009). Valores em `recursos.telas.login.tentativas` e `recursos.telas.login.bloqueio`. A API (`POST /api/auth/login`) ainda não tem o limite.

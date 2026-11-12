@@ -85,6 +85,12 @@
 
 **Desvio de processo** (ressalva 3 da revisão do Gustavo no PR #48, 12/11/2026): a ligação das telas ao back-end (commit `fa94726`) trouxe código e testes juntos, sem um commit `test(red)` antes, pelo mesmo motivo das telas 7 e 8 (o OK da regra 11 não foi pedido). Evidência que existe: 4 mutações feitas à mão, todas pegas (lista na RTM, seção "Telas ligadas ao back-end"). O mesmo vale para a tela 16 (usuários).
 
+**Exemplo de TDD com o vermelho antes do verde** (limite de tentativas no login das telas, 12/11/2026, ressalva 1 do PR #48):
+- **`test(red)`:** só `LimiteDeTentativasDoLoginIntegracaoTest`, com o OK do Leandro (dono da área) pedido antes, pela regra 11. O `./mvnw -B verify` deu 1092 testes, 4 falhas, 0 erros e 0 ignorados. As 4 falhas são do teste novo, todas porque a senha certa entrava (302 para `/`) quando o login deveria estar bloqueado. O teste compila; o vermelho veio da regra que ainda não existia.
+- **`feat(green)`:** a implementação e os testes de unidade (`TentativasDeLoginTest`, `LoginComLimiteTest`), com o `verify` verde (números no status do PR).
+- **Mutações:** 7 feitas à mão, todas pegas (lista na RTM).
+- **Limite:** os testes de unidade entraram junto com o código, no `feat(green)`, porque uma classe nova num teste do commit vermelho impede a compilação, e aí não sai número de teste. Isso foi combinado antes.
+
 **Limite:** defeito achado e corrigido dentro do próprio PR, antes do merge, não foi registrado como DEF. A contagem acima é a do que chegou à `main` ou foi registrado.
 
 ## 6. Riscos residuais
@@ -99,7 +105,7 @@
 | 2 CVEs críticos aceitos no Spring 6.2.19 | Pode contar como "vulnerabilidade crítica", conforme a D4 | Aceitos com justificativa; marcação no SonarCloud pendente | Gustavo | Resposta do professor (D4) e marcação "Accepted" |
 | Decisões pendentes | Testes e telas apoiados em premissas | **D4** (professor), **D8** (critérios do relatório) e **D9** (quando alterar ou cancelar) sem decisão; D1, D3 e D5 decididas pelo Gustavo, aguardando confirmação de Pedro e Leandro | Grupo | Decidir antes de o Pedro escrever os serviços correspondentes |
 | E2E com dados de teste | A tela pode divergir do que o back-end mandar | Contratos documentados em `docs/frontend/README.md` | Leandro / Pedro | Rodar os mesmos E2E contra o back-end real quando ele existir |
-| Força bruta no login das telas (registrado em 12/11/2026) | Senha adivinhada por tentativa e erro | Sem limite de tentativas nem atraso progressivo em `POST /login` (ressalva 1 do Gustavo no PR #48); o login só não revela se o usuário existe | Leandro / Pedro | Limite por login e por IP com bloqueio temporário, ou aceitar o risco por escrito antes da tag |
+| Força bruta no login (registrado em 12/11/2026; atualizado em 12/11/2026) | Senha adivinhada por tentativa e erro | **Telas:** 5 falhas do mesmo login em 15 minutos bloqueiam esse login por 15 minutos, com a mesma resposta de uma senha errada (ressalva 1 do PR #48 resolvida, ADR-0009; `LimiteDeTentativasDoLoginIntegracaoTest`). Continua aberto: (a) **a API** (`POST /api/auth/login`) não tem limite; (b) o contador fica na memória de uma instância só; (c) sem limite por IP (uma senha tentada em muitos logins); (d) quem sabe um login pode bloqueá-lo por 15 minutos | Leandro (telas) / Pedro (API) | Usar o mesmo `TentativasDeLogin` no `AutenticacaoService` (proposta do Leandro, a combinar com o Pedro) ou aceitar o risco da API por escrito antes da tag |
 | Cookie de sessão sem `Secure` em produção | Sessão exposta se a aplicação rodar em HTTP fora da máquina local | `HttpOnly` e `SameSite=Lax` ligados; `Secure` depende de `SESSAO_COOKIE_SEGURO=true`, que exige HTTPS | Gustavo (ambiente) | Ligar a variável onde houver HTTPS |
 | Prazo | Itens `ausente` na entrega | Meta interna 11/11; entrega 13/11 | Grupo | Priorizar os três limitadores acima; o que ficar de fora entra como risco aceito, com responsável |
 

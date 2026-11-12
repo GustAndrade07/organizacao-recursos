@@ -35,6 +35,12 @@ server:
     include-binding-errors: never
 
 recursos:
+  telas:
+    login:
+      # Limite de tentativas do login das telas (ressalva 1 do PR #48, ADR-0009): este número de falhas do mesmo login
+      # dentro da duração abaixo bloqueia esse login pela mesma duração. Contador em memória (uma instância só).
+      tentativas: ${LOGIN_TENTATIVAS:5}
+      bloqueio: ${LOGIN_BLOQUEIO:PT15M}
   seguranca:
     jwt:
       # Segredo HS256 com no mínimo 32 bytes, só por variável de ambiente (AGENTS.md, seção 7).
