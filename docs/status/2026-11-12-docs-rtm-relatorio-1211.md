@@ -28,7 +28,7 @@
 - 2 defeitos (DEF-001 e DEF-002, corrigidos);
 - desvio de autoria dos commits do PR #52 registrado;
 - riscos atualizados.
-- **Recomendação** (seção 7): "liberar com ressalvas, desde que o clone limpo passe antes da tag; se não passar, bloquear". É **proposta a confirmar pelo Leandro**. A decisão formal vai em `docs/decisao-qualidade.md` (lacuna 2), num PR próprio.
+- **Recomendação** (seção 7): "liberar com ressalvas, desde que o clone limpo passe antes da tag; se não passar, bloquear". **Confirmada pelo Leandro** em 12/11/2026, noite. A decisão formal vai em `docs/decisao-qualidade.md` (lacuna 2), num PR próprio.
 
 **Verificado:**
 - todo nome de teste citado na RTM existe;

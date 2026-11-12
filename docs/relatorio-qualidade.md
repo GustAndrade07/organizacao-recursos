@@ -133,7 +133,7 @@ Contagem do `./mvnw -B verify` local de `6ce4478` (12/11/2026), somando o atribu
 
 ## 7. Recomendação
 
-> **Proposta do relatório, a confirmar pelo Leandro** (dono da decisão). A decisão formal vai em `docs/decisao-qualidade.md`, que ainda não existe.
+> **Confirmada pelo Leandro** (dono da decisão) em 12/11/2026, noite. A decisão formal, com critérios, riscos aceitos e quem fez o quê, vai em `docs/decisao-qualidade.md` (lacuna 2), que ainda não existe.
 
 **Recomendação deste relatório: liberar `v1.0.0-rc1` com ressalvas, desde que o clone limpo passe antes da tag. Se o clone limpo não passar, bloquear.**
 
