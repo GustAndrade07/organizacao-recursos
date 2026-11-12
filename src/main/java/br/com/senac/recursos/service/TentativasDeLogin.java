@@ -1,4 +1,4 @@
-package br.com.senac.recursos.web.sessao;
+package br.com.senac.recursos.service;
 
 import java.time.Clock;
 import java.time.Duration;
@@ -10,7 +10,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 /**
- * Limite de tentativas do login das telas (ressalva 1 do PR #48, ADR-0009): {@code limite} falhas do mesmo login
+ * Limite de tentativas do login (ressalva 1 do PR #48, ADR-0009), um contador só para as duas portas: o
+ * {@code POST /login} das telas ({@code LoginComLimite}) e o {@code POST /api/auth/login} ({@link AutenticacaoService}).
+ * {@code limite} falhas do mesmo login
  * dentro de {@code bloqueio} bloqueiam esse login por {@code bloqueio}, contado do instante da última falha. Login
  * certo zera o contador. Tentativa durante o bloqueio não estende o bloqueio. O login não precisa existir: o contador
  * só olha o texto digitado (sem espaços nas pontas e em minúsculas), para não diferenciar logins que existem.
@@ -31,10 +33,10 @@ public class TentativasDeLogin {
 
     public TentativasDeLogin(Clock relogio, int limite, Duration bloqueio) {
         if (limite < 1) {
-            throw new IllegalArgumentException("recursos.telas.login.tentativas precisa ser pelo menos 1");
+            throw new IllegalArgumentException("recursos.seguranca.login.tentativas precisa ser pelo menos 1");
         }
         if (bloqueio == null || bloqueio.isNegative() || bloqueio.isZero()) {
-            throw new IllegalArgumentException("recursos.telas.login.bloqueio precisa ser uma duração positiva");
+            throw new IllegalArgumentException("recursos.seguranca.login.bloqueio precisa ser uma duração positiva");
         }
         this.relogio = relogio;
         this.limite = limite;

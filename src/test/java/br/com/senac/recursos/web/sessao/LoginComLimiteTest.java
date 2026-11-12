@@ -1,5 +1,6 @@
 package br.com.senac.recursos.web.sessao;
 
+import br.com.senac.recursos.service.TentativasDeLogin;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 

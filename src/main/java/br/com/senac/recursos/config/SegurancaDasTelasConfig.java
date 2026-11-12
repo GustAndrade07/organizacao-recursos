@@ -1,13 +1,10 @@
 package br.com.senac.recursos.config;
 
+import br.com.senac.recursos.service.TentativasDeLogin;
 import br.com.senac.recursos.web.sessao.LoginComLimite;
 import br.com.senac.recursos.web.sessao.PortaDeEntradaDasTelas;
 import br.com.senac.recursos.web.sessao.ResultadoDoLogin;
-import br.com.senac.recursos.web.sessao.TentativasDeLogin;
-import java.time.Clock;
-import java.time.Duration;
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -34,7 +31,8 @@ import org.springframework.security.web.SecurityFilterChain;
  *   <li>Perfil sem permissão: 403, a página {@code error/403.html}.</li>
  *   <li>{@code POST /logout} encerra a sessão, apaga o cookie e volta ao login.</li>
  *   <li>{@code POST /login} com limite de tentativas ({@link TentativasDeLogin}, ressalva 1 do PR #48): 5 falhas do
- *       mesmo login em 15 minutos bloqueiam esse login por 15 minutos, com a mesma resposta de uma senha errada.</li>
+ *       mesmo login em 15 minutos bloqueiam esse login por 15 minutos, com a mesma resposta de uma senha errada. O
+ *       contador é o mesmo do login da API (bean em {@code SegurancaConfig}).</li>
  * </ul>
  */
 @Configuration(proxyBeanMethods = false)
@@ -43,14 +41,6 @@ public class SegurancaDasTelasConfig {
     private static final String SOLICITANTE = "SOLICITANTE";
     private static final String RESPONSAVEL = "RESPONSAVEL";
     private static final String ADMINISTRADOR = "ADMINISTRADOR";
-
-    /** Contador de falhas do login das telas, em memória desta instância (limitação escrita no ADR-0009). */
-    @Bean
-    TentativasDeLogin tentativasDeLogin(Clock relogio,
-            @Value("${recursos.telas.login.tentativas:5}") int tentativas,
-            @Value("${recursos.telas.login.bloqueio:PT15M}") Duration bloqueio) {
-        return new TentativasDeLogin(relogio, tentativas, bloqueio);
-    }
 
     @Bean
     @Order(2)

@@ -1,5 +1,6 @@
 package br.com.senac.recursos.web.sessao;
 
+import br.com.senac.recursos.service.TentativasDeLogin;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;

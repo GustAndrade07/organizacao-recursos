@@ -5,9 +5,9 @@
 - Login certo zera o contador. Tentativa durante o bloqueio não estende o bloqueio.
 - O bloqueado recebe a mesma resposta e a mesma tela de uma senha errada (`/login?erro`). A senha é conferida do mesmo jeito, para o tempo de resposta não revelar o bloqueio.
 - Login inexistente também conta.
-- Propriedades `recursos.telas.login.tentativas` (5) e `recursos.telas.login.bloqueio` (`PT15M`).
+- Propriedades `recursos.seguranca.login.tentativas` (5) e `recursos.seguranca.login.bloqueio` (`PT15M`). Os nomes mudaram no segundo ciclo, quando o limite passou a valer também para a API.
 - Contador em memória, para uma instância só (limitação escrita no ADR-0009).
-- Código: `web/sessao/TentativasDeLogin`, `web/sessao/LoginComLimite` e `config/SegurancaDasTelasConfig`, com um `ProviderManager` sem pai (regra 15 nova no `AGENTS.md`).
+- Código: `service/TentativasDeLogin` (era `web/sessao` no primeiro ciclo), `web/sessao/LoginComLimite` e `config/SegurancaDasTelasConfig`, com um `ProviderManager` sem pai (regra 15 nova no `AGENTS.md`).
 
 **Decisões combinadas com o Leandro antes do código:**
 - janela de 15 minutos para contar as falhas;
@@ -33,11 +33,18 @@
 - Changelog em `changelog.d/satoworktree-laughing-mayer-yvtj0y.md`.
 
 **Não verificado:**
-- o run do CI deste PR;
+- o run do CI do segundo ciclo (API). O primeiro ciclo (telas, commit `e86c777`) passou no CI: `verify` no run 43293042621 e Quality Gate do SonarCloud aprovado;
 - o comportamento com mais de uma instância (o contador não é compartilhado, limitação aceita);
-- o tempo de resposta do bloqueado comparado com o de uma senha errada (não medido; a igualdade vem de a senha ser conferida nos dois casos, provada só pelo número de chamadas em `LoginComLimiteTest`);
+- o tempo de resposta do bloqueado comparado com o de uma senha errada (não medido; nas telas, a conferência da senha é provada só pelo número de chamadas em `LoginComLimiteTest`; na API, por nenhum teste);
 - o E2E no navegador do bloqueio (não escrito; o teste com servidor real cobre o HTTP).
 
-**Fica aberto:** a API (`POST /api/auth/login`, área do Pedro) não tem o limite. A proposta é usar o mesmo `TentativasDeLogin` no `AutenticacaoService`, e o Leandro combina isso com o Pedro.
+**Segundo ciclo: o limite também na API (`POST /api/auth/login`).** O Leandro pediu e autorizou a mudança na área do Pedro sem esperar por ele; o Pedro revisa o PR.
+- **Um contador só para as duas portas.** `TentativasDeLogin` foi para `service`, como bean em `SegurancaConfig`. Falhar na tela conta na API, e vice-versa.
+- **No `AutenticacaoService`:** o hash é conferido sempre; login bloqueado lança a mesma `CredenciaisInvalidasException`, com o mesmo 401 e o mesmo corpo de uma senha errada (não 429); a falha conta e o sucesso zera.
+- **`test(red)`:** só `LimiteDeTentativasApiTest` (7 testes). `./mvnw -B verify` deu **1113 testes, 5 falhas, 0 erros, 0 ignorados**, todas porque o login bloqueado ainda entrava.
+- **`feat(green)`:** `./mvnw -B verify` deu **1113 testes, 0 falhas, 0 erros, 0 ignorados**, "All coverage checks have been met". Linhas 95,8% (1464 de 1528) e branches 81,3% (422 de 519); `AutenticacaoService` e `TentativasDeLogin` sem linha nem branch descoberto.
+- **4 mutações na API, todas pegas** (lista na RTM). **Não pega:** conferir o bloqueio antes do hash, que só muda o tempo de resposta.
 
-**Specs atualizadas:** Notion, Specs do Front-end, página "01 · Acesso e navegação" (critério de aceite do limite de tentativas), 12/11/2026.
+**Fica aberto:** contador em memória (uma instância só), sem limite por IP, bloqueio de um login por quem o conhece, e tempo de resposta não medido. Tudo aceito no ADR-0009 e no relatório de qualidade.
+
+**Specs atualizadas:** Notion, Specs do Front-end, página "01 · Acesso e navegação" (critério de aceite do limite de tentativas, atualizado para telas e API), 12/11/2026.

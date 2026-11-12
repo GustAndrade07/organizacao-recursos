@@ -1,4 +1,4 @@
-package br.com.senac.recursos.web.sessao;
+package br.com.senac.recursos.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -9,7 +9,7 @@ import java.time.Instant;
 import org.junit.jupiter.api.Test;
 
 /**
- * Regras do contador do login das telas, sem servidor: janela de 15 minutos, bloqueio que não estende, login com
+ * Regras do contador do login (telas e API), sem servidor: janela de 15 minutos, bloqueio que não estende, login com
  * espaços e maiúsculas, limpeza da memória e valores de configuração. O caminho completo (POST /login com CSRF e
  * cookie) está em {@code LimiteDeTentativasDoLoginIntegracaoTest}.
  */
