@@ -1,5 +1,5 @@
 # ADR-0006 — Migrações com Flyway como único dono do esquema
-- **Status:** proposto (a regra já está em `AGENTS.md` e na configuração; vira "aceito" na revisão do PR)
+- **Status:** proposto (a regra já está em `AGENTS.md` e na configuração). Em 11/11/2026: este ADR entrou pelo PR #13 e a V1 pelo PR #28, e o back-end do PR #44 roda sobre a V1 sem migração nova, mas o Pedro ainda não confirmou o ADR por escrito; vira "aceito" quando ele confirmar
 - **Contexto:** o esquema do banco precisa ser **reproduzível** (clone limpo, CI, Testcontainers) e a proteção contra reserva dupla ([ADR-0002](0002-anti-reserva-dupla.md)) vive no banco, então qualquer divergência de esquema é risco para um dos quatro limitadores de nota. O esqueleto já traz o Flyway (`flyway-core` e `flyway-database-postgresql` no `pom.xml`).
 - **Decisão:**
   1. O **Flyway é o único dono do esquema**: tabelas, índices e constraints só nascem de migrações em `src/main/resources/db/migration` (nome `V<n>__descricao.sql`). Desde 09/11/2026 a pasta tem a V1 (`V1__nucleo_da_reserva.sql`, PR #28) e o `.gitkeep`.

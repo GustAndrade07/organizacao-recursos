@@ -1,0 +1,1 @@
+- Plano (SonarCloud) e status dos ADR-0006 e ADR-0007 atualizados depois dos merges de 11/11/2026; os 2 ADRs continuam propostos até a confirmação do Pedro.
