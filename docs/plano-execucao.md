@@ -178,7 +178,7 @@ Leitura dos materiais das Aulas 01 a 17 e da especificação no site do professo
 | # | Lacuna | Aula | Dono | Bloqueia a tag? |
 |---|---|---|---|---|
 | 1 | Carga com JMeter. Não existem `docs/performance/rnf.md`, `perf/reservas.jmx`, `perf/usuarios.csv` nem `docs/performance/resultado-01.md`. RNF-01 e RNF-03 seguem "ausente" na RTM | 10 (P2 e P3) e 14 | Leandro | Sim (índice de evidências) |
-| 2 | `docs/decisao-qualidade.md` não existe: decisão, critérios com evidência, riscos aceitos (2 críticos do Spring, `jaxb-core`, D13) e quem fez o quê | 14 (P3) | Leandro | Sim |
+| 2 | **Escrita em 12/11/2026, noite** (Leandro, branch `docs/decisao-qualidade`): liberar com ressalvas, condicionada ao clone limpo; faltam as declarações dos integrantes e a conferência no commit da tag. Antes: `docs/decisao-qualidade.md` não existe: decisão, critérios com evidência, riscos aceitos (2 críticos do Spring, `jaxb-core`, D13) e quem fez o quê | 14 (P3) | Leandro | Sim |
 | 3 | RTM e relatório de qualidade desatualizados. O resumo da RTM diz "0 de 2 críticos" e o relatório está no commit `e66c000`, ambos sem os testes do back-end e das telas | 12 (P3) e 13 (P1) | Leandro | Sim (números no commit da tag) |
 | 4 | BDD executável: não há `src/test/resources/features/aprovacao-bloqueio.feature` nem Cucumber no `pom.xml`, e falta `docs/testes/evidencia-tdd.md` | 09 (P2 e P3) | Pedro | Não, mas pesa em "qualidade dos testes" |
 | 5 | O README lista WireMock e Cucumber na pilha, mas nenhum dos dois está no `pom.xml`. Corrigir a linha ou incluir as ferramentas | 08 e 09 | Gustavo (README) | Não, mas a mesa confere o README |
