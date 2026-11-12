@@ -1,0 +1,28 @@
+# ADR-0008 — Back-end como API REST em camadas, ao lado das telas
+- **Status:** proposto (Pedro, 11/11/2026). Vira **aceito** só na revisão do PR #44 e só depois de D10 a D13 (seção 9 do plano) estarem decididas ou aceitas como pendência pelo grupo (regra 6 do `AGENTS.md`). **Não substitui** o [ADR-0003](0003-thymeleaf.md): as telas Thymeleaf continuam no mesmo projeto.
+- **Contexto:** até 11/11 o projeto tinha as telas (pacote `web`, sem regra de negócio: cada controller devolve a view e deixa o contrato para o back-end) e não tinha back-end. A primeira versão do PR #44 removia as telas para a API usar as rotas `/recursos`, `/reservas` e `/relatorios`, que colidiam com as das telas (rotas iguais e beans `recursoController`, `reservaController` e `relatorioController` repetidos). Na revisão, o Leandro (dono do front-end) não confirmou a remoção, porque ela derrubava o RF-13 e os testes de tela, e o Gustavo propôs manter os dois com a API sob `/api/**`. Esta versão do ADR registra essa proposta.
+- **Decisão:**
+  - **Telas e API no mesmo projeto e no mesmo deploy.** As telas continuam em `web/`, `templates/` e `static/`, como o ADR-0003 decidiu.
+  - **API REST sob `/api/**`**: `/api/auth/login`, `/api/usuarios`, `/api/recursos`, `/api/reservas`, `/api/relatorios/utilizacao`. Os controllers da API têm nomes próprios (`*ApiController`), que não colidem com os das telas.
+  - **Back-end em camadas**, um pacote por responsabilidade: `config` (segurança, relógio, propriedades), `controller` (REST, mais `controller.handler` com o tratador de erros), `converter` (DTO ↔ modelo e o tipo Hibernate de `tstzrange`), `dto` (`request`, `response`, usuário autenticado), `model` (entidades JPA espelhando a V1), `repository`, `service`, `enums` e `exception` (exceções de negócio traduzidas em HTTP num só lugar).
+  - **Duas cadeias de segurança** (`SegurancaConfig`): `/api/**` stateless com JWT HS256 (ADR-0001), autorização por perfil e `denyAll` para rota da API fora da matriz; as telas numa cadeia própria, **abertas como estavam antes do back-end** (sem login; com o CSRF padrão do Spring ligado), até o grupo decidir como as telas autenticam (D12).
+  - **Erros:** a API responde `ProblemDetail` (RFC 9457) com `type` próprio por regra; o tratador vale só para o pacote `controller`, então as telas continuam com as páginas de erro do Thymeleaf.
+- **Consequências:**
+  - **Ganhamos:**
+    - RF-13 e os testes de tela e E2E continuam valendo; o back-end entra sem tirar nada do front-end.
+    - A API tem uma única forma de erro (`ProblemDetail`) e as telas mantêm a delas, separadas por pacote.
+    - A matriz de autorização (`docs/seguranca/matriz-autorizacao.md`) cobre as rotas da API e das telas e é conferida por `MatrizAutorizacaoTest`, que falha se surgir rota fora dela.
+    - Regras fora dos controllers (utility tree: manutenibilidade): o controller só converte e delega.
+  - **Perdemos:**
+    - **Duas formas de autenticar** enquanto a D12 estiver aberta: a API exige JWT, e as telas estão abertas. Isso só é aceitável enquanto **nenhuma tela exibir dado real** (hoje elas mostram o estado vazio ou, nos E2E, dados de exemplo do próprio teste).
+    - **O contrato das telas ainda não bate com as rotas da API.** O `docs/frontend/README.md` e a D9 citam, por exemplo, `POST /reservas/{id}` e `POST /reservas/{id}/cancelar`; a API tem `PUT /api/reservas/{id}/periodo` e `POST /api/reservas/{id}/cancelamento`. Ligar as telas à API é trabalho seguinte, junto com a D12.
+    - **RN-04 é "consulta e depois grava"** (`ReservaService.exigirForaDeManutencao`): uma manutenção criada entre a consulta e o commit da reserva passa, porque a V1 não tem constraint entre `manutencao` e `reserva_recurso`. Risco registrado na D13 (aceitar ou proteger no banco).
+    - A suíte fica mais lenta: os testes que sobem a aplicação inteira precisam de banco (o `PaginaNaoEncontradaIntegracaoTest` passou a usar Testcontainers).
+  - **Exige de testes:**
+    - Teste de API caixa-preta (MockMvc com token de cada perfil) para cada regra, contra PostgreSQL real (Testcontainers).
+    - Teste de concorrência de ponta a ponta por HTTP (20 pedidos → 1 × 201 e 19 × 409, contagem no banco).
+    - Matriz de autorização como teste parametrizado, cobrindo API e telas.
+    - Testes de tela (`@WebMvcTest`) com a segurança real do projeto: `src/test/resources/META-INF/spring/...AutoConfigureWebMvc.imports` carrega `SegurancaConfig` no recorte, e `support/RecorteDasTelasSemApi` (registrado em `src/test/resources/META-INF/spring.factories`) tira os controllers da API do recorte, sem mudar os testes do Leandro.
+    - Respostas de erro da API sem stack trace, SQL, nome de classe nem valor rejeitado.
+- **Pendências:** D10 (estado inicial, Administrador cancelando reserva de outra pessoa, Responsável rejeitando a própria), D11 (manutenção sobre reservas existentes), D12 (autenticação das telas) e D13 (RN-04 consulta e depois grava): pendentes na seção 9 do plano. A D8 (premissas do relatório) e a D9 (quando o Solicitante altera e cancela) continuam pendentes; o back-end segue a proposta da D9 (cancelar em SOLICITADA ou APROVADA, RN-07 pelo horário de início, alteração mantém o estado).
+- **Fonte:** `src/main/java/br/com/senac/recursos/`, `docs/seguranca/matriz-autorizacao.md`, `docs/plano-execucao.md` (seção 9), revisões do Leandro e do Gustavo no PR #44 (11/11/2026).

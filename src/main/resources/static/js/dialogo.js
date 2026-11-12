@@ -1,4 +1,4 @@
-// Diálogos das telas 9 e 10 (rejeitar pedido, marcar como não compareceu). O servidor entrega o <dialog>
+// Diálogos das telas 8, 9 e 10 (cancelar reserva, rejeitar pedido, marcar como não compareceu). O servidor entrega o <dialog>
 // já aberto, então a tela funciona sem JavaScript; aqui ele vira modal (fundo escurecido, foco preso,
 // Esc fecha). Ao fechar com Esc, o endereço volta ao da lista (recarregar a página não reabre o diálogo)
 // e o foco volta ao link que abriu o diálogo (data-origem guarda o data-testid dele).

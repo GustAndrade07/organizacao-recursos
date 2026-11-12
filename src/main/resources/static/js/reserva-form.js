@@ -1,16 +1,19 @@
-// Nova reserva: bloqueia término igual ou anterior ao início antes do envio (RN-01), evita envio duplicado
-// e leva o foco ao aviso quando a página volta com erro do servidor.
+// Formulário de horário da reserva: nova reserva (tela 6, prefixo "reserva-form") e alteração no detalhe
+// (tela 8, prefixo "reserva-alterar"). O formulário diz o prefixo em data-reserva-form. Bloqueia término igual
+// ou anterior ao início antes do envio (RN-01), evita envio duplicado e leva o foco ao aviso quando a página
+// volta com erro do servidor.
 // Sem JavaScript o formulário envia normalmente e o back-end valida (a tela mostra o que ele devolver).
 (function () {
-  var form = document.querySelector('[data-testid="reserva-form"]');
+  var form = document.querySelector('form[data-reserva-form]');
   if (!form) {
     return;
   }
-  var inicio = form.querySelector('[data-testid="reserva-form-inicio"]');
-  var termino = form.querySelector('[data-testid="reserva-form-termino"]');
-  var botao = form.querySelector('[data-testid="reserva-form-confirmar"]');
-  var erro = document.getElementById('reserva-form-erro-termino');
-  var resumo = document.querySelector('[data-testid="reserva-form-erro-resumo"]');
+  var prefixo = form.getAttribute('data-reserva-form');
+  var inicio = form.querySelector('[data-testid="' + prefixo + '-inicio"]');
+  var termino = form.querySelector('[data-testid="' + prefixo + '-termino"]');
+  var botao = form.querySelector('[data-testid="' + prefixo + '-confirmar"]');
+  var erro = document.getElementById(prefixo + '-erro-termino');
+  var resumo = document.querySelector('[data-testid="' + prefixo + '-erro-resumo"]');
   var titulo = resumo.querySelector('[data-resumo-titulo]');
   var lista = resumo.querySelector('[data-resumo-lista]');
   var textoOriginal = botao.textContent;

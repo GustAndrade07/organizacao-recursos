@@ -115,6 +115,47 @@ Envio: no evento `submit`, o `login.js` desabilita o botão Entrar, mostra "Entr
 - Erro de campo aparece junto ao campo e num resumo no topo (`role="alert"`), com link para o campo.
 - `reserva-form.js` bloqueia término igual ou anterior ao início antes do envio (RN-01) e desabilita o botão Confirmar durante o envio. Sem JavaScript o back-end valida.
 - Sucesso leva ao detalhe da reserva (tela 8), decisão do back-end.
+- `reserva-form.js` serve a esta tela e à alteração da tela 8: o formulário diz o prefixo dos ids em `data-reserva-form` (`reserva-form` aqui, `reserva-alterar` na tela 8). `GanchosDoScriptDeReserva` (teste) confere que todo seletor do script existe nas duas páginas.
+
+## Minhas reservas e detalhe
+
+Telas 7 e 8 do Solicitante (`ReservaController`, RF-04, RN-01, RN-05 e RN-07; spec 02 do Notion). **Não listam, alteram nem cancelam nada**; o controller só devolve o filtro e a ação pedida. Contrato com o back-end, a confirmar com o Pedro:
+
+| Rota | Template | Para quê |
+|---|---|---|
+| `GET /reservas/minhas?estado=` | `reservas-minhas.html` | Tela 7: lista do usuário logado com filtro por estado |
+| `GET /reservas/{id}` | `reserva-detalhe.html` | Tela 8: detalhe; `?acao=alterar` abre o formulário e `?acao=cancelar` abre a confirmação (outro valor é ignorado; `{id}` não numérico responde 400) |
+| `POST /reservas/{id}` | (back-end) | Altera data e horário (campos `data`, `inicio`, `termino`) |
+| `POST /reservas/{id}/cancelar` | (back-end) | Cancela, sem corpo |
+
+**Quando a reserva pode mudar.** Alterar e Cancelar só aparecem para `Solicitada` ou `Aprovada` com `iniciada` **exatamente** falso (nome exato, como nas telas 9 e 10; `iniciada` ausente conta como iniciada). Isso é a proposta da pergunta em aberto **D9** do plano (cancelar Solicitada, o que é "já iniciada" e se alterar uma Aprovada restrita volta a Solicitada); o back-end continua obrigado a recusar a transição inválida. Nos outros casos o detalhe diz "Esta reserva não pode mais ser alterada nem cancelada." e a lista mostra só "Ver detalhes".
+
+**Tela 7, lista (`reservas-minhas.html`)**
+
+| Atributo de modelo | Conteúdo | Sem ele |
+|---|---|---|
+| `filtro` | `todos` (padrão), `solicitada`, `aprovada`, `em-uso`, `concluida`, `rejeitada`, `cancelada` ou `nao-compareceu`; o controller preenche com `?estado=` (desconhecido vira `todos`) e o back-end filtra por ele | — |
+| `reservas` | do usuário logado, **já ordenadas com as próximas primeiro** (a tela não reordena): `id`, `recurso`, `local`, `data` e `horario` (texto pronto), `estado` (nome por extenso) e `iniciada` (booleano: o horário de início já chegou) | Vazia com `todos`: "Você ainda não tem reservas" e "Buscar recursos"; vazia com outro filtro: "Nenhuma reserva com esse estado" e "Ver todas as reservas" |
+
+- Cada linha tem "Ver detalhes" (`/reservas/{id}`) e, quando pode mudar, "Alterar" (`?acao=alterar`) e "Cancelar" (`?acao=cancelar`, que só abre a confirmação). Os três links têm nome acessível com o recurso e a data.
+- Tabela no desktop e cartões no mobile com o mesmo HTML (`data-rotulo`); o badge vem de `fragments/estado :: badge`.
+
+**Tela 8, detalhe (`reserva-detalhe.html`)**
+
+| Atributo de modelo | Conteúdo | Sem ele |
+|---|---|---|
+| `acao` | `alterar` ou `cancelar` (o controller preenche com `?acao=`). Ao recusar o `POST /reservas/{id}`, o back-end renderiza a view com `acao` = `alterar` | Só o resumo |
+| `reserva` | `id`, `recurso`, `local`, `data` (`LocalDate`), `inicio` e `termino` (`LocalTime`; a tela formata "14:00 às 15:30"), `estado`, `iniciada` e `motivo` (da rejeição, opcional; aparece só em `Rejeitada`) | A página mostra só o título e "Voltar para minhas reservas" |
+| `formulario` | `data`, `inicio`, `termino` que o usuário enviou na alteração recusada | O formulário vem com os valores da reserva |
+| `erros` | `LinkedHashMap` de `data`, `inicio` ou `termino` para texto pronto; outra chave entra no resumo como texto, sem link | Sem erros |
+| `conflito` | verdadeiro após o 409 de horário na alteração | Sem aviso |
+| `manutencao` | `inicio` e `fim` (`LocalDateTime`) após o 409 de manutenção | Sem aviso |
+| `confirmacao` | `titulo`, `reserva` e `estado` (fragmento `fragments/confirmacao`), depois de criar, alterar ou cancelar | Sem aviso |
+
+- `Solicitada` mostra "Aguardando a aprovação de um Responsável."
+- A alteração mantém o recurso e só troca data e horário; usa os mesmos campos, resumo de erros e avisos de conflito e manutenção da nova reserva, e `reserva-form.js` bloqueia término igual ou anterior ao início (RN-01) e desabilita "Salvar alterações" durante o envio. "Voltar sem alterar" volta a `/reservas/{id}`.
+- Cancelar abre o diálogo "Cancelar a reserva?" (mesmo padrão das telas 9 e 10: `<dialog open>` do servidor, `dialogo.js`, foco inicial em "Voltar"), que avisa que a ação não pode ser desfeita. "Sim, cancelar reserva" envia `POST /reservas/{id}/cancelar` uma vez só (`data-envio-unico`).
+- Onde fica o link para o histórico (tela 11) continua decisão do back-end; o Solicitante não o vê (RN-11).
 
 ## Recursos e bloqueio por manutenção
 
@@ -177,7 +218,7 @@ O back-end pode usar DTO próprio no lugar de `FormularioRecurso`, `FormularioBl
 - Os formulários que gravam (cadastro, edição e bloqueio, inclusive "Confirmar bloqueio", que é um botão ligado ao formulário por `form=`) têm `data-envio-unico` (ver "Envio único de formulário"); o `name`/`value` do botão (`confirmar=true`) segue no `POST`, que sai uma vez só no clique duplo. O "Atualizar campos" é `GET` e não precisa.
 - `.situacao` (Ativo, Em manutenção) divide a base de estilo do `.estado` e só acrescenta borda e cores.
 
-**Testes e JavaScript.** Os testes de contrato só conferem que cada tela carrega o seu script; o comportamento dos scripts (`recurso-form.js`, `manutencao-form.js`) fica para o E2E Playwright em 375 px (RF-13).
+**Testes e JavaScript.** Os testes de contrato só conferem que cada tela carrega o seu script. O E2E em 375 px cobre o bloqueio de fim antes do início do `manutencao-form.js` (`ResponsavelEAdministradorE2ETest`); a troca de tipo do `recurso-form.js` continua sem E2E (ver "E2E em 375 px").
 ## Fila de aprovação
 
 `GET /aprovacoes` (`AprovacaoController`, template `aprovacoes.html`) é a tela 9, do Responsável (RF-07, RN-06). **Não lista nem decide pedidos**; o controller só devolve a view. Contrato com o back-end, a confirmar com o Pedro:
@@ -211,7 +252,7 @@ O back-end pode usar DTO próprio no lugar de `FormularioRecurso`, `FormularioBl
 - Reserva Aprovada com `horarioPassou` mostra a etiqueta "Horário já passou" e o botão "Marcar como não compareceu", que leva a `?estado={filtro}&naoCompareceu={id}` e abre um diálogo de confirmação (`role="alertdialog"`, foco em "Voltar"), porque a mudança não tem volta: Não compareceu é estado terminal (RN-05) e fica registrada para auditoria (RN-08). "Marcar como não compareceu" também é um link, pelo mesmo motivo de "Rejeitar". O prazo para marcar NAO_COMPARECEU ainda é decisão pendente do back-end: a tela mostra o botão quando ele disser `horarioPassou`. Reserva Em uso nunca mostra a etiqueta nem o botão.
 - Depois de cada ação o aviso `role="status"` diz o novo estado; o redirecionamento para `GET /retirada-devolucao` com `confirmacao` fica a cargo do back-end.
 
-### Diálogos (telas 9 e 10)
+### Diálogos (telas 8, 9 e 10)
 
 Os dois diálogos são `<dialog>` que o servidor entrega com o atributo `open`, e `dialogo.js` (só carregado quando há diálogo) troca `open` por `showModal()`: fundo escurecido, foco preso, Esc fecha e o endereço volta ao da lista. Sem JavaScript o `<dialog open>` fica não modal, aparece fixo sobre a lista sem o fundo escurecido e vem depois da tabela na ordem de tabulação (quem navega por teclado precisa passar pela lista para chegar a ele); "Voltar" é um link para a lista. Com JavaScript, ao fechar com Esc o foco volta ao link que abriu o diálogo (`data-origem` guarda o `data-testid` dele) e o endereço volta ao da lista. O foco inicial é o campo do motivo na rejeição e o botão "Voltar" na confirmação de não compareceu.
 
@@ -223,7 +264,7 @@ O badge do estado vem de `fragments/estado.html :: badge` (ver "Estado da reserv
 
 Todo formulário que envia uma ação (aprovar, rejeitar, retirar, devolver, confirmar não compareceu) tem `data-envio-unico` e um botão de envio, então `envio-unico.js` (carregado pelo layout) desabilita o botão no primeiro envio e a ação não sai duas vezes; ver "Envio único de formulário" abaixo. O formulário do filtro (GET) não precisa. O diálogo reaproveita `cartao__titulo`, `pagina__descricao` e `formulario__acoes`, e o "(você)" usa `tabela__nota`.
 
-Risco aberto: `dialogo.js` não tem teste automatizado (o teste de servidor só confere o HTML). O comportamento com JavaScript (modal, foco, Esc, endereço) foi conferido à mão no Chromium e depende do E2E Playwright em 375 px (RF-13) para ficar coberto.
+O comportamento de `dialogo.js` (modal, foco inicial, Esc, endereço e foco de volta ao gatilho) é coberto pelo E2E em 375 px nas telas 8, 9 e 10 (`ReservaE2ETest` e `ResponsavelEAdministradorE2ETest`).
 
 ## Estado da reserva (RN-05)
 
@@ -257,7 +298,7 @@ A classe sai de uma tabela fechada (`em uso` → `estado--em-uso`, `concluída` 
 
 Use em formulários que mudam estado no servidor e não têm script próprio: aprovar, rejeitar, cancelar, registrar retirada e devolução, bloquear e liberar recurso. O formulário precisa ter um botão de envio (`type="submit"`); sem ele o Enter nos campos não é barrado.
 
-**Risco aberto:** o comportamento no navegador (um único POST, restauração no `pageshow` e nos 30 s) foi conferido à mão com Playwright em página de teste, mas não está no repositório. Os testes de servidor só provam que o layout carrega o script e que a página marcada o referencia; o E2E de cada tela deve provar o POST único.
+O E2E em 375 px prova o POST único com clique duplo nas telas 8 e 10 (botão desabilitado, um só POST). **Observação medida em 11/11/2026 (Chromium 1243):** num clique duplo imediato (ou Enter duas vezes) o navegador dispara dois eventos `submit` antes de o `setTimeout(0)` travar o botão; mesmo assim só um POST sai, porque o Chromium troca a primeira navegação pela segunda. Em outros navegadores **não medido**. A restauração no `pageshow` e nos 30 s continua sem teste automatizado.
 
 ## Histórico da reserva
 
@@ -293,3 +334,26 @@ Use em formulários que mudam estado no servidor e não têm script próprio: ap
 - `relatorio-form.js` bloqueia fim anterior ao início antes do envio, com o mesmo texto do servidor (`#relatorio-fim-erro`, sempre presente no HTML e escondido quando não há erro), e leva o foco ao campo. Sem JavaScript o servidor devolve o erro. Parâmetros vazios ou só o início não são erro.
 - Tabelas no desktop e cartões no mobile com o mesmo HTML (cada célula traz o rótulo em `data-rotulo`).
 - Acessibilidade: rótulos visíveis ligados por `for`, erro em texto junto ao campo (`role="alert"`, `aria-invalid`, `aria-describedby`), `<caption>` em cada tabela e um único `<h1>`.
+
+## E2E em 375 px
+
+`src/test/java/br/com/senac/recursos/e2e` (ADR-0004, RF-13). Rodam no `./mvnw -B verify` como qualquer teste: sobem a aplicação real numa porta aleatória contra PostgreSQL em Testcontainers e abrem o Chromium do Playwright sem tela, em 375 × 812 px (`isMobile`).
+
+| Classe | O que prova |
+|---|---|
+| `Responsividade375E2ETest` | 28 telas e estados: sem rolagem horizontal, um único `h1`, tabela vira cartão (cabeçalho só para leitor de tela) e todo controle tocável com pelo menos 44 px de altura; um print por tela |
+| `AcessoE2ETest` | Avisos do login com foco, "Entrando…" durante o envio, menu recolhido que abre e fecha com Esc, itens só do perfil, páginas 401, 403, 404 e 500 com caminho para continuar e sem jargão técnico |
+| `ReservaE2ETest` | Busca → nova reserva → envio (RN-01 barrada, um POST com os campos certos), conflito 409 com foco, aviso de restrito, minhas reservas, alterar e cancelar (modal, Esc, clique duplo) |
+| `ResponsavelEAdministradorE2ETest` | Diálogos de rejeitar e de não compareceu, motivo obrigatório, envio único da retirada, fim antes do início no relatório e na manutenção, histórico sem ação de editar |
+
+- **Sem back-end:** as rotas reais só mostram o estado vazio. `TelasComDados` (só do teste, fora do component scan) renderiza os mesmos templates com dados de exemplo em `/e2e/...`, seguindo os contratos deste README. Os `POST` são interceptados no navegador, contados e respondidos com 204. Quando o back-end existir, os fluxos de login, 409 real, 401 e 403 devem passar a rodar contra ele.
+- **Navegador:** a versão vem da dependência `com.microsoft.playwright:playwright` do `pom.xml`. No CI o passo "Navegador do E2E" instala o Chromium com as bibliotecas do sistema; numa máquina de desenvolvimento o Playwright baixa o navegador na primeira execução (ou use `PLAYWRIGHT_BROWSERS_PATH` apontando para um Chromium da mesma versão).
+- **Esperas:** só as do Playwright (auto-wait, `waitForURL`, asserções); nada de `Thread.sleep`. O print espera dois quadros de animação antes de capturar e tenta mais uma vez só se o Chromium responder "Unable to capture screenshot" (falha vista uma vez no CI, run 43093990942).
+- **Prints:** `target/e2e/375/*.png`, no artifact `e2e-375` do CI; amostra versionada em `docs/evidencias/e2e-375/`.
+- **Mutações conferidas em 11/11/2026**, cada uma deixou vermelho pelo menos um E2E e foi desfeita:
+  - E1: tirar o bloqueio de RN-01 do `reserva-form.js`;
+  - E2: trocar `showModal()` por `open` no `dialogo.js`;
+  - E3: desligar a trava do `envio-unico.js`;
+  - E4: deixar a tabela mais larga que a tela;
+  - E5: abrir o menu ao carregar.
+- **Fora do E2E por enquanto:** a troca de tipo do formulário de recurso (`recurso-form.js`), a restauração do `envio-unico.js` no `pageshow` e nos 30 s, e larguras de 768 e 1280 px (conferidas à mão).

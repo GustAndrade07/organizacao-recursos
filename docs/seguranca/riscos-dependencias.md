@@ -60,7 +60,13 @@ Demais riscos do Spring Framework 6.2.19 (`spring-web`, `spring-beans`, `spring-
 - **Spring Framework conferido de novo no Maven Central em 11/11/2026:** a linha 6.2 continua parando em 6.2.19 e o Spring Boot 3.5 em 3.5.16. Sem correção na mesma linha, a seção 3 continua valendo. `grep` em `src/` em 11/11/2026: nenhum `XsltView`, `SseEmitter`, `ResponseBodyEmitter` nem `text/event-stream`, o que sustenta o "por que não nos atinge" dos dois críticos.
 
 ## 5. Pendências
-- [ ] Depois do merge deste PR, reabrir o painel (logado) e anotar aqui quantos riscos restam e quais são Critical e High.
-- [ ] No SonarCloud, marcar os dois críticos do Spring como **Accepted** com o motivo da seção 3 (ação manual do Gustavo no painel).
-- [ ] Reler os riscos restantes que não têm correção e decidir (corrigir, aceitar com motivo ou migrar de linha).
-- [ ] Perguntar ao professor se "0 vulnerabilidades críticas" se mede pelo CVSS das dependências ou pelo Quality Gate/issues.
+- [x] Depois do merge deste PR, reabrir o painel (logado) e anotar aqui quantos riscos restam e quais são Critical e High. — feito em 11/11/2026, seção 6.
+- [x] No SonarCloud, marcar os dois críticos do Spring como **Accepted** com o motivo da seção 3 (ação manual do Gustavo no painel). — feito em 11/11/2026, seção 6.
+- [ ] Reler os riscos restantes que não têm correção e decidir (corrigir, aceitar com motivo ou migrar de linha). Primeiro da fila: o `jaxb-core` 4.0.9 (CVSS 8,3, High), único High aberto.
+- [ ] Perguntar ao professor se "0 vulnerabilidades críticas" se mede pelo CVSS das dependências ou pelo Quality Gate/issues. — sem resposta até 11/11/2026; ver a seção 6 e a D4 da seção 9 do plano.
+
+## 6. Painel e D4 em 11/11/2026, noite (Gustavo, logado no SonarCloud)
+- **Dependency risks (branch `main`, commit `8b18dd9`):** antes da marcação, 21 riscos em 123 dependências, com 2 Critical (os da seção 3). Depois de marcar os 2 como **Accepted**: **19 riscos abertos, 0 Critical, 1 High** (`org.glassfish.jaxb:jaxb-core` 4.0.9, CVE-2026-92877, CVSS 8,3, escopo runtime, transitivo). O risco do `jsoup` não aparece mais na lista depois do PR #38.
+- **Descrição dos CVEs conferida no painel antes de aceitar:** o título do SonarCloud muda (CVE-2026-47884 aparece como "Path Traversal", CWE-22; CVE-2026-47890 como "CRLF Injection", CWE-93), mas a descrição continua sendo a da seção 3 (`XsltView`; SSE com fragmentos de view). `git grep` por `XsltView`, `SseEmitter`, `ResponseBodyEmitter`, `text/event-stream` e `FragmentsRendering` em `src/` da `main` e do PR #44 (back-end): 0 ocorrências. A justificativa de cada aceite no painel cita esta seção e a seção 3.
+- **Quality Gate da `main`** (API pública `api/qualitygates/project_status` e `api/measures/component`, lida em 11/11/2026): **OK**; `vulnerabilities` = 0, `security_rating` = A (1.0), `security_hotspots` = 0, `security_hotspots_reviewed` = 100%.
+- **Leitura para a D4:** pelas duas medições, não há vulnerabilidade crítica **aberta**: o Quality Gate tem 0 vulnerabilidades, e as dependências têm 0 Critical aberto. A ressalva é que os 2 Critical das dependências estão **aceitos com justificativa, não corrigidos**: se o professor ler "0 críticas" como "0 críticas presentes", o critério não é atendido e o risco residual tem de constar em `docs/decisao-qualidade.md` com impacto, justificativa e responsável.

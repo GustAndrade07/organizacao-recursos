@@ -15,7 +15,7 @@
   - **Perdemos:**
     - **Migração mergeada não se edita**: erro de V1 vira V2, e o histórico guarda o erro. Por isso a V1 só foi adiada até as decisões que mudam o esquema (D1, D2 e D5, abaixo) estarem tomadas.
     - Banco local que aplicou uma migração depois editada fica inconsistente e precisa de `docker compose down -v` (AGENTS.md, seção 8).
-    - A extensão `btree_gist` precisa poder ser criada no banco de destino. A imagem `postgres:16` (a do `docker-compose.yml` e a do `AplicacaoSmokeTest`) a traz: conferido em 05/11/2026 num container descartável (PostgreSQL 16.15, `btree_gist` 1.7 disponível, `CREATE EXTENSION` e uma `EXCLUDE USING gist` criadas sem erro). Em outro ambiente (banco gerenciado, outra versão) isso **não foi conferido**.
+    - A extensão `btree_gist` precisa poder ser criada no banco de destino. A imagem `postgres:16` (a do `docker-compose.yml` e a do `AplicacaoSmokeTest`) a traz: conferido em 05/11/2026 num container descartável (PostgreSQL 16.15, `btree_gist` 1.7 disponível, `CREATE EXTENSION` e uma `EXCLUDE USING gist` criadas sem erro). Em 11/11/2026, na mesma máquina, conferido também em `postgres:16-alpine` (PostgreSQL 16.15, musl) e `postgres:17` (PostgreSQL 17.11): `CREATE EXTENSION btree_gist` cria a versão 1.7, e uma `EXCLUDE USING gist (r WITH =, p WITH &&)` sobre `tstzrange` aceita `[10:00, 12:00)` e recusa `[11:00, 13:00)` do mesmo recurso. Banco gerenciado (nuvem) **não foi conferido**: a extensão depende do provedor permitir `CREATE EXTENSION`.
     - Mais disciplina de PR: toda mudança de modelo exige migração, não só alteração de entidade.
   - **Exige de testes:**
     - Teste com Testcontainers que aplica **todas** as migrações num banco vazio e sobe o contexto com `ddl-auto: validate`.
