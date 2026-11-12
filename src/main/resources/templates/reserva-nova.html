@@ -55,7 +55,7 @@
             </div>
         </div>
 
-        <form class="cartao formulario" method="post" th:action="@{/reservas}" data-testid="reserva-form">
+        <form class="cartao formulario" method="post" th:action="@{/reservas}" data-testid="reserva-form" data-reserva-form="reserva-form">
             <input type="hidden" name="recursoId" th:value="${reserva.recursoId}">
 
             <div class="cartao__linha" th:if="${recurso != null}">

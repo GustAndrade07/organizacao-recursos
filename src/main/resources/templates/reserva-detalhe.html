@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<!--/*
+  Tela 8 do inventário (prefixo "reserva-"), RF-04, RN-01, RN-05 e RN-07. Atributos de modelo (docs/frontend/README.md):
+    acao        : alterar | cancelar                                     (o controller preenche com ?acao=)
+    reserva     : id, recurso, local, data (LocalDate), inicio e termino (LocalTime), estado (nome por extenso),
+                  iniciada (verdadeiro se o horário de início já chegou) e motivo (da rejeição, opcional)
+                  (o back-end preenche; ausente = só o título e o link de volta)
+    formulario  : data, inicio, termino que o usuário enviou na alteração recusada (back-end; sem ele o
+                  formulário vem com os valores da reserva)
+    erros       : mapa campo (data, inicio, termino) para mensagem       (back-end, após POST recusado)
+    conflito    : verdadeiro após 409 de horário na alteração            (back-end)
+    manutencao  : inicio e fim (LocalDateTime) após 409 de manutenção    (back-end)
+    confirmacao : titulo, reserva e estado depois de criar, alterar ou cancelar
+  Alterar e Cancelar só aparecem para Solicitada ou Aprovada com iniciada falso (RN-07; ver D9 no plano).
+*/-->
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: pagina(titulo='Detalhe da reserva', conteudo=~{::#conteudo-pagina})}">
+<head>
+    <title>Detalhe da reserva</title>
+</head>
+<body>
+<div id="conteudo-pagina">
+    <div class="secao"
+         th:with="podeMudar=${reserva != null and (reserva.estado == 'Solicitada' or reserva.estado == 'Aprovada') and reserva.iniciada == false},
+                  horario=${reserva != null ? #temporals.format(reserva.inicio, 'HH:mm') + ' às ' + #temporals.format(reserva.termino, 'HH:mm') : ''},
+                  dataTexto=${reserva != null ? #temporals.format(reserva.data, 'dd/MM/yyyy') : ''}">
+        <div th:replace="${confirmacao != null} ? ~{fragments/confirmacao :: confirmacao(${confirmacao}, 'reserva-sucesso')} : ~{}"></div>
+
+        <header class="pagina__cabecalho">
+            <h1 data-testid="reserva-titulo">Detalhe da reserva</h1>
+            <p class="pagina__descricao"><a th:href="@{/reservas/minhas}" data-testid="reserva-voltar">Voltar para minhas reservas</a></p>
+        </header>
+
+        <th:block th:if="${reserva != null}">
+            <section class="cartao" aria-labelledby="reserva-resumo-titulo" data-testid="reserva-resumo">
+                <div class="cartao__linha">
+                    <h2 class="cartao__titulo" id="reserva-resumo-titulo" data-testid="reserva-recurso" th:text="${reserva.recurso}">Sala 203</h2>
+                    <span th:replace="~{fragments/estado :: badge(${reserva.estado}, 'reserva-estado')}">Aprovada</span>
+                </div>
+                <dl class="lista-dados">
+                    <dt>Local</dt>
+                    <dd data-testid="reserva-local" th:text="${reserva.local}">Bloco B, 2º andar</dd>
+                    <dt>Data</dt>
+                    <dd data-testid="reserva-data" th:text="${dataTexto}">12/11/2026</dd>
+                    <dt>Horário</dt>
+                    <dd data-testid="reserva-horario" th:text="${horario}">14:00 às 15:30</dd>
+                    <th:block th:if="${reserva.estado == 'Rejeitada' and !#strings.isEmpty(#strings.trim(reserva['motivo']))}">
+                        <dt>Motivo da rejeição</dt>
+                        <dd data-testid="reserva-motivo" th:text="${reserva['motivo']}">Laboratório reservado para a banca</dd>
+                    </th:block>
+                </dl>
+                <p class="tabela__nota" data-testid="reserva-aguardando" th:if="${reserva.estado == 'Solicitada'}">Aguardando a aprovação de um Responsável.</p>
+
+                <div class="formulario__acoes" th:if="${podeMudar and acao != 'alterar'}">
+                    <a class="botao botao--secundario" th:href="@{/reservas/{id}(id=${reserva.id},acao='alterar')}"
+                       data-testid="reserva-alterar">Alterar data ou horário</a>
+                    <a class="botao botao--perigo" th:href="@{/reservas/{id}(id=${reserva.id},acao='cancelar')}"
+                       data-testid="reserva-cancelar">Cancelar reserva</a>
+                </div>
+                <p class="tabela__nota" data-testid="reserva-sem-acao" th:unless="${podeMudar}">Esta reserva não pode mais ser alterada nem cancelada.</p>
+            </section>
+
+            <section class="cartao" aria-labelledby="reserva-alterar-titulo" data-testid="reserva-alterar-secao"
+                     th:if="${podeMudar and acao == 'alterar'}"
+                     th:with="total=${erros != null ? erros.size() : 0},
+                              valores=${formulario != null ? formulario : reserva}">
+                <h2 class="cartao__titulo" id="reserva-alterar-titulo">Alterar data ou horário</h2>
+
+                <div class="alerta alerta--perigo" role="alert" tabindex="-1" data-testid="reserva-alterar-erro-resumo"
+                     th:hidden="${total == 0}" hidden>
+                    <strong class="alerta__titulo" data-resumo-titulo
+                            th:text="${total > 0} ? 'Corrija ' + ${total} + (${total == 1} ? ' campo' : ' campos') + ' para continuar'"></strong>
+                    <ul class="alerta__lista" data-resumo-lista>
+                        <li th:each="erro : ${erros}"
+                            th:with="minuscula=${erro.value == null or erro.value.isEmpty() ? '' : erro.value.substring(0, 1).toLowerCase() + erro.value.substring(1)}">
+                            <a th:if="${erro.key == 'data' or erro.key == 'inicio' or erro.key == 'termino'}"
+                               th:href="'#reserva-alterar-' + ${erro.key}"
+                               th:text="(${erro.key == 'data'} ? 'Data' : (${erro.key == 'inicio'} ? 'Hora de início' : 'Hora de término')) + ': ' + ${minuscula}"></a>
+                            <span th:unless="${erro.key == 'data' or erro.key == 'inicio' or erro.key == 'termino'}" th:text="${erro.value}"></span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="alerta alerta--perigo" role="alert" tabindex="-1" data-testid="reserva-alterar-erro-conflito" th:if="${conflito}">
+                    <strong class="alerta__titulo">Não foi possível alterar</strong>
+                    <p class="alerta__texto">Esse horário acabou de ser reservado ou se sobrepõe a outra reserva. Escolha outro horário.</p>
+                </div>
+
+                <div class="alerta alerta--perigo" role="alert" tabindex="-1" data-testid="reserva-alterar-erro-manutencao" th:if="${manutencao != null}">
+                    <strong class="alerta__titulo">Recurso em manutenção</strong>
+                    <p class="alerta__texto"
+                       th:text="'O recurso ' + ${reserva.recurso} + ' está em manutenção de ' + ${#temporals.format(manutencao.inicio, 'dd/MM/yyyy, HH:mm')} + ' até ' + ${#temporals.format(manutencao.fim, 'dd/MM/yyyy, HH:mm')} + '. Escolha outro período.'"></p>
+                </div>
+
+                <form class="formulario" method="post" th:action="@{/reservas/{id}(id=${reserva.id})}"
+                      data-testid="reserva-alterar" data-reserva-form="reserva-alterar">
+                    <div class="campo">
+                        <label class="campo__rotulo" for="reserva-alterar-data">Data</label>
+                        <input class="campo__entrada" id="reserva-alterar-data" name="data" type="date" required
+                               th:value="${valores.data}" data-testid="reserva-alterar-data"
+                               th:classappend="${erros != null and erros.containsKey('data')} ? 'campo__entrada--erro'"
+                               th:aria-invalid="${erros != null and erros.containsKey('data')} ? 'true'"
+                               th:aria-describedby="${erros != null and erros.containsKey('data')} ? 'reserva-alterar-erro-data'">
+                        <p class="campo__erro" id="reserva-alterar-erro-data" data-testid="reserva-alterar-erro-data" hidden
+                           th:hidden="${erros == null or !erros.containsKey('data')}" th:text="${erros?.get('data')}"></p>
+                    </div>
+
+                    <div class="campo-par">
+                        <div class="campo">
+                            <label class="campo__rotulo" for="reserva-alterar-inicio">Hora de início</label>
+                            <input class="campo__entrada" id="reserva-alterar-inicio" name="inicio" type="time" required
+                                   th:value="${valores.inicio}" data-testid="reserva-alterar-inicio"
+                                   th:classappend="${erros != null and erros.containsKey('inicio')} ? 'campo__entrada--erro'"
+                                   th:aria-invalid="${erros != null and erros.containsKey('inicio')} ? 'true'"
+                                   th:aria-describedby="${erros != null and erros.containsKey('inicio')} ? 'reserva-alterar-erro-inicio'">
+                            <p class="campo__erro" id="reserva-alterar-erro-inicio" data-testid="reserva-alterar-erro-inicio" hidden
+                               th:hidden="${erros == null or !erros.containsKey('inicio')}" th:text="${erros?.get('inicio')}"></p>
+                        </div>
+                        <div class="campo">
+                            <label class="campo__rotulo" for="reserva-alterar-termino">Hora de término</label>
+                            <input class="campo__entrada" id="reserva-alterar-termino" name="termino" type="time" required
+                                   th:value="${valores.termino}" data-testid="reserva-alterar-termino"
+                                   th:classappend="${erros != null and erros.containsKey('termino')} ? 'campo__entrada--erro'"
+                                   th:aria-invalid="${erros != null and erros.containsKey('termino')} ? 'true'"
+                                   th:aria-describedby="${erros != null and erros.containsKey('termino')} ? 'reserva-alterar-erro-termino'">
+                            <p class="campo__erro" id="reserva-alterar-erro-termino" data-testid="reserva-alterar-erro-termino" hidden
+                               th:hidden="${erros == null or !erros.containsKey('termino')}" th:text="${erros?.get('termino')}"></p>
+                        </div>
+                    </div>
+
+                    <div class="formulario__acoes">
+                        <button type="submit" class="botao botao--primario" data-enviando="Salvando…"
+                                data-testid="reserva-alterar-confirmar">Salvar alterações</button>
+                        <a class="botao botao--secundario" th:href="@{/reservas/{id}(id=${reserva.id})}"
+                           data-testid="reserva-alterar-voltar">Voltar sem alterar</a>
+                    </div>
+                </form>
+            </section>
+            <script th:if="${podeMudar and acao == 'alterar'}" th:src="@{/js/reserva-form.js}" defer></script>
+
+            <dialog class="dialogo" open role="alertdialog" aria-labelledby="reserva-cancelar-titulo" aria-describedby="reserva-cancelar-texto"
+                    data-testid="reserva-cancelar-dialogo" data-origem="reserva-cancelar" th:if="${podeMudar and acao == 'cancelar'}">
+                <form method="post" data-envio-unico th:action="@{/reservas/{id}/cancelar(id=${reserva.id})}">
+                    <h2 class="cartao__titulo" id="reserva-cancelar-titulo">Cancelar a reserva?</h2>
+                    <p class="pagina__descricao" id="reserva-cancelar-texto"><th:block th:text="${reserva.recurso} + ', ' + ${dataTexto} + ', das ' + ${horario}">Sala 203, 12/11/2026, das 14:00 às 15:30</th:block>. A reserva passa para <span th:replace="~{fragments/estado :: badge('Cancelada', null)}">Cancelada</span> e esta ação não pode ser desfeita.</p>
+                    <div class="formulario__acoes">
+                        <a class="botao botao--secundario" th:href="@{/reservas/{id}(id=${reserva.id})}" autofocus data-fechar
+                           data-testid="reserva-cancelar-voltar">Voltar</a>
+                        <button type="submit" class="botao botao--perigo" data-testid="reserva-cancelar-confirmar">Sim, cancelar reserva</button>
+                    </div>
+                </form>
+            </dialog>
+            <script th:if="${podeMudar and acao == 'cancelar'}" th:src="@{/js/dialogo.js}" defer></script>
+        </th:block>
+    </div>
+</div>
+</body>
+</html>

@@ -13,8 +13,8 @@ Os critérios de aceite de cada tela estão na spec do módulo, no Notion ([Spec
 | 4 | Buscar disponibilidade | 02 | Solicitante | `GET /recursos/disponiveis` | RF-03 | `busca-` | `html` |
 | 5 | Resultados da busca | 02 | Solicitante | mesma rota, com parâmetros | RF-03 | `resultado-` | `html` |
 | 6 | Nova reserva | 02 | Solicitante | `GET /reservas/nova` | RF-04, RF-05, RF-06 | `reserva-form-` | `html` |
-| 7 | Minhas reservas | 02 | Solicitante | `GET /reservas/minhas` | RF-04 | `minhas-` | — |
-| 8 | Detalhe / alterar / cancelar | 02 | Solicitante | `GET /reservas/{id}` | RF-04 | `reserva-` | — |
+| 7 | Minhas reservas | 02 | Solicitante | `GET /reservas/minhas` | RF-04 | `minhas-` | `html` |
+| 8 | Detalhe / alterar / cancelar | 02 | Solicitante | `GET /reservas/{id}` | RF-04 | `reserva-` | `html` |
 | 9 | Fila de aprovação | 03 | Responsável | `GET /aprovacoes` | RF-07 | `aprovacao-` | `html` |
 | 10 | Retirada e devolução | 03 | Responsável | `GET /retirada-devolucao` | RF-09 | `retirada-devolucao-` | `html` |
 | 11 | Histórico da reserva | 04 | Responsável, Administrador | `GET /reservas/{id}/historico` | RF-10 | `historico-` | `html` |
