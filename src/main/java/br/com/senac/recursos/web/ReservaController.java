@@ -148,6 +148,8 @@ public class ReservaController {
             model.addAttribute("acao", acao);
         }
         model.addAttribute("reserva", detalheDaTela(reservas.buscar(id, quem), quem));
+        // RN-11: o histórico é de Responsável e Administrador (a rota da tela 11 confere o mesmo na matriz)
+        model.addAttribute("verHistorico", quem.veTodasAsReservas());
         return VIEW_DETALHE;
     }
 

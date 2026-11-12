@@ -167,4 +167,52 @@ class ResponsavelEAdministradorE2ETest extends E2ETeste {
         abrir("/reservas/" + pedido.id());
         assertThat(testid("reserva-estado")).hasText("Aprovada");
     }
+
+    @Test
+    void administradorCadastraUsuarioPelaTelaEOUsuarioNovoEntra() {
+        entrarComo(PerfilUsuario.ADMINISTRADOR);
+        String login = "e2e-novo-" + java.util.UUID.randomUUID().toString().substring(0, 6);
+
+        abrir("/admin/usuarios/novo");
+        testid("usuario-form-nome").fill("Pessoa Nova");
+        testid("usuario-form-login").fill(login);
+        testid("usuario-form-senha").fill("curta");
+        pagina.waitForNavigation(() -> testid("usuario-form-salvar").click());
+        assertThat(testid("usuario-form-senha-erro")).hasText("A senha deve ter de 8 a 72 caracteres.");
+        assertThat(focado()).isEqualTo("usuario-form-erros");
+        assertThat(testid("usuario-form-senha")).hasValue("");
+        semRolagemHorizontal();
+        print("05-usuario-erro");
+
+        testid("usuario-form-senha").fill("senha-nova-123");
+        testid("usuario-form-perfil").selectOption("RESPONSAVEL");
+        pagina.waitForNavigation(() -> testid("usuario-form-salvar").click());
+        assertThat(testid("usuarios-sucesso")).containsText("Pessoa Nova já pode entrar com o login " + login);
+        semRolagemHorizontal();
+        print("05-usuarios-lista");
+        contexto.clearCookies();
+
+        abrir("/login");
+        testid("login-usuario").fill(login);
+        testid("login-senha").fill("senha-nova-123");
+        pagina.waitForNavigation(() -> testid("login-entrar").click());
+        assertThat(testid("menu-usuario")).hasText("Pessoa Nova");
+        assertThat(testid("menu-perfil")).hasText("Responsável");
+    }
+
+    @Test
+    void responsavelAbreOHistoricoPelaRetiradaEDevolucao() {
+        RecursoResponse sala = salaReal("Sala com histórico", false);
+        UsuarioAutenticado ana = entrarComo(PerfilUsuario.SOLICITANTE);
+        ReservaResponse reserva = reservaReal(ana, sala, "16:00", "17:00");
+        contexto.clearCookies();
+        entrarComo(PerfilUsuario.RESPONSAVEL);
+
+        abrir("/retirada-devolucao");
+        pagina.waitForNavigation(() -> testid("retirada-devolucao-historico-" + reserva.id()).click());
+
+        assertThat(caminhoAtual()).isEqualTo("/reservas/" + reserva.id() + "/historico");
+        assertThat(testid("historico-evento-1-para")).hasText("Aprovada");
+        semRolagemHorizontal();
+    }
 }

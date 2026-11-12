@@ -343,6 +343,27 @@ O E2E em 375 px prova o POST único com clique duplo nas telas 8 e 10 (botão de
 - Tabelas no desktop e cartões no mobile com o mesmo HTML (cada célula traz o rótulo em `data-rotulo`).
 - Acessibilidade: rótulos visíveis ligados por `for`, erro em texto junto ao campo (`role="alert"`, `aria-invalid`, `aria-describedby`), `<caption>` em cada tabela e um único `<h1>`.
 
+## Usuários (tela 16)
+
+`GET /admin/usuarios` (lista) e `GET /admin/usuarios/novo` (cadastro), templates `usuarios.html` e `usuario-form.html` (`UsuarioController`), só do Administrador (matriz). Usa o `UsuarioService`, o mesmo de `POST /api/usuarios`.
+
+| Atributo de modelo | Conteúdo | Sem ele |
+|---|---|---|
+| `usuarios` | lista de `id`, `nome`, `login` e `perfil` (por extenso), em ordem de nome | Lista vazia mostra "Nenhum usuário cadastrado" |
+| `confirmacao` | `titulo` e `texto`, depois de cadastrar (flash) | Sem aviso |
+| `usuario` | `nome`, `login`, `perfil` do formulário; **a senha nunca volta** | — |
+| `perfis` | `valor` (`SOLICITANTE`, `RESPONSAVEL`, `ADMINISTRADOR`) e `rotulo` | — |
+| `erros` | mapa de `nome`, `login`, `senha` ou `perfil` para a mensagem, na ordem do formulário | Sem erros |
+
+- As regras dos campos são as do `UsuarioRequest` da API, com as mesmas mensagens (nome até 120; login `[a-z0-9._-]{3,60}`; senha de 8 a 72; perfil obrigatório). Login repetido: "Já existe um usuário com este login." no campo.
+- A senha é `type=password` com `autocomplete="new-password"` e só é guardada como hash BCrypt pelo service.
+- Não há editar nem desativar usuário: o service ainda não tem essas operações.
+- O menu do Administrador ganhou o item "Usuários".
+
+## Link para o histórico (tela 11)
+
+"Ver histórico" aparece em cada linha da retirada e devolução (tela 10, só Responsável) e no detalhe da reserva (tela 8) quando o controller põe `verHistorico` verdadeiro, só para Responsável e Administrador (RN-11). É um link de leitura: na tela 10 ele não conta como ação, e as linhas sem transição continuam com "Sem ação disponível".
+
 ## E2E em 375 px
 
 `src/test/java/br/com/senac/recursos/e2e` (ADR-0004, RF-13). Rodam no `./mvnw -B verify` como qualquer teste: sobem a aplicação real numa porta aleatória contra PostgreSQL em Testcontainers e abrem o Chromium do Playwright sem tela, em 375 × 812 px (`isMobile`).

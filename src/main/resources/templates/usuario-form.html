@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<!--/*
+  Tela 16 do inventário, cadastro (prefixo "usuario-form-"), RF-01, só do Administrador. Atributos de modelo:
+    usuario : nome, login, perfil (o que foi digitado; a senha nunca volta)
+    perfis  : lista de valor (SOLICITANTE, RESPONSAVEL, ADMINISTRADOR) e rotulo
+    erros   : mapa campo (nome, login, senha, perfil) para mensagem, na ordem do formulário   (back-end; opcional)
+*/-->
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: pagina(titulo='Cadastrar usuário', conteudo=~{::#conteudo-pagina})}">
+<head>
+    <title>Cadastrar usuário</title>
+</head>
+<body>
+<div id="conteudo-pagina">
+    <div class="secao" th:with="total=${erros != null ? erros.size() : 0}">
+        <header class="pagina__cabecalho">
+            <h1 data-testid="usuario-form-titulo">Cadastrar usuário</h1>
+            <p class="pagina__descricao"><a th:href="@{/admin/usuarios}" data-testid="usuario-form-voltar">Voltar para a lista de usuários</a></p>
+        </header>
+
+        <div class="alerta alerta--perigo" role="alert" tabindex="-1" data-testid="usuario-form-erros" th:if="${total > 0}">
+            <strong class="alerta__titulo">Não foi possível cadastrar o usuário</strong>
+            <p class="alerta__texto" th:text="${total == 1} ? 'Corrija o campo destacado:' : 'Corrija os ' + ${total} + ' campos destacados:'">Corrija os 2 campos destacados:</p>
+            <ul class="alerta__lista">
+                <li th:each="erro : ${erros}" th:switch="${erro.key}">
+                    <a th:case="'nome'" href="#usuario-form-nome">Nome</a>
+                    <a th:case="'login'" href="#usuario-form-login">Login</a>
+                    <a th:case="'senha'" href="#usuario-form-senha">Senha</a>
+                    <a th:case="'perfil'" href="#usuario-form-perfil">Perfil</a>
+                    <span th:case="*" th:text="${erro.value}">Erro sem campo</span>
+                </li>
+            </ul>
+        </div>
+
+        <form class="cartao formulario" method="post" novalidate data-envio-unico data-testid="usuario-form"
+              th:action="@{/admin/usuarios}">
+            <div th:replace="~{fragments/campo :: campo('usuario-form', 'nome', 'Nome', 'text', ${usuario.nome}, ${erros?.get('nome')}, null, false, false)}"></div>
+            <div th:replace="~{fragments/campo :: campo('usuario-form', 'login', 'Login', 'text', ${usuario.login}, ${erros?.get('login')}, 'De 3 a 60 caracteres: letras minúsculas, números, ponto, hífen ou sublinhado.', false, false)}"></div>
+
+            <!--/* Senha fora do fragmento: precisa de autocomplete="new-password" e nunca leva valor de volta */-->
+            <div class="campo" th:with="erroSenha=${erros?.get('senha')}">
+                <label class="campo__rotulo" for="usuario-form-senha">Senha <span class="campo__obrig">(obrigatório)</span></label>
+                <input class="campo__entrada" id="usuario-form-senha" name="senha" type="password" autocomplete="new-password"
+                       required aria-required="true" data-testid="usuario-form-senha"
+                       th:classappend="${erroSenha != null} ? 'campo__entrada--erro'"
+                       th:aria-invalid="${erroSenha != null} ? 'true'"
+                       th:aria-describedby="${erroSenha != null} ? 'usuario-form-senha-erro usuario-form-senha-ajuda' : 'usuario-form-senha-ajuda'">
+                <p class="campo__ajuda" id="usuario-form-senha-ajuda">De 8 a 72 caracteres. Entregue a senha à pessoa por um canal seguro.</p>
+                <p class="campo__erro" id="usuario-form-senha-erro" data-testid="usuario-form-senha-erro"
+                   th:if="${erroSenha != null}" th:text="${erroSenha}">A senha deve ter de 8 a 72 caracteres.</p>
+            </div>
+
+            <div class="campo" th:with="erroPerfil=${erros?.get('perfil')}">
+                <label class="campo__rotulo" for="usuario-form-perfil">Perfil <span class="campo__obrig">(obrigatório)</span></label>
+                <select class="campo__entrada" id="usuario-form-perfil" name="perfil" required aria-required="true"
+                        data-testid="usuario-form-perfil"
+                        th:aria-invalid="${erroPerfil != null} ? 'true'"
+                        th:aria-describedby="${erroPerfil != null} ? 'usuario-form-perfil-erro'">
+                    <option th:each="opcao : ${perfis}" th:value="${opcao.valor}" th:text="${opcao.rotulo}"
+                            th:selected="${opcao.valor == usuario.perfil}">Solicitante</option>
+                </select>
+                <p class="campo__erro" id="usuario-form-perfil-erro" data-testid="usuario-form-perfil-erro"
+                   th:if="${erroPerfil != null}" th:text="${erroPerfil}">Informe o perfil.</p>
+            </div>
+
+            <div class="formulario__acoes">
+                <button type="submit" class="botao botao--primario" data-testid="usuario-form-salvar">Cadastrar usuário</button>
+                <a class="botao botao--secundario" th:href="@{/admin/usuarios}" data-testid="usuario-form-cancelar">Cancelar</a>
+            </div>
+        </form>
+    </div>
+    <script th:src="@{/js/usuario-form.js}" defer></script>
+</div>
+</body>
+</html>
