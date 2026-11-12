@@ -36,7 +36,6 @@
 - o run do CI do segundo ciclo (API). O primeiro ciclo (telas, commit `e86c777`) passou no CI: `verify` no run 43293042621 e Quality Gate do SonarCloud aprovado;
 - o comportamento com mais de uma instância (o contador não é compartilhado, limitação aceita);
 - o tempo de resposta do bloqueado comparado com o de uma senha errada (não medido; nas telas, a conferência da senha é provada só pelo número de chamadas em `LoginComLimiteTest`; na API, por nenhum teste);
-- o E2E no navegador do bloqueio (não escrito; o teste com servidor real cobre o HTTP).
 
 **Segundo ciclo: o limite também na API (`POST /api/auth/login`).** O Leandro pediu e autorizou a mudança na área do Pedro sem esperar por ele; o Pedro revisa o PR.
 - **Um contador só para as duas portas.** `TentativasDeLogin` foi para `service`, como bean em `SegurancaConfig`. Falhar na tela conta na API, e vice-versa.
@@ -44,6 +43,15 @@
 - **`test(red)`:** só `LimiteDeTentativasApiTest` (7 testes). `./mvnw -B verify` deu **1113 testes, 5 falhas, 0 erros, 0 ignorados**, todas porque o login bloqueado ainda entrava.
 - **`feat(green)`:** `./mvnw -B verify` deu **1113 testes, 0 falhas, 0 erros, 0 ignorados**, "All coverage checks have been met". Linhas 95,8% (1464 de 1528) e branches 81,3% (422 de 519); `AutenticacaoService` e `TentativasDeLogin` sem linha nem branch descoberto.
 - **4 mutações na API, todas pegas** (lista na RTM). **Não pega:** conferir o bloqueio antes do hash, que só muda o tempo de resposta.
+
+**E2E do bloqueio (Playwright, pedido do Leandro em 12/11/2026).** `LimiteDeTentativasE2ETest`, 3 testes em 375 px contra o back-end real, com o `RelogioDeTeste` num contexto próprio do Spring (as outras classes E2E usam o relógio de verdade):
+- o bloqueado vê a mesma tela de senha errada, mesmo com a senha certa: o mesmo aviso, com foco, o login digitado e a senha em branco, sem a palavra "bloqueado";
+- depois de 15 minutos no relógio controlado, a senha certa entra pelo formulário;
+- 5 falhas pela API (feitas pelo próprio navegador) bloqueiam o formulário.
+
+O print está em `docs/evidencias/e2e-375/01-login-bloqueado.png`. Mutações contra o E2E, todas pegas: a tela não conta a falha (2 vermelhos), a API não conta a falha (1), provedor com o gerenciador global de pai (3).
+
+Uma interrupção no meio da última mutação deixou o `SegurancaDasTelasConfig` mutado na máquina. Isso foi achado com `git diff` e restaurado com `git checkout` antes do `verify`, sem chegar a commit. Depois, `./mvnw -B verify` nesta máquina deu **1116 testes, 0 falhas, 0 erros, 0 ignorados**, "All coverage checks have been met". Testes escritos depois do código, não em TDD: o E2E confere o comportamento no navegador, e o red → green deste limite está nos testes de integração.
 
 **Fica aberto:** contador em memória (uma instância só), sem limite por IP, bloqueio de um login por quem o conhece, e tempo de resposta não medido. Tudo aceito no ADR-0009 e no relatório de qualidade.
 

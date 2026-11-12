@@ -18,6 +18,7 @@ enviado é `14:00`.
 | `02-minhas.png` | Minhas reservas em cartões, Alterar e Cancelar só quando pode | `Responsividade375E2ETest` |
 | `02-detalhe-cancelar.png` | Confirmação de cancelamento | `Responsividade375E2ETest` |
 | `01-menu-aberto.png` | Menu do Solicitante aberto no celular | `AcessoE2ETest` |
+| `01-login-bloqueado.png` | Login bloqueado depois de 5 falhas, com a senha certa: a mesma tela de senha errada, com o aviso em foco (gerado em 12/11/2026, branch `satoworktree/laughing-mayer-yvtj0y`, contra o back-end real) | `LimiteDeTentativasE2ETest` |
 | `01-erro-403.png` | Página 403 | `Responsividade375E2ETest` |
 | `03-retirada-nao-compareceu.png` | Confirmação de não compareceu | `Responsividade375E2ETest` |
 | `04-relatorio.png` | Relatório em cartões | `Responsividade375E2ETest` |
