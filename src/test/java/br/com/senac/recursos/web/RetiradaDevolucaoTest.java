@@ -296,7 +296,10 @@ class RetiradaDevolucaoTest {
 
         var linha = doc.selectFirst("tr[data-testid=retirada-devolucao-linha-5]");
         assertThat(linha.selectFirst("[data-testid=retirada-devolucao-sem-acao-5]").text()).isEqualTo("Sem ação disponível");
-        assertThat(linha.select("button, a, form")).isEmpty();
+        // O único link é o histórico (leitura, tela 11); nenhuma ação que mude o estado
+        assertThat(linha.select("button, form, a:not([data-testid=retirada-devolucao-historico-5])")).isEmpty();
+        assertThat(linha.selectFirst("a[data-testid=retirada-devolucao-historico-5]").attr("href"))
+                .isEqualTo("/reservas/5/historico");
     }
 
     @ParameterizedTest
@@ -306,7 +309,8 @@ class RetiradaDevolucaoTest {
 
         var linha = doc.selectFirst("tr[data-testid=retirada-devolucao-linha-" + id + "]");
         assertThat(linha.selectFirst("[data-testid=retirada-devolucao-estado-" + id + "]").text()).isEqualTo(estado);
-        assertThat(linha.select("button, a, form")).as("ações do estado %s", estado).isEmpty();
+        assertThat(linha.select("button, form, a:not([data-testid^=retirada-devolucao-historico-])"))
+                .as("ações do estado %s", estado).isEmpty();
         assertThat(linha.selectFirst(".tabela__nota").text()).isEqualTo("Sem ação disponível");
         assertThat(linha.select(".etiqueta")).as("etiqueta no estado %s", estado).isEmpty();
         assertThat(linha.select("[data-testid^=retirada-devolucao-nao-compareceu-], [data-testid^=retirada-devolucao-vencida-]"))

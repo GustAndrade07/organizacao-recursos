@@ -18,6 +18,14 @@ spring:
     locations: classpath:db/migration
 
 server:
+  servlet:
+    session:
+      cookie:
+        # Cookie da sessão das telas (D12, ADR-0009): fora do alcance de script e sem ir em navegação de outro site.
+        # Secure só com HTTPS: ligue SESSAO_COOKIE_SEGURO=true fora do desenvolvimento local (ressalva do PR #48).
+        http-only: true
+        same-site: lax
+        secure: ${SESSAO_COOKIE_SEGURO:false}
   error:
     # Resposta de erro nunca traz stack trace, mensagem interna nem nome de exceção (AGENTS.md, seção 5).
     # Os valores abaixo são os padrões do Spring Boot, escritos aqui para a regra ficar visível e não mudar sem querer.

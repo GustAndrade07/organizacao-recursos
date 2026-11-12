@@ -7,10 +7,14 @@ import br.com.senac.recursos.service.ReservaService;
 import br.com.senac.recursos.service.UsuarioService;
 import br.com.senac.recursos.web.FormatoDasTelas;
 import br.com.senac.recursos.web.VisaoDasReservas;
+import java.time.Clock;
+import java.time.Instant;
+import java.time.ZoneOffset;
 import org.mockito.Mockito;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Primary;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
@@ -32,6 +36,16 @@ import org.springframework.test.context.bean.override.mockito.MockReset;
 @TestConfiguration(proxyBeanMethods = false)
 @Import({FormatoDasTelas.class, VisaoDasReservas.class})
 public class TelasNoRecorte {
+
+    /**
+     * DEF-002: o "agora" dos recortes é fixo, 01/11/2026 12:00 UTC (o mesmo de {@code ApiIntegracaoTest}). Sem isto
+     * o recorte usava o relógio do sistema, e uma reserva de exemplo passava a "ter começado" (RN-07) com o tempo.
+     */
+    @Bean
+    @Primary
+    Clock relogioFixoDasTelas() {
+        return Clock.fixed(Instant.parse("2026-11-01T12:00:00Z"), ZoneOffset.UTC);
+    }
 
     @Bean
     ReservaService reservaService() {
