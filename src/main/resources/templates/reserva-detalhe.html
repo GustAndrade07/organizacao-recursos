@@ -3,7 +3,8 @@
   Tela 8 do inventário (prefixo "reserva-"), RF-04, RN-01, RN-05 e RN-07. Atributos de modelo (docs/frontend/README.md):
     acao        : alterar | cancelar                                     (o controller preenche com ?acao=)
     reserva     : id, recurso, local, data (LocalDate), inicio e termino (LocalTime), estado (nome por extenso),
-                  iniciada (verdadeiro se o horário de início já chegou) e motivo (da rejeição, opcional)
+                  iniciada (verdadeiro se o horário de início já chegou), motivo (da rejeição, opcional) e dono
+                  (opcional; falso esconde Alterar e Cancelar de quem vê a reserva de outra pessoa)
                   (o back-end preenche; ausente = só o título e o link de volta)
     formulario  : data, inicio, termino que o usuário enviou na alteração recusada (back-end; sem ele o
                   formulário vem com os valores da reserva)
@@ -21,7 +22,7 @@
 <body>
 <div id="conteudo-pagina">
     <div class="secao"
-         th:with="podeMudar=${reserva != null and (reserva.estado == 'Solicitada' or reserva.estado == 'Aprovada') and reserva.iniciada == false},
+         th:with="podeMudar=${reserva != null and (reserva.estado == 'Solicitada' or reserva.estado == 'Aprovada') and reserva.iniciada == false and reserva['dono'] != false},
                   horario=${reserva != null ? #temporals.format(reserva.inicio, 'HH:mm') + ' às ' + #temporals.format(reserva.termino, 'HH:mm') : ''},
                   dataTexto=${reserva != null ? #temporals.format(reserva.data, 'dd/MM/yyyy') : ''}">
         <div th:replace="${confirmacao != null} ? ~{fragments/confirmacao :: confirmacao(${confirmacao}, 'reserva-sucesso')} : ~{}"></div>

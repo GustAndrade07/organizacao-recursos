@@ -2,6 +2,7 @@ package br.com.senac.recursos.config;
 
 import br.com.senac.recursos.converter.UsuarioAutenticadoConverter;
 import br.com.senac.recursos.dto.UsuarioAutenticado;
+import br.com.senac.recursos.web.sessao.UsuarioDaSessao;
 import java.util.List;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.MethodParameter;
@@ -15,8 +16,9 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
- * Permite que um controller receba {@link UsuarioAutenticado} como parâmetro, sem lidar com o token. Rotas que o
- * recebem são sempre autenticadas pela matriz; sem token, o Spring Security já respondeu 401 antes de chegar aqui.
+ * Permite que um controller receba {@link UsuarioAutenticado} como parâmetro, sem lidar com o token nem com a sessão.
+ * Na API ele vem do JWT; nas telas, do usuário da sessão (D12). Rotas que o recebem são sempre autenticadas pela
+ * matriz; sem token ou sessão, o Spring Security já respondeu antes de chegar aqui.
  */
 @Configuration(proxyBeanMethods = false)
 public class WebConfig implements WebMvcConfigurer {
@@ -42,7 +44,11 @@ public class WebConfig implements WebMvcConfigurer {
                 if (autenticacao instanceof JwtAuthenticationToken token) {
                     return conversor.paraUsuario(token.getToken());
                 }
-                throw new IllegalStateException("Rota que exige usuário autenticado chamada sem token JWT.");
+                // Telas (D12, opção (a)): quem entrou pelo /login fica na sessão como UsuarioDaSessao.
+                if (autenticacao != null && autenticacao.getPrincipal() instanceof UsuarioDaSessao daSessao) {
+                    return daSessao.comoUsuarioAutenticado();
+                }
+                throw new IllegalStateException("Rota que exige usuário autenticado chamada sem token JWT nem sessão.");
             }
         });
     }

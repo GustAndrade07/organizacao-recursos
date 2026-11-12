@@ -1,9 +1,17 @@
 package br.com.senac.recursos.web;
 
+import br.com.senac.recursos.enums.PerfilUsuario;
+import br.com.senac.recursos.support.ComoUsuario;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.when;
+
+import br.com.senac.recursos.service.RecursoService;
+import br.com.senac.recursos.support.Respostas;
+import org.junit.jupiter.api.BeforeEach;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.junit.jupiter.api.Test;
@@ -16,6 +24,7 @@ import org.springframework.test.web.servlet.MockMvc;
  * RF-04, RF-05, RF-06. O formulário já vem preenchido com o recurso e o horário escolhidos na busca
  * e envia por POST para {@code /reservas}; quem grava a reserva é o back-end.
  */
+@ComoUsuario(PerfilUsuario.SOLICITANTE)
 @WebMvcTest(ReservaController.class)
 class NovaReservaPaginaTest {
 
@@ -23,6 +32,14 @@ class NovaReservaPaginaTest {
 
     @Autowired
     MockMvc mvc;
+
+    @Autowired
+    RecursoService recursos;
+
+    @BeforeEach
+    void recursoDaBusca() {
+        when(recursos.buscar(anyLong())).thenAnswer(pedido -> Respostas.sala(pedido.getArgument(0), "Sala 203"));
+    }
 
     private Document pagina(String caminho) throws Exception {
         String html = mvc.perform(get(caminho))
@@ -139,15 +156,25 @@ class NovaReservaPaginaTest {
         mvc.perform(get("/reservas/nova?inicio=25:99")).andExpect(status().isBadRequest());
     }
 
+    /** Desde a ligação com o back-end o id vira número antes de chegar ao template: HTML na URL nem é renderizado. */
     @Test
-    void recursoIdComHtmlNaUrlEhEscapadoNoCampoOculto() throws Exception {
+    void recursoIdNaoNumericoNaUrlResponde400SemEcoarOValor() throws Exception {
         String html = mvc.perform(get("/reservas/nova").param("recursoId", "\"><script>alert(1)</script>"))
-                .andExpect(status().isOk())
+                .andExpect(status().isBadRequest())
                 .andReturn().getResponse().getContentAsString();
-        Document doc = Jsoup.parse(html);
 
-        assertThat(doc.select("script:containsData(alert)")).isEmpty();
-        assertThat(doc.selectFirst("input[type=hidden][name=recursoId]").val()).isEqualTo("\"><script>alert(1)</script>");
+        assertThat(html).doesNotContain("<script>alert(1)</script>");
+    }
+
+    @Test
+    void recursoDaBuscaApareceComNomeEAvisoDeRestricaoVindosDoService() throws Exception {
+        when(recursos.buscar(9L)).thenReturn(Respostas.recurso(9, br.com.senac.recursos.enums.TipoRecurso.SALA,
+                "Laboratório de Química", true));
+
+        Document doc = pagina(ROTA);
+
+        assertThat(doc.text()).contains("Laboratório de Química");
+        assertThat(doc.select("[data-testid=reserva-form-aviso-restrito]")).hasSize(1);
     }
 
     @Test
