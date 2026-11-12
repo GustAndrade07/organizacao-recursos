@@ -1,0 +1,1 @@
+- Login com limite de tentativas, nas telas e na API (`POST /api/auth/login`) com um contador só: 5 falhas do mesmo login em 15 minutos bloqueiam esse login por 15 minutos, com a mesma resposta de uma senha errada (ressalva 1 do PR #48, ADR-0009). Valores em `recursos.seguranca.login.tentativas` e `recursos.seguranca.login.bloqueio`.

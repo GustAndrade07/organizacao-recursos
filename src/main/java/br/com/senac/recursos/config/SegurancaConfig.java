@@ -1,6 +1,7 @@
 package br.com.senac.recursos.config;
 
 import br.com.senac.recursos.converter.UsuarioAutenticadoConverter;
+import br.com.senac.recursos.service.TentativasDeLogin;
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
@@ -10,6 +11,7 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -156,5 +158,16 @@ public class SegurancaConfig {
     @Bean
     PasswordEncoder codificadorDeSenha() {
         return new BCryptPasswordEncoder();
+    }
+
+    /**
+     * Contador de falhas de login (ADR-0009, ressalva 1 do PR #48), o mesmo para a API ({@code AutenticacaoService})
+     * e para as telas ({@code SegurancaDasTelasConfig}): falhar numa porta conta na outra. Em memória desta instância.
+     */
+    @Bean
+    TentativasDeLogin tentativasDeLogin(Clock relogio,
+            @Value("${recursos.seguranca.login.tentativas:5}") int tentativas,
+            @Value("${recursos.seguranca.login.bloqueio:PT15M}") Duration bloqueio) {
+        return new TentativasDeLogin(relogio, tentativas, bloqueio);
     }
 }
