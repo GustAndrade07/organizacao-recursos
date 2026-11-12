@@ -190,6 +190,52 @@ Leitura dos materiais das Aulas 01 a 17 e da especificação no site do professo
 | 11 | Clone limpo e `docs/entrega/checklist.md` não feitos | 14 (P1) | Leandro ou Pedro | Sim |
 | 12 | Prova oral: 4 de 15 perguntas em `docs/prova-oral/perguntas.md`, ensaio não feito | 13 (P2 e P3) | Todos | Não (Semana 47) |
 
+**O que cada lacuna é e para que serve (para estudo):**
+
+1. **Carga com JMeter:** mede como a aplicação responde com muitos usuários ao mesmo tempo. O teste de concorrência prova que **não há reserva dupla**; o de carga mede **tempo e erro** sob volume. A ordem é:
+   - `rnf.md`: escrito **antes** de rodar, com a meta (ex.: p95 ≤ 300 ms com 50 usuários), para o número não ser escolhido depois de ver o resultado.
+   - `reservas.jmx`: o plano do JMeter (quantos usuários, por quanto tempo, quais requisições, que respostas são aceitas).
+   - `usuarios.csv`: os logins fictícios que os usuários virtuais usam.
+   - Rodada em modo CLI, gerando o `.jtl` com cada requisição.
+   - `resultado-01.md`: a leitura do resultado.
+     - **p50** é o tempo da metade das requisições; **p95**, o tempo abaixo do qual ficam 95% delas (mostra os casos lentos que a média esconde); **p99** é o extremo.
+     - Vazão é quantas requisições por segundo a aplicação atendeu.
+     - O **409** de conflito é resposta correta, não erro; erro de verdade é 500 ou timeout.
+   - Cobre o RNF-01 (tempo da busca) e o RNF-03 (criação sob carga só responde 201 ou 409).
+2. **`docs/decisao-qualidade.md`:** a conclusão da entrega, como um parecer, com cinco partes:
+   - A decisão: **liberar**, **liberar com ressalvas** ou **bloquear**.
+   - Cada critério (80/70, 100% dos críticos na RTM, 0 vulnerabilidades críticas…) com a evidência.
+   - Os **riscos aceitos**, cada um com impacto, motivo e responsável: os 2 críticos do Spring, o `jaxb-core` e a D13.
+   - O que cada integrante fez.
+   - O limite do que foi provado: teste local não é "pronto para produção".
+3. **RTM e relatório atualizados no commit da tag:**
+   - A RTM (matriz de rastreabilidade) liga cada requisito ao risco, ao teste que o prova e à evidência (run do CI).
+   - O relatório de qualidade compara os resultados com as metas.
+   - Os dois precisam descrever **o mesmo commit que a tag aponta**, porque o professor confere os números na mesa. Número desatualizado conta como evidência errada.
+4. **BDD executável (Cucumber) e evidência de TDD:**
+   - BDD descreve a regra em linguagem de negócio (Dado / Quando / Então) num arquivo `.feature`. O Cucumber transforma cada frase num passo de teste que roda no `verify`, então o cenário escrito vira teste de verdade.
+   - Hoje os cenários de aprovação e bloqueio existem só em texto (`bdd-aprovacao-bloqueio.md`).
+   - O `evidencia-tdd.md` mostra o ciclo **red → green → refactor** (commit do teste falhando, commit que faz passar, commit que limpa) para cada cenário.
+5. **README × `pom.xml`:**
+   - O professor clona e segue o README. Se o README promete WireMock e Cucumber e a ferramenta não está no projeto, a afirmação não tem evidência.
+   - Correção: tirar da lista o que não existe ou incluir de fato.
+6. **Mutação manual:** quebrar de propósito uma regra crítica no código (ex.: deixar o Solicitante aprovar) e ver se algum teste fica vermelho. Se nenhum falhar, o teste não protege aquela regra e é preciso escrever o que falta. Depois, `git restore`, para nenhuma mutação sobrar no código. O banco já fez as dele (M1 a M5); faltam aprovação, manutenção e autorização no serviço.
+7. **`plano-tdd.md`:** o inventário das regras de negócio, com a matriz **regra → caso de teste → teste → status**. Mostra que nenhuma regra ficou sem teste e serve de mapa para os ciclos de TDD.
+8. **OpenAPI (RF-14):** documentação da API gerada a partir do código (ex.: `springdoc-openapi`, com Swagger UI em `/swagger-ui.html`). Lista cada rota, parâmetro, corpo e código de resposta, para alguém usar a API sem ler o código. O endpoint do relatório (`GET /relatorios/utilizacao`) também precisa estar documentado.
+9. **"Pendências e divisão" em `status-requisitos.md`:**
+   - O arquivo marca cada RF como feito, parcial ou ausente; só vale "feito" com o teste citado.
+   - A seção vazia é a lista do que falta, ordenada pelos limitadores de nota e com dono, para o grupo não esquecer nada até a entrega.
+10. **Números no `ciclo-01.md`:**
+    - O ATAM liga atributos de qualidade (desempenho, segurança, testabilidade) a cenários, riscos e decisões.
+    - A Aula 07 pede levar ao ciclo 01 as medidas reais (cobertura do JaCoCo, Quality Gate e issues do Sonar), para os riscos de testabilidade serem confirmados ou fechados com números. O RK9 é um desses riscos e ainda está "a confirmar".
+11. **Clone limpo e checklist:**
+    - Alguém que **não** escreveu o README clona o repositório numa pasta vazia e segue só o README: sobe o banco, roda a aplicação, roda o `verify`, abre o JaCoCo.
+    - Prova o primeiro limitador de nota ("aplicação executa").
+    - O que falhar vira bloqueador no `checklist.md`, a ser corrigido antes da tag.
+12. **Prova oral:**
+    - O banco de 15 perguntas cita arquivos do projeto e mistura as áreas, porque cada integrante precisa responder sobre o que **não** escreveu.
+    - O ensaio cronometrado (8 minutos: problema, arquitetura, demo, testes e CI, RTM e relatório, limitações) mostra as lacunas, que viram tarefas com dono.
+
 **Fora do escopo do projeto do grupo:** as Aulas 01 a 03 e 08 usam o repositório da disciplina ou o Foot Fanatics. O RF-11 (notificação externa, ADR-0005) segue ausente, sem cliente e sem WireMock.
 
 **Não verificado:** os números do JaCoCo do run 211 (lidos só no SonarCloud) e se a matriz de autorização já teve célula vermelha.
