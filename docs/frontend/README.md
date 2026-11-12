@@ -79,6 +79,7 @@ O Spring escolhe o template pelo status: `templates/error/401.html`, `403.html`,
 | Sem sessão | Qualquer tela leva a `/login?destino=<página pedida>` (só no `GET`, só se o destino passar em `CaminhoDoSite`) |
 | Sucesso | Redireciona para o `destino` **revalidado** com `CaminhoDoSite` (o campo oculto é editável); sem destino válido, `/`, que leva à primeira tela do menu do perfil |
 | Sair | `POST /logout` (botão "Sair" do menu) encerra a sessão, apaga o cookie e volta a `/login` |
+| Limite de tentativas | 5 falhas do mesmo login em 15 minutos bloqueiam esse login por 15 minutos, desde a 5ª falha (`recursos.seguranca.login.tentativas` e `recursos.seguranca.login.bloqueio`). Durante o bloqueio, até a senha certa volta a `/login?erro`, com a **mesma** tela e o mesmo aviso de uma senha errada: a tela não diz que bloqueou nem se o login existe. Login certo zera o contador, e login inexistente também conta. Tentativa no bloqueio não estende o bloqueio. O contador é o **mesmo** do `POST /api/auth/login`: falhas na API também bloqueiam a tela, e vice-versa. Ele fica na memória (uma instância só). E2E em 375 px: `LimiteDeTentativasE2ETest`. Ver ADR-0009, ressalva 1 |
 
 O campo é **Login** (`type=text`, `autocomplete=username`), não e-mail: o cadastro aceita `[a-z0-9._-]` (`UsuarioRequest`), e um `type=email` recusava esses logins no navegador.
 
