@@ -118,5 +118,5 @@ Nenhum dos três está na lista KEV de exploração conhecida. Na mesma leitura,
 - Responsável: Gustavo.
 - Revisão: quando sair uma 6.5.12 (o Spring Boot 3.5.x a traz pelo BOM) ou quando o projeto migrar para o Spring Boot 4.
 - O CVE-2026-59276 fica marcado como **não verificado** até alguém conferir os componentes afetados.
-- A marcação **Accepted** no painel do SonarCloud ainda não foi feita (ação manual do Gustavo, como nas seções 6 e 7).
+- Marcados como **Accepted** no painel do SonarCloud em 12/11/2026, cada um com o motivo desta seção, e conferidos no filtro "Accepted". O filtro mostrava 6 riscos aceitos: os 2 do Spring Framework (seção 6), o `jaxb-core` (seção 7) e estes 3.
 - Esses três riscos entram como risco residual em `docs/decisao-qualidade.md`, do Leandro.
