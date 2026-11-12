@@ -44,3 +44,5 @@
 **Depende do PR #56:** as linhas de RNF-01 e RNF-03 citam arquivos de `perf/` e `docs/performance/` que entram com ele. A ordem de merge é o #56 primeiro; depois, merge da `main` nesta branch.
 
 **Specs atualizadas:** Notion, spec principal (KPI "Requisitos com teste citado", critério de aceite da RTM e riscos), 12/11/2026.
+
+**Atualização depois do PR #55 (12/11/2026, noite).** O Gustavo aceitou mais 3 riscos do Spring Security 6.5.11 (`docs/seguranca/riscos-dependencias.md`, seção 8). O relatório passou de "2 Critical e 1 High aceitos" para **6 riscos aceitos** (2 Critical, 2 High, 2 Medium), com o CVE-2026-59276 "não verificado". A branch foi atualizada com merge da `main`. Só documentação.
