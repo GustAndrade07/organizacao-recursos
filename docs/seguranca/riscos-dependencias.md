@@ -63,7 +63,7 @@ Demais riscos do Spring Framework 6.2.19 (`spring-web`, `spring-beans`, `spring-
 - [x] Depois do merge deste PR, reabrir o painel (logado) e anotar aqui quantos riscos restam e quais são Critical e High. — feito em 11/11/2026, seção 6.
 - [x] No SonarCloud, marcar os dois críticos do Spring como **Accepted** com o motivo da seção 3 (ação manual do Gustavo no painel). — feito em 11/11/2026, seção 6.
 - [ ] Reler os riscos restantes que não têm correção e decidir (corrigir, aceitar com motivo ou migrar de linha). Primeiro da fila: o `jaxb-core` 4.0.9 (CVSS 8,3, High), único High aberto. — `jaxb-core` avaliado em 11/11/2026: aceito com justificativa (seção 7). Faltam os riscos sem nota (CVSS "Unscored (pending)"), entre eles os 3 novos do Spring Security 6.5.11 que entraram com o back-end (PR #44).
-- [ ] No SonarCloud, marcar o CVE-2026-92877 (`jaxb-core`) como **Accepted** com o motivo da seção 7 (ação manual do Gustavo no painel).
+- [x] No SonarCloud, marcar o CVE-2026-92877 (`jaxb-core`) como **Accepted** com o motivo da seção 7 (ação manual do Gustavo no painel). — feito em 12/11/2026, depois do merge do PR #49, e conferido no filtro "Accepted" do painel. Na mesma leitura o painel mostrava esse risco com severidade de impacto "Low" (CVSS 8,3 inalterado).
 - [ ] Perguntar ao professor se "0 vulnerabilidades críticas" se mede pelo CVSS das dependências ou pelo Quality Gate/issues. — sem resposta até 11/11/2026; ver a seção 6 e a D4 da seção 9 do plano.
 
 ## 6. Painel e D4 em 11/11/2026, noite (Gustavo, logado no SonarCloud)

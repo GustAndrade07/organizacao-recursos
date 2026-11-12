@@ -6,7 +6,9 @@ Projeto de Qualidade de Software (Senac, 2026.2, Prof. Afonso) — o foco é a *
 **Grupo:** Gustavo (banco de dados) · Pedro (back-end) · Leandro (front-end)
 
 ## Stack
-Java 21 · Spring Boot 3 · Maven Wrapper · Thymeleaf · Spring Security (JWT na API) · PostgreSQL 16 + Flyway · JUnit 5, Testcontainers, WireMock, Cucumber, Playwright · GitHub Actions, JaCoCo, SonarCloud, JMeter
+Java 21 · Spring Boot 3 · Maven Wrapper · Thymeleaf · Spring Security (JWT na API) · PostgreSQL 16 + Flyway · JUnit 5, Testcontainers, Playwright · GitHub Actions, JaCoCo, SonarCloud
+
+Previstos e **ainda não presentes** no projeto (12/11/2026): WireMock (notificação externa, RF-11), Cucumber (cenários BDD de `docs/testes/bdd-aprovacao-bloqueio.md`) e a rodada de carga com JMeter (`perf/`). Nenhum deles está no `pom.xml` nem tem resultado versionado.
 
 ## Pré-requisitos
 - **JDK 21** (o `JAVA_HOME` precisa apontar para ele; conferir com `java -version`)
