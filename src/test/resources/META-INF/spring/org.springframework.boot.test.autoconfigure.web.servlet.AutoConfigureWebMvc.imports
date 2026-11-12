@@ -4,3 +4,6 @@ br.com.senac.recursos.config.SegurancaConfig
 br.com.senac.recursos.config.RelogioConfig
 br.com.senac.recursos.config.RespostaDeErroDeSeguranca
 br.com.senac.recursos.converter.UsuarioAutenticadoConverter
+# Cadeia das telas (D12, ADR-0009) e o que os recortes precisam: services sem resposta e rotas /teste/** abertas.
+br.com.senac.recursos.config.SegurancaDasTelasConfig
+br.com.senac.recursos.support.TelasNoRecorte

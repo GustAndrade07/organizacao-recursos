@@ -8,7 +8,7 @@
 
 | Requisito | Situação | Evidência (arquivo e nome do teste) | Risco se ficar de fora | Dono |
 |---|---|---|---|---|
-| RF-01 Login e permissão por perfil | parcial | `AutenticacaoApiControllerTest` (token certo, credencial errada sem revelar login, sem token, token expirado com `Clock`, token adulterado) e `MatrizAutorizacaoTest` (154 testes, com os casos lidos de `docs/seguranca/matriz-autorizacao.md`; falha se surgir rota fora da matriz). Falta o run do CI | Falha de autorização zera a nota | Pedro |
+| RF-01 Login e permissão por perfil | parcial | `AutenticacaoApiControllerTest` (token certo, credencial errada sem revelar login, sem token, token expirado com `Clock`, token adulterado) e `MatrizAutorizacaoTest` (210 testes desde 12/11/2026: API com token e telas com o usuário na sessão, casos lidos de `docs/seguranca/matriz-autorizacao.md`; falha se surgir rota fora da matriz). Login das telas (D12, opção (a), ADR-0009): `PaginaNaoEncontradaIntegracaoTest` (servidor real) e `AcessoE2ETest` (login, senha errada, sair, 403). Falta o run do CI | Falha de autorização zera a nota | Pedro |
 | RF-02 Cadastro e consulta | parcial | `RecursoApiControllerTest` (cadastro, alteração sem trocar o tipo, 404, filtros) e `UsuarioApiControllerTest`. Localização, patrimônio e competências não existem na V1 (pendente de V2, Gustavo) | | Pedro |
 | RF-03 Pesquisa | parcial | `RecursoApiControllerTest.disponiveisExcluiReservaQueOcupaEManutencaoMasNaoACancelada` (tipo, capacidade e disponibilidade, fronteira `[início, fim)`). Falta localização e competência (dependem da V2) | | Pedro |
 | RF-04 Criar, alterar e cancelar reservas | parcial | `ReservaApiControllerTest` (`Criar`, `Alterar`, `Cancelar`: RN-01, dono, RN-07 com fronteira de 1 s). Falta o run do CI | | Pedro |
@@ -26,4 +26,4 @@
 ## Pendências e divisão
 (preencher: ordem de prioridade e quem pega cada uma)
 
-Decisões do grupo que travam itens acima (seção 9 do plano, todas pendentes): D8 (premissas do relatório, RF-12), D9 (quando o Solicitante altera e cancela, RF-04), D10 (estado inicial e limites de perfil, RF-07), D11 (manutenção sobre reservas existentes, RF-08), D12 (autenticação das telas, RF-01 e RF-13) e D13 (RN-04 consulta e depois grava, RF-08).
+Decisões do grupo que travam itens acima (seção 9 do plano, pendentes; a D12, autenticação das telas, foi decidida em 12/11/2026 pela opção (a), ADR-0009): D8 (premissas do relatório, RF-12), D9 (quando o Solicitante altera e cancela, RF-04), D10 (estado inicial e limites de perfil, RF-07), D11 (manutenção sobre reservas existentes, RF-08), D13 (RN-04 consulta e depois grava, RF-08).

@@ -1,5 +1,7 @@
 package br.com.senac.recursos.web;
 
+import br.com.senac.recursos.enums.PerfilUsuario;
+import br.com.senac.recursos.support.ComoUsuario;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -28,6 +30,7 @@ import org.springframework.web.bind.annotation.RequestParam;
  * {@code confirmacao} (titulo, reserva, estado). O controller preenche {@code filtro}. A tela só oferece a
  * ação que o estado permite: Aprovada retira, Em uso devolve, qualquer outro estado fica sem ação.
  */
+@ComoUsuario(PerfilUsuario.RESPONSAVEL)
 @WebMvcTest({RetiradaDevolucaoController.class, RetiradaDevolucaoTest.PaginasDeTeste.class})
 @Import(RetiradaDevolucaoTest.PaginasDeTeste.class)
 class RetiradaDevolucaoTest {

@@ -39,9 +39,8 @@ import org.springframework.security.web.SecurityFilterChain;
  *       a matriz de autorização ({@code docs/seguranca/matriz-autorizacao.md}); {@code MatrizAutorizacaoTest} lê a
  *       matriz e confere cada célula, e falha se surgir rota que não está nela. Rota da API fora da lista é recusada
  *       ({@code denyAll}). Regra de posse (dono da reserva, RN-06) é do serviço.</li>
- *   <li><b>Telas Thymeleaf (todo o resto)</b>: abertas, como estavam antes do back-end (as telas ainda não leem nem
- *       gravam dados; a gravação é da API). Como as telas vão autenticar (formulário com sessão ou o mesmo JWT em
- *       cookie) é a decisão pendente D12 da seção 9 do plano; até lá, nenhuma tela deve exibir dado real.</li>
+ *   <li><b>Telas Thymeleaf (todo o resto)</b>: formulário em {@code /login} com sessão do Spring Security e perfil
+ *       conferido por rota (D12, opção (a)). Fica em {@link SegurancaDasTelasConfig}.</li>
  * </ol>
  */
 @Configuration(proxyBeanMethods = false)
@@ -104,21 +103,6 @@ public class SegurancaConfig {
                 .exceptionHandling(erro -> erro
                         .authenticationEntryPoint(respostaDeErro)
                         .accessDeniedHandler(respostaDeErro));
-        return http.build();
-    }
-
-    /**
-     * Telas, páginas de erro, arquivos estáticos e {@code /actuator/health}: abertos, como antes do back-end (D12
-     * pendente). CSRF ligado (padrão do Spring): todo formulário de tela leva o {@code _csrf}, então a primeira rota
-     * de tela que gravar com sessão (D12) já nasce protegida.
-     */
-    @Bean
-    @Order(2)
-    SecurityFilterChain cadeiaDasTelas(HttpSecurity http) throws Exception {
-        http
-                .authorizeHttpRequests(rota -> rota.anyRequest().permitAll())
-                .httpBasic(AbstractHttpConfigurer::disable)
-                .formLogin(AbstractHttpConfigurer::disable);
         return http.build();
     }
 

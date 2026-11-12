@@ -1,5 +1,7 @@
 package br.com.senac.recursos.web;
 
+import br.com.senac.recursos.enums.PerfilUsuario;
+import br.com.senac.recursos.support.ComoUsuario;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -16,6 +18,7 @@ import org.springframework.test.web.servlet.MockMvc;
  * Critério de aceite: filtros de tipo de recurso, capacidade mínima, localização, data, hora de início e
  * hora de término. A lista de tipos e de locais vem do back-end (atributos {@code tipos} e {@code locais}).
  */
+@ComoUsuario(PerfilUsuario.SOLICITANTE)
 @WebMvcTest(BuscaController.class)
 class BuscaPaginaTest {
 

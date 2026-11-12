@@ -1,5 +1,7 @@
 package br.com.senac.recursos.web;
 
+import br.com.senac.recursos.enums.PerfilUsuario;
+import br.com.senac.recursos.support.ComoUsuario;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -27,6 +29,7 @@ import org.springframework.web.bind.annotation.GetMapping;
  * {@code relatorio} (recursos, professores, totalReservas, totalHoras e conflitos); sem ele a página mostra
  * só o filtro. Professor é quem pediu a reserva.
  */
+@ComoUsuario(PerfilUsuario.RESPONSAVEL)
 @WebMvcTest(RelatorioPaginaTest.PaginasDeTeste.class)
 @Import({RelatorioController.class, RelatorioPaginaTest.PaginasDeTeste.class})
 class RelatorioPaginaTest {
@@ -114,6 +117,19 @@ class RelatorioPaginaTest {
 
     @Autowired
     MockMvc mvc;
+
+    @Autowired
+    br.com.senac.recursos.service.RelatorioService relatorios;
+
+    /** O service responde um relatório vazio; o que a tela faz com dados reais está em {@code TelasComBancoTest}. */
+    @org.junit.jupiter.api.BeforeEach
+    void relatorioVazio() {
+        org.mockito.Mockito.when(relatorios.utilizacao(org.mockito.ArgumentMatchers.any())).thenAnswer(pedido -> {
+            br.com.senac.recursos.model.Periodo janela = pedido.getArgument(0);
+            return new br.com.senac.recursos.dto.response.RelatorioUtilizacaoResponse(janela.inicio(), janela.fim(),
+                    List.of(), List.of(), 0);
+        });
+    }
 
     private Document pagina(String caminho) throws Exception {
         String html = mvc.perform(get(caminho))
