@@ -1,5 +1,5 @@
 # ADR-0005 — Notificação por cliente HTTP isolado em adapter
-- **Status:** proposto (a validar com o Pedro, dono do back-end, na revisão do PR)
+- **Status:** aceito (OK do Pedro, dono do back-end, em 12/11/2026)
 - **Contexto:** o RF-11 pede notificação simulada ou integração com API externa. O provedor é externo, pode demorar, falhar ou responder lixo, e **não pode derrubar a reserva** nem vazar o token de acesso (risco R7 de [arquitetura.md](../arquitetura.md)). A Aula 08 pede teste com WireMock cobrindo 200, 404, 500, timeout e JSON inválido.
 - **Decisão:**
   1. Um **adapter** no pacote `notificacao` (porta no domínio, implementação HTTP) é o único ponto que fala com o provedor; o serviço de reserva depende só da porta.
@@ -33,6 +33,6 @@
     - Teste de unidade do serviço de reserva usa a porta com dublê (mock só em teste de unidade isolado); a integração real do adapter usa WireMock.
 - **Pendências:**
   - **D2 decidida** (Gustavo, 05/11/2026, seção 9 do plano): a tentativa recusada é gravada em transação própria ([ADR-0002](0002-anti-reserva-dupla.md)). **Recusa por conflito não gera notificação**, porque não houve reserva. Se a **falha da notificação** também deixa registro persistente não foi decidido (aberto com o Pedro); este ADR só exige log sem o token.
-  - **D3 decidida** (Gustavo, 05/11/2026, a confirmar com o Pedro): transição de estado inválida responde **409**, com `ProblemDetail` de tipo próprio. **Recusa por transição inválida não gera notificação**, porque não houve mudança.
+  - **D3 decidida** (Gustavo, 05/11/2026; OK do Pedro em 12/11/2026): transição de estado inválida responde **409**, com `ProblemDetail` de tipo próprio. **Recusa por transição inválida não gera notificação**, porque não houve mudança.
   - Valor do timeout e modelo (síncrono ou assíncrono depois do commit): abertos com o Pedro.
 - **Fonte:** `docs/arquitetura.md` (seções 5.1, 8, 9 e 10), `docs/prd.md` (RF-11), `docs/plano-execucao.md` (Etapa 3, linha da notificação), `docs/plano-de-teste.md` (seção 2), `AGENTS.md` (seção 5). WireMock ainda **não está no `pom.xml`**.

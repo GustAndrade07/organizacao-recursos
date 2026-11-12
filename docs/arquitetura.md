@@ -142,7 +142,7 @@ sequenceDiagram
         API-->>R: 200
     else estado não permite a transição
         SRV-->>API: transição inválida
-        API-->>R: 409 (decidido em 05/11, D3, `ProblemDetail` de tipo próprio; a confirmar com o Pedro)
+        API-->>R: 409 (decidido em 05/11, D3, `ProblemDetail` de tipo próprio; OK do Pedro em 12/11/2026)
     end
 ```
 A rota `POST /reservas/{id}/aprovacao` é **proposta**; as rotas definitivas saem do inventário de telas (`docs/frontend/telas.md`) e do controller do Pedro.
@@ -211,11 +211,11 @@ A coluna "Evidência" é preenchida conforme os testes existem (a RTM, `docs/rtm
 
 ## 11. Pendências deste documento
 - [ ] Validar pacotes e rotas com o Pedro e as telas com o Leandro.
-- [x] Completar a seção "Consequências" dos ADRs 0001 a 0004 e escrever os ADRs de notificação e de Flyway (Etapa 2). — feito em 05/11: ADRs 0001 a 0004 com ganhos, perdas e testes exigidos; ADR-0005 (notificação) e ADR-0006 (Flyway) escritos com status **proposto**, a validar com o Pedro.
+- [x] Completar a seção "Consequências" dos ADRs 0001 a 0004 e escrever os ADRs de notificação e de Flyway (Etapa 2). — feito em 05/11: ADRs 0001 a 0004 com ganhos, perdas e testes exigidos; ADR-0005 (notificação) e ADR-0006 (Flyway) escritos com status **proposto**, a validar com o Pedro; aceitos em 12/11/2026 (OK do Pedro).
 - [x] Decidir o intervalo semiaberto (pergunta em aberto do BDD) e registrar no ADR-0002. — D1 decidida em 05/11 pelo Gustavo (`[início, fim)`), registrada no ADR-0002 e na seção 9 do [plano](plano-execucao.md); a confirmar com Pedro e Leandro na revisão.
 - [x] D2 (tentativa recusada em transação própria), D3 (409 para transição inválida) e D5 (estados que ocupam o horário), seção 9 do plano: decididas em 05/11 e registradas nos ADRs 0002, 0005 e 0006.
 - [ ] Preencher a coluna "Evidência" da seção 10 à medida que os testes de regra entram na `main` (hoje parciais: RF-04, RF-05, RF-06, RF-10, RF-12 e RF-13); cada célula cita arquivo e nome do teste.
-- [x] Migração V1 e modelagem da proteção contra reserva dupla (professor como recurso, estado copiado por FK composta, trava por recurso). — feito em 06/11 (na `main` pelo PR #28, mergeado em 09/11/2026): D6 e D7 (seção 9 do plano) e [ADR-0007](adr/0007-modelagem-protecao-reserva-dupla.md), proposto; a confirmar com o Pedro.
+- [x] Migração V1 e modelagem da proteção contra reserva dupla (professor como recurso, estado copiado por FK composta, trava por recurso). — feito em 06/11 (na `main` pelo PR #28, mergeado em 09/11/2026): D6 e D7 (seção 9 do plano) e [ADR-0007](adr/0007-modelagem-protecao-reserva-dupla.md), aceito em 12/11/2026 (OK do Pedro).
 - [ ] Atualizar a tabela de fronteiras e a pergunta em aberto de `docs/testes/bdd-aprovacao-bloqueio.md` com a D1 (arquivo do Pedro; não alterado neste PR).
 - [ ] D4 (critério de "0 vulnerabilidades críticas"): resposta do professor ainda pendente.
 - [x] Ciclo 01 da avaliação arquitetural: [`docs/avaliacao-arquitetural/ciclo-01.md`](avaliacao-arquitetural/ciclo-01.md) (Etapa 3). — feito em 07/11: cenários C1 a C5, sensibilidades, trade-offs e riscos ligados aos ADRs; rascunho do Gustavo, a validar com Pedro e Leandro.
