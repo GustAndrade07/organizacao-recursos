@@ -1,5 +1,7 @@
 package br.com.senac.recursos.web;
 
+import br.com.senac.recursos.enums.PerfilUsuario;
+import br.com.senac.recursos.support.ComoUsuario;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
@@ -7,6 +9,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 import java.time.LocalDateTime;
+import static org.mockito.Mockito.when;
+
+import br.com.senac.recursos.service.RecursoService;
+import br.com.senac.recursos.support.Respostas;
+import org.junit.jupiter.api.BeforeEach;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.junit.jupiter.api.Test;
@@ -19,11 +26,24 @@ import org.springframework.test.web.servlet.MockMvc;
  * tela. Quem lista, grava e consulta reservas afetadas é o back-end, que preenche o resto do modelo; por
  * isso estes testes olham o que o controller coloca no modelo, não o que a página mostra sem o back-end.
  */
+@ComoUsuario(PerfilUsuario.ADMINISTRADOR)
 @WebMvcTest(RecursoController.class)
 class RecursoControllerTest {
 
     @Autowired
     MockMvc mvc;
+
+    @Autowired
+    RecursoService recursos;
+
+    @BeforeEach
+    void recursosGravados() {
+        when(recursos.buscar(7L)).thenReturn(Respostas.sala(7, "Sala 203"));
+        when(recursos.buscar(20L)).thenReturn(Respostas.recurso(20,
+                br.com.senac.recursos.enums.TipoRecurso.PROFESSOR, "Prof. Ana", false));
+        when(recursos.buscar(3L)).thenReturn(Respostas.recurso(3,
+                br.com.senac.recursos.enums.TipoRecurso.MATERIAL, "Projetor P-07", false));
+    }
 
     private Document pagina(String caminho) throws Exception {
         String html = mvc.perform(get(caminho))
@@ -86,15 +106,16 @@ class RecursoControllerTest {
         mvc.perform(get("/admin/recursos/7?tipo=carros")).andExpect(status().isBadRequest());
     }
 
+    /** Na edição o formulário vem com o que está gravado, e o tipo é o do recurso, não o da URL. */
     @Test
-    void editarRecursoLevaOIdDaRotaETipoOpcional() throws Exception {
+    void editarRecursoVemComOQueEstaGravadoEOTipoDoRecurso() throws Exception {
         mvc.perform(get("/admin/recursos/7"))
                 .andExpect(view().name("recurso-form"))
                 .andExpect(model().attribute("tipo", TipoRecurso.SALAS))
-                .andExpect(model().attribute("recurso", new FormularioRecurso("7", null, null, null, null, null, false)));
-        mvc.perform(get("/admin/recursos/20?tipo=professores"))
+                .andExpect(model().attribute("recurso", new FormularioRecurso("7", "Sala 203", "40", null, null, null, false)));
+        mvc.perform(get("/admin/recursos/20?tipo=salas"))
                 .andExpect(model().attribute("tipo", TipoRecurso.PROFESSORES))
-                .andExpect(model().attribute("recurso", new FormularioRecurso("20", null, null, null, null, null, false)));
+                .andExpect(model().attribute("recurso", new FormularioRecurso("20", "Prof. Ana", null, null, null, null, false)));
     }
 
     @Test

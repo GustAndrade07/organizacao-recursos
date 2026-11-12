@@ -1,5 +1,7 @@
 package br.com.senac.recursos.web;
 
+import br.com.senac.recursos.enums.PerfilUsuario;
+import br.com.senac.recursos.support.ComoUsuario;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -27,6 +29,7 @@ import org.springframework.web.bind.annotation.GetMapping;
  * o controller preenche {@code filtro}. Alterar e Cancelar só aparecem para Solicitada ou Aprovada que ainda
  * não começou.
  */
+@ComoUsuario(PerfilUsuario.SOLICITANTE)
 @WebMvcTest({ReservaController.class, MinhasReservasPaginaTest.PaginasDeTeste.class})
 @Import(MinhasReservasPaginaTest.PaginasDeTeste.class)
 class MinhasReservasPaginaTest {

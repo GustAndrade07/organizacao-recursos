@@ -4,6 +4,7 @@ import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertTha
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.microsoft.playwright.Locator;
+import br.com.senac.recursos.enums.PerfilUsuario;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -11,7 +12,8 @@ import org.junit.jupiter.params.provider.CsvSource;
 /**
  * Spec 01 do Notion (acesso e navegação) em 375 px: avisos do login com foco, botão Entrar em "Entrando…"
  * durante o envio, menu recolhido no celular e páginas de erro 401, 403, 404 e 500 sem jargão técnico.
- * A autenticação ainda não existe (RF-01, back-end): o {@code POST /login} é segurado no navegador.
+ * O login de verdade (D12, opção (a)) está em {@code entrarComo} e nos testes de "entrar" abaixo; o teste do botão
+ * "Entrando…" segura o {@code POST /login} no navegador para ver o estado intermediário.
  */
 class AcessoE2ETest extends E2ETeste {
 
@@ -20,11 +22,67 @@ class AcessoE2ETest extends E2ETeste {
     }
 
     @Test
+    void loginRealLevaDeVoltaAPaginaPedidaEMostraOMenuDoPerfil() {
+        entrarComo(PerfilUsuario.RESPONSAVEL);
+        contexto.clearCookies();
+
+        abrir("/relatorios/utilizacao");
+        pagina.waitForURL("**/login?destino=**");
+        testid("login-usuario").fill("e2e-responsavel");
+        testid("login-senha").fill(SENHA);
+        pagina.waitForNavigation(() -> testid("login-entrar").click());
+        pagina.waitForURL("**/relatorios/utilizacao");
+
+        assertThat(testid("menu-usuario")).hasText("Carlos Souza");
+        assertThat(testid("menu-perfil")).hasText("Responsável");
+        assertThat(testid("relatorio-titulo")).isVisible();
+    }
+
+    @Test
+    void loginRealComSenhaErradaVoltaComOAvisoEOLoginDigitado() {
+        entrarComo(PerfilUsuario.SOLICITANTE);
+        contexto.clearCookies();
+
+        abrir("/login");
+        testid("login-usuario").fill("e2e-solicitante");
+        testid("login-senha").fill("senha-errada");
+        pagina.waitForNavigation(() -> testid("login-entrar").click());
+        pagina.waitForURL("**/login?erro");
+
+        assertThat(testid("login-erro")).isVisible();
+        assertThat(testid("login-usuario")).hasValue("e2e-solicitante");
+        assertThat(testid("login-senha")).hasValue("");
+    }
+
+    @Test
+    void sairEncerraASessaoEAsTelasVoltamAPedirLogin() {
+        entrarComo(PerfilUsuario.SOLICITANTE);
+
+        testid("menu-abrir").click();
+        pagina.waitForNavigation(() -> testid("menu-sair").click());
+        pagina.waitForURL("**/login");
+        abrir("/reservas/minhas");
+
+        assertThat(caminhoAtual()).startsWith("/login");
+        assertThat(testid("login-formulario")).isVisible();
+    }
+
+    @Test
+    void solicitanteRecebe403NaTelaDoResponsavel() {
+        entrarComo(PerfilUsuario.SOLICITANTE);
+
+        var resposta = pagina.navigate(url("/aprovacoes"));
+
+        assertThat(resposta.status()).isEqualTo(403);
+        assertThat(testid("erro-codigo")).containsText("403");
+    }
+
+    @Test
     void credencialInvalidaMostraAvisoComFocoSemDizerQualCampoErrou() {
         abrir("/login?erro");
 
         assertThat(testid("login-erro")).isVisible();
-        assertThat(testid("login-erro")).containsText("E-mail ou senha incorretos");
+        assertThat(testid("login-erro")).containsText("Login ou senha incorretos");
         assertThat(focado()).isEqualTo("login-erro");
     }
 
@@ -40,7 +98,7 @@ class AcessoE2ETest extends E2ETeste {
     void entrarFicaDesabilitadoEmEntrandoDuranteOEnvioEEnviaUmaVezSo() {
         var posts = segurarPosts("**/login");
         abrir("/login");
-        testid("login-email").fill("ana.lima@senac.br");
+        testid("login-usuario").fill("ana.lima");
         testid("login-senha").fill("segredo-de-teste");
 
         pagina.waitForRequest(r -> "POST".equals(r.method()), () -> testid("login-entrar").click());
@@ -53,7 +111,7 @@ class AcessoE2ETest extends E2ETeste {
         entrar.click(new Locator.ClickOptions().setForce(true));
         assertThat(enviosDeFormulario()).isEqualTo(1);
         assertThat(posts).hasSize(1);
-        assertThat(posts.get(0).postData()).contains("email=ana.lima%40senac.br").contains("senha=");
+        assertThat(posts.get(0).postData()).contains("login=ana.lima").contains("senha=");
     }
 
     @Test
@@ -96,10 +154,12 @@ class AcessoE2ETest extends E2ETeste {
     @CsvSource({
             "401, /e2e/erro/401, Você precisa entrar,                               /login?expirou",
             "403, /e2e/erro/403, Você não tem permissão para acessar esta página,   /",
-            "404, /nao-existe,   Página não encontrada,                             /",
+            "404, /reservas/999999, Página não encontrada,                             /",
             "500, /e2e/erro/500, Algo deu errado,                                   /e2e/erro/500"
     })
     void paginaDeErroTemMensagemPropriaECaminhoParaContinuar(String codigo, String caminho, String titulo, String destino) {
+        // Logado: sem sessão as telas levam ao login; o 404 é de uma reserva que não existe
+        entrarComo(PerfilUsuario.SOLICITANTE);
         var resposta = pagina.navigate(url(caminho));
 
         assertThat(resposta.status()).isEqualTo(Integer.parseInt(codigo));

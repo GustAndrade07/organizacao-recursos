@@ -7,11 +7,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 /**
- * Tela de login (tela 1 do inventário). Só mostra o formulário: quem autentica é o back-end (ADR-0001), que
- * deve responder a {@code POST /login} e, em caso de falha, redirecionar para {@code /login?erro}, devolvendo o
- * e-mail digitado no atributo de modelo {@code email} (por exemplo, atributo flash). Sessão expirada chega em
- * {@code /login?expirou}. {@code ?destino=} guarda a página anterior, que a tela repassa no POST (só se for {@link CaminhoDoSite}); quem decide
- * o redirecionamento é o back-end.
+ * Tela de login (tela 1 do inventário). Só mostra o formulário: quem autentica é o Spring Security, no
+ * {@code POST /login} da cadeia das telas (D12, opção (a), {@code config.SegurancaDasTelasConfig}). Em caso de falha
+ * ele volta para {@code /login?erro}, com o login digitado no atributo flash {@code login}; sessão expirada chega em
+ * {@code /login?expirou}. {@code ?destino=} guarda a página anterior, que a tela repassa no POST (só se for
+ * {@link CaminhoDoSite}); depois do login o Spring Security revalida o destino antes de redirecionar.
  */
 @Controller
 public class LoginController {

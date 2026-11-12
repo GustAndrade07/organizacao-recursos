@@ -55,7 +55,7 @@ class LoginPaginaTest {
         assertThat(doc.select("link[rel=stylesheet]").eachAttr("href")).containsExactly("/css/tokens.css", "/css/app.css");
         assertThat(doc.selectFirst("main#conteudo h1[data-testid=login-titulo]").text()).isEqualTo("Entrar");
         assertThat(doc.selectFirst("[data-testid=login-descricao]").text())
-                .isEqualTo("Use seu e-mail e senha para acessar o sistema de reservas.");
+                .isEqualTo("Use seu login e senha para acessar o sistema de reservas.");
         assertThat(doc.select("h1")).hasSize(1);
     }
 
@@ -77,15 +77,16 @@ class LoginPaginaTest {
     }
 
     @Test
-    void campoDeEmailTemRotuloVisivelTipoEAutocompletarParaGerenciadorDeSenhas() throws Exception {
+    void campoDeLoginTemRotuloVisivelTipoEAutocompletarParaGerenciadorDeSenhas() throws Exception {
         Document doc = pagina("/login");
 
-        var campo = doc.selectFirst("input[data-testid=login-email]");
-        assertThat(campo.attr("type")).isEqualTo("email");
-        assertThat(campo.attr("name")).isEqualTo("email");
+        // O usuário entra com o login do cadastro ([a-z0-9._-]), não com e-mail: type=email recusaria "laura.mendes"
+        var campo = doc.selectFirst("input[data-testid=login-usuario]");
+        assertThat(campo.attr("type")).isEqualTo("text");
+        assertThat(campo.attr("name")).isEqualTo("login");
         assertThat(campo.attr("autocomplete")).isEqualTo("username");
         assertThat(campo.hasAttr("required")).isTrue();
-        assertThat(doc.selectFirst("label[for=" + campo.id() + "]").text()).isEqualTo("E-mail");
+        assertThat(doc.selectFirst("label[for=" + campo.id() + "]").text()).isEqualTo("Login");
     }
 
     @Test
@@ -123,8 +124,8 @@ class LoginPaginaTest {
 
         var aviso = doc.selectFirst("[data-testid=login-erro]");
         assertThat(aviso.attr("role")).isEqualTo("alert");
-        assertThat(aviso.text()).isEqualTo("E-mail ou senha incorretos. Confira os dados e tente novamente.");
-        assertThat(doc.selectFirst("input[data-testid=login-email]")).isNotNull();
+        assertThat(aviso.text()).isEqualTo("Login ou senha incorretos. Confira os dados e tente novamente.");
+        assertThat(doc.selectFirst("input[data-testid=login-usuario]")).isNotNull();
     }
 
     @Test
@@ -136,37 +137,37 @@ class LoginPaginaTest {
     }
 
     @Test
-    void semAtributoEmailOCampoVemVazio() throws Exception {
+    void semAtributoLoginOCampoVemVazio() throws Exception {
         Document doc = pagina("/login?erro");
 
-        assertThat(doc.selectFirst("input[data-testid=login-email]").val()).isEmpty();
+        assertThat(doc.selectFirst("input[data-testid=login-usuario]").val()).isEmpty();
     }
 
     @Test
-    void aposFalhaOEmailDigitadoVoltaPreenchido() throws Exception {
-        Document doc = pagina(get("/login?erro").flashAttr("email", "ana.lima@escola.edu.br"));
+    void aposFalhaOLoginDigitadoVoltaPreenchido() throws Exception {
+        Document doc = pagina(get("/login?erro").flashAttr("login", "ana.lima"));
 
-        assertThat(doc.selectFirst("input[data-testid=login-email]").val()).isEqualTo("ana.lima@escola.edu.br");
+        assertThat(doc.selectFirst("input[data-testid=login-usuario]").val()).isEqualTo("ana.lima");
         assertThat(doc.selectFirst("[data-testid=login-erro]")).isNotNull();
     }
 
     @Test
-    void emailComHtmlPerigosoVoltaEscapadoNoCampo() throws Exception {
-        String perigoso = "\"><script>alert(1)</script>@x.com";
+    void loginComHtmlPerigosoVoltaEscapadoNoCampo() throws Exception {
+        String perigoso = "\"><script>alert(1)</script>";
 
-        String html = mvc.perform(get("/login?erro").flashAttr("email", perigoso))
+        String html = mvc.perform(get("/login?erro").flashAttr("login", perigoso))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
         Document doc = Jsoup.parse(html);
 
         assertThat(html).doesNotContain("<script>alert(1)");
-        assertThat(doc.selectFirst("input[data-testid=login-email]").val()).isEqualTo(perigoso);
+        assertThat(doc.selectFirst("input[data-testid=login-usuario]").val()).isEqualTo(perigoso);
     }
 
     @Test
     void asenhaNuncaVoltaNoHtml() throws Exception {
         String html = mvc.perform(get("/login?erro")
-                        .flashAttr("email", "ana.lima@escola.edu.br")
+                        .flashAttr("login", "ana.lima")
                         .flashAttr("senha", "segredo-123")
                         .param("senha", "segredo-456"))
                 .andExpect(status().isOk())
@@ -207,10 +208,10 @@ class LoginPaginaTest {
     }
 
     @Test
-    void sessaoExpiradaTambemMantemOEmailQuandoOBackEndPassa() throws Exception {
-        Document doc = pagina(get("/login?expirou").flashAttr("email", "ana.lima@escola.edu.br"));
+    void sessaoExpiradaTambemMantemOLoginQuandoOBackEndPassa() throws Exception {
+        Document doc = pagina(get("/login?expirou").flashAttr("login", "ana.lima"));
 
-        assertThat(doc.selectFirst("input[data-testid=login-email]").val()).isEqualTo("ana.lima@escola.edu.br");
+        assertThat(doc.selectFirst("input[data-testid=login-usuario]").val()).isEqualTo("ana.lima");
     }
 
     @Test

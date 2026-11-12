@@ -1,5 +1,7 @@
 package br.com.senac.recursos.web;
 
+import br.com.senac.recursos.enums.PerfilUsuario;
+import br.com.senac.recursos.support.ComoUsuario;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -9,6 +11,16 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.when;
+
+import br.com.senac.recursos.dto.response.AuditoriaResponse;
+import br.com.senac.recursos.enums.EstadoReserva;
+import br.com.senac.recursos.service.ReservaService;
+import br.com.senac.recursos.support.Respostas;
+import java.time.Instant;
+import java.util.List;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.junit.jupiter.api.Test;
@@ -29,6 +41,7 @@ import org.springframework.web.bind.annotation.RequestParam;
  * {@code eventos} (instante, de, para, usuario, motivo), do mais antigo ao mais recente. A tela é somente
  * leitura. O 403 do Solicitante (RN-11) é a página de erro 403 que o back-end devolve; não há tela própria.
  */
+@ComoUsuario(PerfilUsuario.RESPONSAVEL)
 @WebMvcTest(HistoricoPaginaTest.PaginasDeTeste.class)
 @Import({HistoricoController.class, HistoricoPaginaTest.PaginasDeTeste.class})
 class HistoricoPaginaTest {
@@ -131,6 +144,9 @@ class HistoricoPaginaTest {
     @Autowired
     MockMvc mvc;
 
+    @Autowired
+    ReservaService reservas;
+
     private Document pagina(String caminho) throws Exception {
         String html = mvc.perform(get(caminho))
                 .andExpect(status().isOk())
@@ -149,11 +165,22 @@ class HistoricoPaginaTest {
     }
 
     @Test
-    void rotaDoBackEndDevolveATelaSemReservaNemLinhaDoTempoAteOBackEndPreencher() throws Exception {
+    void rotaRealMontaResumoELinhaDoTempoComOQueOServiceDevolve() throws Exception {
+        when(reservas.buscar(anyLong(), any())).thenReturn(
+                Respostas.reserva(5, 2, EstadoReserva.REJEITADA, Respostas.sala(3, "Sala 203")));
+        when(reservas.historico(5L)).thenReturn(List.of(
+                new AuditoriaResponse(1L, 5L, 2L, "laura", Instant.parse("2026-11-01T12:00:00Z"), null,
+                        EstadoReserva.SOLICITADA, "Reserva criada."),
+                new AuditoriaResponse(2L, 5L, 3L, "rafael", Instant.parse("2026-11-02T13:30:00Z"),
+                        EstadoReserva.SOLICITADA, EstadoReserva.REJEITADA, "Sala em obra.")));
+
         Document doc = pagina("/reservas/5/historico");
 
-        assertThat(doc.selectFirst("h1[data-testid=historico-titulo]").text()).isEqualTo("Histórico da reserva");
-        assertThat(doc.select("[data-testid=historico-resumo], [data-testid=historico-linha-tempo]")).isEmpty();
+        assertThat(doc.selectFirst("section[data-testid=historico-resumo] h2").text()).isEqualTo("Sala 203");
+        assertThat(doc.selectFirst("[data-testid=historico-evento-1-para]").text()).isEqualTo("Solicitada");
+        assertThat(doc.selectFirst("[data-testid=historico-evento-2-para]").text()).isEqualTo("Rejeitada");
+        assertThat(doc.select("main li")).hasSize(2);
+        assertThat(doc.text()).contains("Sala em obra.").contains("12/11/2026").contains("14:00 às 15:30");
     }
 
     @Test
@@ -203,6 +230,8 @@ class HistoricoPaginaTest {
 
     @Test
     void rotaExigeIdNumericoEDevolve400ParaOutroValor() throws Exception {
+        when(reservas.buscar(anyLong(), any())).thenReturn(
+                Respostas.reserva(5, 2, EstadoReserva.APROVADA, Respostas.sala(3, "Sala 203")));
         mvc.perform(get("/reservas/abc/historico")).andExpect(status().isBadRequest());
         mvc.perform(get("/reservas/5/historico")).andExpect(status().isOk());
     }
@@ -242,7 +271,7 @@ class HistoricoPaginaTest {
         Document doc = pagina("/teste/historico/sem-eventos");
 
         assertThat(doc.selectFirst("[data-testid=historico-sem-eventos]").text()).isEqualTo("Nenhuma mudança registrada.");
-        assertThat(doc.select("ol, li")).isEmpty();
+        assertThat(doc.select("main ol, main li")).isEmpty();
         assertThat(doc.selectFirst("section[data-testid=historico-resumo] h2").text()).isEqualTo("Sala 203");
     }
 

@@ -1,5 +1,7 @@
 package br.com.senac.recursos.web;
 
+import br.com.senac.recursos.enums.PerfilUsuario;
+import br.com.senac.recursos.support.ComoUsuario;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -28,6 +30,7 @@ import org.springframework.web.bind.annotation.RequestParam;
  * {@code motivo}), {@code confirmacao} (titulo, reserva, estado) e {@code erroAprovacao} (403 da API).
  * A tela só mostra o que recebe; quem aprova e rejeita é o back-end, por POST.
  */
+@ComoUsuario(PerfilUsuario.RESPONSAVEL)
 @WebMvcTest({AprovacaoController.class, FilaAprovacaoTest.PaginasDeTeste.class})
 @Import(FilaAprovacaoTest.PaginasDeTeste.class)
 class FilaAprovacaoTest {
