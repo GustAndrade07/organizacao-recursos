@@ -29,3 +29,9 @@
 - `./mvnw -B verify` nesta máquina: 1059 testes, 0 falhas, 0 ignorados, "All coverage checks have been met".
 
 **Tela 16 (usuários) e link do histórico (12/11/2026, depois do PR #48).** Tela do Administrador em `/admin/usuarios` (lista e cadastro), ligada ao `UsuarioService` com as regras e mensagens do `UsuarioRequest` da API. Item "Usuários" no menu do Administrador e 3 linhas novas na tabela "Telas" da matriz. Link "Ver histórico" na retirada e devolução e no detalhe da reserva, só para Responsável e Administrador (RN-11). Inventário (`docs/frontend/telas.md`) com 16 telas. `./mvnw -B verify` nesta máquina: 1084 testes, 0 falhas, 0 ignorados. Testes: `UsuariosPaginaTest` (8), 3 casos novos em `TelasComBancoTest`, `MatrizAutorizacaoTest` com 222 casos e 2 E2E novos. Sem editar nem desativar usuário, porque o service ainda não tem essas operações.
+
+**Ressalvas da revisão do PR #48 (Gustavo, aprovado com ressalvas).**
+- ADR-0009 passou a **aceito**.
+- (1) Sem limite de tentativas no login: risco no relatório de qualidade.
+- (2) Cookie de sessão: agora com `HttpOnly` e `SameSite=Lax` (`application.yml`) e teste em `PaginaNaoEncontradaIntegracaoTest`; `Secure` por `SESSAO_COOKIE_SEGURO=true`.
+- (3) Sem `test(red)`: desvio de processo no relatório, seção 5.

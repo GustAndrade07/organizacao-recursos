@@ -82,6 +82,8 @@
 - **Evidência que existe:** a mutação manual de RN-07 (tirar `reserva.iniciada == false` das duas telas) deixou 5 testes vermelhos, e o código foi restaurado. Isso mostra que os testes pegam a regra quando ela é quebrada.
 - **Limite:** não há prova de que esses testes falhavam antes de as telas existirem, porque o `git log` não tem o vermelho antes do verde. O E2E não é TDD (foi escrito sobre telas que já existiam). Para as outras telas e para os testes de banco, este relatório não conferiu, commit a commit, se o vermelho veio antes.
 
+**Desvio de processo** (ressalva 3 da revisão do Gustavo no PR #48, 12/11/2026): a ligação das telas ao back-end (commit `fa94726`) trouxe código e testes juntos, sem um commit `test(red)` antes, pelo mesmo motivo das telas 7 e 8 (o OK da regra 11 não foi pedido). Evidência que existe: 4 mutações feitas à mão, todas pegas (lista na RTM, seção "Telas ligadas ao back-end"). O mesmo vale para a tela 16 (usuários).
+
 **Limite:** defeito achado e corrigido dentro do próprio PR, antes do merge, não foi registrado como DEF. A contagem acima é a do que chegou à `main` ou foi registrado.
 
 ## 6. Riscos residuais
@@ -96,6 +98,8 @@
 | 2 CVEs críticos aceitos no Spring 6.2.19 | Pode contar como "vulnerabilidade crítica", conforme a D4 | Aceitos com justificativa; marcação no SonarCloud pendente | Gustavo | Resposta do professor (D4) e marcação "Accepted" |
 | Decisões pendentes | Testes e telas apoiados em premissas | **D4** (professor), **D8** (critérios do relatório) e **D9** (quando alterar ou cancelar) sem decisão; D1, D3 e D5 decididas pelo Gustavo, aguardando confirmação de Pedro e Leandro | Grupo | Decidir antes de o Pedro escrever os serviços correspondentes |
 | E2E com dados de teste | A tela pode divergir do que o back-end mandar | Contratos documentados em `docs/frontend/README.md` | Leandro / Pedro | Rodar os mesmos E2E contra o back-end real quando ele existir |
+| Força bruta no login das telas (registrado em 12/11/2026) | Senha adivinhada por tentativa e erro | Sem limite de tentativas nem atraso progressivo em `POST /login` (ressalva 1 do Gustavo no PR #48); o login só não revela se o usuário existe | Leandro / Pedro | Limite por login e por IP com bloqueio temporário, ou aceitar o risco por escrito antes da tag |
+| Cookie de sessão sem `Secure` em produção | Sessão exposta se a aplicação rodar em HTTP fora da máquina local | `HttpOnly` e `SameSite=Lax` ligados; `Secure` depende de `SESSAO_COOKIE_SEGURO=true`, que exige HTTPS | Gustavo (ambiente) | Ligar a variável onde houver HTTPS |
 | Prazo | Itens `ausente` na entrega | Meta interna 11/11; entrega 13/11 | Grupo | Priorizar os três limitadores acima; o que ficar de fora entra como risco aceito, com responsável |
 
 ## 7. Recomendação

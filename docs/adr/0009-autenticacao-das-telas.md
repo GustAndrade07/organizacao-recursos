@@ -1,6 +1,6 @@
 # ADR-0009 — Telas autenticam por formulário com sessão e chamam os services
 
-- **Status:** proposto (Leandro, 12/11/2026). Escolha da D12 (seção 9 do plano) pela opção (a), informada pelo Leandro como combinada com o grupo; vira **aceito** na revisão do PR (regra 6 do `AGENTS.md`). **Não substitui** o [ADR-0001](0001-login-jwt.md) (JWT da API) nem o [ADR-0008](0008-backend-api-rest-em-camadas.md); completa o que o ADR-0008 deixou aberto ("Ligar as telas à API é trabalho seguinte, junto com a D12").
+- **Status:** **aceito** pelo Gustavo na revisão do PR #48 (12/11/2026), "aprovado com ressalvas", confirmando a opção (a) como combinada com o grupo. Antes: proposto (Leandro, 12/11/2026). Escolha da D12 (seção 9 do plano) pela opção (a), informada pelo Leandro como combinada com o grupo; vira **aceito** na revisão do PR (regra 6 do `AGENTS.md`). **Não substitui** o [ADR-0001](0001-login-jwt.md) (JWT da API) nem o [ADR-0008](0008-backend-api-rest-em-camadas.md); completa o que o ADR-0008 deixou aberto ("Ligar as telas à API é trabalho seguinte, junto com a D12").
 - **Contexto:** depois do PR #44 as telas Thymeleaf estavam abertas a todos e sem dado real (ADR-0008, "Perdemos"), e a API exigia JWT no cabeçalho. Para as telas mostrarem dados era preciso decidir como a pessoa entra e como o perfil é conferido (D12): (a) formulário em `/login` com sessão do Spring Security, ou (b) o JWT da API guardado num cookie `HttpOnly`.
 - **Decisão:**
   - **Opção (a).** `POST /login` (campos `login` e `senha`) é atendido pelo Spring Security numa cadeia própria (`config/SegurancaDasTelasConfig`), com sessão HTTP, CSRF ligado e `POST /logout`. O usuário vem da mesma tabela e do mesmo hash BCrypt da API (`web/sessao/UsuariosDaTela`).
@@ -23,5 +23,9 @@
     - Cada tela contra PostgreSQL real, conferindo HTML **e banco** (`web/TelasComBancoTest`).
     - Login de ponta a ponta com servidor real: senha errada, destino revalidado, 403 fora da matriz e 404 de reserva inexistente com sessão (`PaginaNaoEncontradaIntegracaoTest`), e no navegador em 375 px (`AcessoE2ETest`, `ReservaE2ETest`, `ResponsavelEAdministradorE2ETest`).
     - Os recortes `@WebMvcTest` usam services dublês sem resposta programada (`support/TelasNoRecorte`) e entram com `@ComoUsuario`.
+- **Ressalvas da revisão (Gustavo, PR #48):**
+  1. **Sem limite de tentativas no `/login`.** Fica como risco registrado (relatório de qualidade, seção 6); não implementado.
+  2. **Cookie de sessão sem `Secure`/`SameSite`.** Corrigido no PR seguinte: `SameSite=Lax` e `HttpOnly` em `application.yml`, conferidos por `PaginaNaoEncontradaIntegracaoTest`; `Secure` liga com `SESSAO_COOKIE_SEGURO=true` (exige HTTPS, desligado no desenvolvimento local).
+  3. **Testes e código no mesmo commit, sem o `test(red)`.** Registrado como desvio de processo no relatório de qualidade, seção 5.
 - **Pendências:** D8 (premissas do relatório), D9 (quando alterar e cancelar), D10 (estado inicial e quem cancela reserva de outra pessoa), D11 (manutenção sobre reservas existentes) e D13 (RN-04) continuam pendentes na seção 9 do plano; as telas seguem o comportamento atual do service. A lista de itens do menu por perfil é a proposta de `docs/frontend/README.md` ("Layout base e menu"). Aceite do grupo para a opção (a) na revisão do PR.
 - **Fonte:** `src/main/java/br/com/senac/recursos/config/SegurancaDasTelasConfig.java`, `src/main/java/br/com/senac/recursos/web/`, `docs/seguranca/matriz-autorizacao.md`, `docs/plano-execucao.md` (seção 9, D12).

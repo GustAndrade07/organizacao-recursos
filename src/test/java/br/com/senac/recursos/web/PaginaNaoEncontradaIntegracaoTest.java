@@ -114,6 +114,17 @@ class PaginaNaoEncontradaIntegracaoTest {
                 .isEqualTo("http://localhost:" + porta + "/");
     }
 
+    /** Ressalva 2 do PR #48: o cookie da sessão vai com HttpOnly e SameSite=Lax. */
+    @Test
+    void cookieDeSessaoTemHttpOnlyESameSiteLax() throws Exception {
+        HttpRequest pedido = HttpRequest.newBuilder(URI.create("http://localhost:" + porta + "/login")).GET().build();
+        HttpResponse<String> resposta = HttpClient.newHttpClient().send(pedido, HttpResponse.BodyHandlers.ofString());
+
+        String cookie = resposta.headers().allValues("Set-Cookie").stream()
+                .filter(valor -> valor.startsWith("JSESSIONID=")).findFirst().orElseThrow();
+        assertThat(cookie).containsIgnoringCase("HttpOnly").containsIgnoringCase("SameSite=Lax");
+    }
+
     private void entrar() throws Exception {
         assertThat(enviarLogin(LOGIN, SENHA, null).statusCode()).isEqualTo(302);
     }
