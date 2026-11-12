@@ -345,6 +345,52 @@ class TelasComBancoTest extends ApiIntegracaoTest {
         assertThat(contar("select count(*) from reserva where estado = 'APROVADA'")).isEqualTo(1);
     }
 
+    // ---------------------------------------------------------------- usuários (tela 16) e histórico
+
+    @Test
+    void administradorCadastraUsuarioComSenhaSoEmHashEOUsuarioNovoEntra() throws Exception {
+        enviar(administrador, "/admin/usuarios", Map.of("nome", "Carla Dias", "login", "carla.dias",
+                "senha", "senha-da-carla-1", "perfil", "RESPONSAVEL"))
+                .andExpect(redirectedUrl("/admin/usuarios"))
+                .andExpect(flash().attributeExists("confirmacao"));
+
+        String hash = jdbc.queryForObject("select senha_hash from usuario where login = 'carla.dias'", String.class);
+        assertThat(hash).startsWith("$2").doesNotContain("senha-da-carla-1");
+        assertThat(jdbc.queryForObject("select perfil from usuario where login = 'carla.dias'", String.class))
+                .isEqualTo("RESPONSAVEL");
+        assertThat(abrir(administrador, "/admin/usuarios").text()).contains("Carla Dias").contains("carla.dias");
+        // O login da tela aceita a usuária nova (mesma tabela e mesmo BCrypt)
+        mvc.perform(org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestBuilders
+                        .formLogin("/login").userParameter("login").passwordParam("senha")
+                        .user("carla.dias").password("senha-da-carla-1"))
+                .andExpect(redirectedUrl("/"));
+    }
+
+    @Test
+    void loginRepetidoNaoCriaSegundoUsuario() throws Exception {
+        String html = enviar(administrador, "/admin/usuarios", Map.of("nome", "Outra Laura", "login", "laura",
+                "senha", "senha-qualquer-1", "perfil", "SOLICITANTE"))
+                .andExpect(status().isBadRequest())
+                .andReturn().getResponse().getContentAsString();
+
+        assertThat(Jsoup.parse(html).selectFirst("[data-testid=usuario-form-login-erro]").text())
+                .isEqualTo("Já existe um usuário com este login.");
+        assertThat(contar("select count(*) from usuario where login = 'laura'")).isEqualTo(1);
+    }
+
+    @Test
+    void historicoTemLinkNoDetalheENaRetiradaSoParaQuemPodeVer() throws Exception {
+        long reserva = reservarPelaTela(laura, sala, "14:00", "15:00");
+
+        assertThat(abrir(laura, "/reservas/" + reserva).select("[data-testid=reserva-historico]")).isEmpty();
+        assertThat(abrir(responsavel, "/reservas/" + reserva).selectFirst("[data-testid=reserva-historico]")
+                .attr("href")).isEqualTo("/reservas/" + reserva + "/historico");
+        assertThat(abrir(responsavel, "/retirada-devolucao").selectFirst(
+                "[data-testid=retirada-devolucao-historico-" + reserva + "]").attr("href"))
+                .isEqualTo("/reservas/" + reserva + "/historico");
+        mvc.perform(get("/reservas/" + reserva + "/historico").with(sessao(laura))).andExpect(status().isForbidden());
+    }
+
     // ---------------------------------------------------------------- menu e início (RF-01)
 
     @Test

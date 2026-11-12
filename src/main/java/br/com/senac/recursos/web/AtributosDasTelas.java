@@ -39,6 +39,7 @@ class AtributosDasTelas {
     private static final Item RETIRADA = new Item("retirada", "Retirada e devolução", "/retirada-devolucao");
     private static final Item RELATORIOS = new Item("relatorios", "Relatórios", "/relatorios/utilizacao");
     private static final Item RECURSOS = new Item("recursos", "Recursos", "/admin/recursos");
+    private static final Item USUARIOS = new Item("usuarios", "Usuários", "/admin/usuarios");
 
     @ModelAttribute("caminhoDoSite")
     CaminhoDoSite caminhoDoSite() {
@@ -72,7 +73,7 @@ class AtributosDasTelas {
         return switch (perfil) {
             case SOLICITANTE -> List.of(BUSCAR, MINHAS);
             case RESPONSAVEL -> List.of(APROVACOES, RETIRADA, RELATORIOS);
-            case ADMINISTRADOR -> List.of(RECURSOS, RELATORIOS);
+            case ADMINISTRADOR -> List.of(RECURSOS, USUARIOS, RELATORIOS);
         };
     }
 

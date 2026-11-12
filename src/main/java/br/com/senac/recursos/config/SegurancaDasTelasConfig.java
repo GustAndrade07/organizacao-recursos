@@ -65,6 +65,9 @@ public class SegurancaDasTelasConfig {
                                 "/admin/recursos/*/manutencao").hasRole(ADMINISTRADOR)
                         .requestMatchers(HttpMethod.POST, "/admin/recursos", "/admin/recursos/*",
                                 "/admin/recursos/*/manutencao").hasRole(ADMINISTRADOR)
+                        // Administrador: usuários (tela 16, como GET e POST /api/usuarios)
+                        .requestMatchers(HttpMethod.GET, "/admin/usuarios", "/admin/usuarios/novo").hasRole(ADMINISTRADOR)
+                        .requestMatchers(HttpMethod.POST, "/admin/usuarios").hasRole(ADMINISTRADOR)
 
                         // Fora da lista: negada (regra 13 do AGENTS.md), como na API. Sem sessão leva ao login;
                         // com sessão, 403. Esquecer uma rota aqui fecha o acesso em vez de abrir.

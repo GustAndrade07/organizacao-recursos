@@ -12,6 +12,7 @@
     conflito    : verdadeiro após 409 de horário na alteração            (back-end)
     manutencao  : inicio e fim (LocalDateTime) após 409 de manutenção    (back-end)
     confirmacao : titulo, reserva e estado depois de criar, alterar ou cancelar
+    verHistorico: verdadeiro mostra o link para o histórico (tela 11); só Responsável e Administrador (RN-11)
   Alterar e Cancelar só aparecem para Solicitada ou Aprovada com iniciada falso (RN-07; ver D9 no plano).
 */-->
 <html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"
@@ -59,6 +60,11 @@
                        data-testid="reserva-cancelar">Cancelar reserva</a>
                 </div>
                 <p class="tabela__nota" data-testid="reserva-sem-acao" th:unless="${podeMudar}">Esta reserva não pode mais ser alterada nem cancelada.</p>
+                <!--/* Só para quem pode ver o histórico (Responsável e Administrador, RN-11): o back-end põe verHistorico */-->
+                <div class="formulario__acoes" th:if="${verHistorico == true}">
+                    <a class="botao botao--secundario" th:href="@{/reservas/{id}/historico(id=${reserva.id})}"
+                       data-testid="reserva-historico">Ver histórico</a>
+                </div>
             </section>
 
             <section class="cartao" aria-labelledby="reserva-alterar-titulo" data-testid="reserva-alterar-secao"

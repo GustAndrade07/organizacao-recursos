@@ -76,6 +76,9 @@ Decisão **D12, opção (a)** (12/11/2026, ADR-0009): formulário em `/login` co
 | POST | /admin/recursos/{id} | login | 403 | 403 | ok | RF-02 |
 | GET | /admin/recursos/{id}/manutencao | login | 403 | 403 | ok | RF-08 |
 | POST | /admin/recursos/{id}/manutencao | login | 403 | 403 | ok | RF-08 |
+| GET | /admin/usuarios | login | 403 | 403 | ok | RF-01, tela 16 (como `GET /api/usuarios`) |
+| GET | /admin/usuarios/novo | login | 403 | 403 | ok | RF-01, tela 16 |
+| POST | /admin/usuarios | login | 403 | 403 | ok | RF-01, tela 16 (como `POST /api/usuarios`) |
 
 URL de tela fora desta tabela: **negada** (`denyAll`, regra 13 do `AGENTS.md`): sem sessão leva ao login, com sessão 403. Esquecer de cadastrar uma rota fecha o acesso em vez de abrir. A página 404 aparece para recurso ou reserva que não existe numa rota da tabela.
 

@@ -22,6 +22,7 @@ Os critérios de aceite de cada tela estão na spec do módulo, no Notion ([Spec
 | 13 | Lista de recursos | 05 | Administrador | `GET /admin/recursos` | RF-02 | `recursos-` | `html` |
 | 14 | Formulário de recurso | 05 | Administrador | `GET /admin/recursos/novo`, `/admin/recursos/{id}` | RF-02 | `recurso-form-` | `html` |
 | 15 | Bloqueio por manutenção | 05 | Administrador | `GET /admin/recursos/{id}/manutencao` | RF-08 | `manutencao-` | `html` |
+| 16 | Usuários (lista e cadastro) | 05 | Administrador | `GET /admin/usuarios`, `/admin/usuarios/novo` | RF-01 | `usuarios-`, `usuario-form-` | `html` |
 
 A rota do relatório (`/relatorios/utilizacao`) já está definida no [PRD](../prd.md). RF-14 (OpenAPI) é o Swagger UI e não tem tela própria.
 

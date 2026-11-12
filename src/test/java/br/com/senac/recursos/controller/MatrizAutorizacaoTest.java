@@ -195,6 +195,8 @@ class MatrizAutorizacaoTest extends ApiIntegracaoTest {
             case "POST /reservas/{id}" -> Map.of("data", "2026-11-10", "inicio", "19:00", "termino", "20:00");
             case "POST /aprovacoes/{id}/rejeitar" -> Map.of("motivo", "Sala em obra.");
             case "POST /admin/recursos" -> Map.of("tipo", "materiais", "nome", "Projetor");
+            case "POST /admin/usuarios" -> Map.of("nome", "Nova Pessoa", "login", "nova.pessoa",
+                    "senha", "senha-nova-123", "perfil", "SOLICITANTE");
             case "POST /admin/recursos/{id}" -> Map.of("nome", "Sala renomeada", "capacidade", "10");
             case "POST /admin/recursos/{id}/manutencao" -> Map.of("inicio", "2026-12-01T10:00",
                     "fim", "2026-12-01T12:00", "confirmar", "true");
