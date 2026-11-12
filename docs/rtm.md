@@ -18,7 +18,7 @@ Requisito → risco → teste → evidência, para todos os requisitos do [PRD](
 |---|---|---|---|---|
 | Requisitos funcionais (RF) | 14 | 0 | 5 (RF-05, 06, 10, 12 e 13) | 9 |
 | Regras de negócio (RN) | 13 | 0 | 6 (RN-01, 02, 03, 05, 09 e 12) | 7 |
-| Requisitos não funcionais (RNF) | 3 | 1 (RNF-02) | 0 | 2 |
+| Requisitos não funcionais (RNF) | 3 | 3 (RNF-02; RNF-01 e RNF-03 medidos só localmente, 12/11/2026) | 0 | 0 |
 
 **Críticos.** A [spec principal](https://app.notion.com/p/40e8bb977b7b8155b440c12880c46df1) marca 2 RFs como críticos, porque zeram a nota:
 - **RF-06** (reserva dupla): ligado a teste e a run do CI, mas só no banco. Falta o 409 de ponta a ponta.
@@ -67,9 +67,9 @@ A meta do plano, "100% dos críticos ligados a teste e run do CI", ainda **não*
 
 | Requisito | Risco | Teste | Evidência | Situação | Dono |
 |---|---|---|---|---|---|
-| RNF-01 Busca: p95 ≤ 300 ms com 50 usuários (a validar) | Busca lenta no horário de pico | **A escrever:** `perf/reservas.jmx` (JMeter em modo CLI, local); `docs/performance/rnf.md` antes da rodada | **Não medido:** o plano JMeter e a busca no back-end ainda não existem (`perf/` só tem o README) | ausente | Leandro |
+| RNF-01 Busca: p95 ≤ 300 ms com 50 usuários | Busca lenta no horário de pico | [carga] `perf/reservas.jmx` (JMeter 5.6.3 em modo CLI, local; 50 usuários, rampa de 10 s, pausa de 100 a 300 ms), meta escrita antes em `docs/performance/rnf.md` (commit `0464847`) | `perf/resultados/rodada-01.jtl` (p95 = 17 ms, no máximo 48 ativos) e `rodada-02.jtl` (p95 = 8 ms, 50 ativos), leitura em `docs/performance/resultado-01.md`, 12/11/2026. Só nesta máquina (4 vCPUs, JMeter, aplicação e banco juntos); nada sobre produção | feito (local) | Leandro |
 | RNF-02 Cobertura ≥ 80% de linhas e ≥ 70% de branches | Código sem teste | Gate do JaCoCo no `pom.xml` (o build falha abaixo da meta) | Run 43091027823: "All coverage checks have been met". `target/site/jacoco/jacoco.csv` local do `verify` de `3d63d72` (11/11/2026): 100,0% das linhas (106 de 106) e 94,0% dos branches (79 de 84). **Limite:** hoje o código de produção é só a camada de tela (controllers); o número vai mudar quando o back-end entrar | feito | Gustavo |
-| RNF-03 Criação de reserva sob carga: só 201 ou 409, nunca 500 | Erro 500 sob disputa | **A escrever:** asserção no plano JMeter | **Não medido:** o plano JMeter e o `POST /reservas` ainda não existem | ausente | Leandro |
+| RNF-03 Criação de reserva sob carga: só 201 ou 409, nunca 500 | Erro 500 sob disputa | [carga] asserção "RNF-03: só 201 ou 409" em `perf/reservas.jmx` (50 usuários disputando o mesmo horário a cada repetição); [API] `ConcorrenciaReservaApiTest` (20 pedidos → 1 × 201 e 19 × 409) | `rodada-01.jtl`: 20 × 201 e 980 × 409; `rodada-02.jtl`: 60 × 201 e 2940 × 409; nenhum outro código. Banco conferido: 80 reservas e 3920 tentativas recusadas (`docs/performance/resultado-01.md`) | feito (local) | Leandro |
 
 ## Testes do back-end (PR #44) — a incorporar nas linhas acima
 
