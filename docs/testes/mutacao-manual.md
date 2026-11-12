@@ -2,7 +2,7 @@
 
 Plano de execução, Etapa 5 [Aula 12]: quebrar cada regra crítica de propósito, ver o teste falhar e desfazer a quebra com `git restore`. Teste que continua verde com a regra quebrada é lacuna: escrever o teste que falta. **Nenhuma mutação pode sobrar no código.**
 
-Este arquivo tem **só a seção do banco** (Gustavo). As regras que dependem do serviço de reserva, da aprovação e da autorização ficam como **pendente (Pedro)**.
+Este arquivo tem a seção do banco (Gustavo) e, desde 12/11/2026, a M1 repetida no nível da API (Pedro, seção "Mutações do back-end"). As demais regras que dependem do serviço de reserva, da aprovação e da autorização continuam **pendente (Pedro)**.
 
 ## Como foi medido (vale para todas as linhas)
 
@@ -22,7 +22,7 @@ Este arquivo tem **só a seção do banco** (Gustavo). As regras que dependem do
 | Regra | Situação | Mutação |
 |---|---|---|
 | Sobreposição | banco feito | M1 |
-| Dupla reserva (concorrência) | banco feito | M1 e M2 (mesma constraint: uma mutação cobre as duas regras) |
+| Dupla reserva (concorrência) | banco feito; API feito (12/11) | M1 e M2 (mesma constraint: uma mutação cobre as duas regras); M1 também no nível da API |
 | Aprovação de recurso restrito | pendente (Pedro) | regra de serviço, não há constraint no banco |
 | Manutenção | pendente (Pedro) | a V1 não tem exclusão em `manutencao` (só um índice); o bloqueio é do serviço, então não afirmo mutação de banco |
 | Autorização | pendente (Pedro) | matriz de autorização e testes de API |
@@ -71,6 +71,24 @@ Não estão entre as seis regras, mas servem para provar que os valores calculad
 | M5 | `relatorio-horas-por-recurso.sql`: a duração passa a ser a da reserva inteira, sem a interseção com a janela | 1 de 6 vermelhos: `reservaQueCruzaABordaContaSoAParteDentroDaJanela` |
 
 Não mutei ainda `relatorio-carga-por-professor.sql` nem `relatorio-conflitos-evitados.sql` (não medido): têm teste próprio, mas sem rodada de mutação.
+
+## Mutações do back-end
+
+### M1 no nível da API — 20 pedidos HTTP sem a constraint de exclusão
+
+- **Data e máquina:** 12/11/2026, máquina do Pedro (Windows 11, OpenJDK 21.0.13, Docker Desktop 29.9.3, PostgreSQL 16.15 em Testcontainers). **Medido só nesta máquina; não generalizar.**
+- **Base:** `main` no commit `986e1cd`.
+- **Comando:**
+
+```powershell
+.\mvnw.cmd -B test "-Dtest=ConcorrenciaReservaApiTest" "-Djacoco.skip=true"
+```
+
+- **Linha de base, sem mutação:** 10 testes, 0 falhas, 0 erros, 0 ignorados.
+- **Quebra:** a mesma da M1 do banco: em `V1__nucleo_da_reserva.sql`, o predicado da constraint `reserva_recurso_sem_sobreposicao` trocado por `WHERE (false)`. A migração alterada nunca foi commitada: `git restore` logo depois da rodada e `git status --short` vazio.
+- **Resultado:** **10 de 10 vermelhos** (`vintePedidosParaAMesmaSalaGeramUmaReserva` e `vintePedidosParaOMesmoProfessorEmSalasDiferentesGeramUmaReserva`, 5 rodadas cada). Em todas as rodadas, as 20 respostas foram 201 (`{201=20}` em vez de `{201=1, 409=19}`).
+- **Conclusão:** o serviço não tem checagem própria de sobreposição; de ponta a ponta, quem barra a reserva dupla é o banco, e o teste de API pega a falta da constraint.
+- **CI:** o `ConcorrenciaReservaApiTest` faz parte do `verify`; o run 43302104277 (`main`, `986e1cd`) terminou verde. O log por teste não foi aberto (pede login).
 
 ## Lacunas encontradas
 

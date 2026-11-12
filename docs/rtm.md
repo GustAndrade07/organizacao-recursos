@@ -82,7 +82,7 @@ A meta do plano, "100% dos críticos ligados a teste e run do CI", ainda **não*
 | RF-03 | [API] `RecursoApiControllerTest.disponiveisExcluiReservaQueOcupaEManutencaoMasNaoACancelada` (tipo, capacidade e disponibilidade; localização e competência dependem da V2) | idem |
 | RF-04, RN-01, RN-07 | [API] `ReservaApiControllerTest` (`Criar`, `Alterar`, `Cancelar`: término antes do início, só o dono, reserva iniciada recusada na fronteira de 1 s); [unidade] `PeriodoTest` | idem |
 | RF-05, RN-02 | [API] `ReservaApiControllerTest.Sobreposicao` (trinca de fronteiras da D1, professor em outra sala, cancelar libera) | idem |
-| RF-06, RN-03, RNF-03 | [API] `ConcorrenciaReservaApiTest` (20 pedidos HTTP → 1 × 201 e 19 × 409, nunca 500, contagem no banco, sala e professor, 5 rodadas cada) | idem |
+| RF-06, RN-03, RNF-03 | [API] `ConcorrenciaReservaApiTest` (20 pedidos HTTP → 1 × 201 e 19 × 409, nunca 500, contagem no banco, sala e professor, 5 rodadas cada); vermelho sem a proteção: mutação M1 (`docs/testes/mutacao-manual.md`), 10 de 10 vermelhos | CI: run 43302104277 (`main`, `986e1cd`, verde); mutação medida localmente em 12/11/2026 |
 | RF-07, RN-06 | [API] `ReservaApiControllerTest.Aprovacao` (Responsável aprova; ninguém aprova a própria reserva: 403 e a reserva continua SOLICITADA) | idem |
 | RF-08, RN-04 | [API] `ReservaApiControllerTest.Manutencao` (trinca de fronteiras 10:00 a 12:00, 409 de tipo próprio) | idem |
 | RF-09, RN-05 | [API] `ReservaApiControllerTest.CicloDeUso` (APROVADA → EM_USO → CONCLUIDA, transição inválida 409 da D3); [unidade] `EstadoReservaTest` (49 pares) | idem |
