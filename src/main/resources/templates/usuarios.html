@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<!--/*
+  Tela 16 do inventário (prefixo "usuarios-"), RF-01, só do Administrador. Atributos de modelo (docs/frontend/README.md):
+    usuarios    : lista de id, nome, login, perfil (por extenso)          (back-end; ausente = sem lista)
+    confirmacao : titulo, texto, depois de cadastrar                       (back-end; opcional)
+  A senha nunca aparece aqui.
+*/-->
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: pagina(titulo='Usuários', conteudo=~{::#conteudo-pagina})}">
+<head>
+    <title>Usuários</title>
+</head>
+<body>
+<div id="conteudo-pagina">
+    <div class="secao">
+        <div class="alerta alerta--sucesso" role="status" data-testid="usuarios-sucesso" th:if="${confirmacao != null}">
+            <strong class="alerta__titulo" th:text="${confirmacao.titulo}">Usuário cadastrado</strong>
+            <p class="alerta__texto" th:text="${confirmacao.texto}">Ana Lima já pode entrar com o login ana.lima.</p>
+        </div>
+
+        <header class="pagina__cabecalho pagina__cabecalho--acao">
+            <div class="pagina__cabecalho">
+                <h1 data-testid="usuarios-titulo">Usuários</h1>
+                <p class="pagina__descricao">Quem pode entrar no sistema e com qual perfil.</p>
+            </div>
+            <a class="botao botao--primario" th:href="@{/admin/usuarios/novo}" data-testid="usuarios-cadastrar">Cadastrar usuário</a>
+        </header>
+
+        <section class="vazio" aria-labelledby="usuarios-vazio-titulo" data-testid="usuarios-vazio"
+                 th:if="${usuarios != null and #lists.isEmpty(usuarios)}">
+            <h2 class="vazio__titulo" id="usuarios-vazio-titulo">Nenhum usuário cadastrado</h2>
+            <p class="pagina__descricao">Cadastre quem vai reservar, aprovar ou administrar os recursos.</p>
+        </section>
+
+        <table class="tabela" data-testid="usuarios-tabela" th:if="${usuarios != null and !#lists.isEmpty(usuarios)}">
+            <caption class="so-leitor">Usuários cadastrados</caption>
+            <thead>
+            <tr>
+                <th scope="col">Nome</th>
+                <th scope="col">Login</th>
+                <th scope="col">Perfil</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="usuario : ${usuarios}" th:attr="data-testid='usuarios-linha-' + ${usuario.id}">
+                <th scope="row" class="tabela__nome" th:text="${usuario.nome}">Ana Lima</th>
+                <td data-rotulo="Login" th:text="${usuario.login}">ana.lima</td>
+                <td data-rotulo="Perfil" th:text="${usuario.perfil}" th:attr="data-testid='usuarios-perfil-' + ${usuario.id}">Solicitante</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>

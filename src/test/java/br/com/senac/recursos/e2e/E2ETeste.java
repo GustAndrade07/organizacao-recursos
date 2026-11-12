@@ -10,13 +10,31 @@ import com.microsoft.playwright.Playwright;
 import com.microsoft.playwright.PlaywrightException;
 import com.microsoft.playwright.Request;
 import com.microsoft.playwright.Route;
+import br.com.senac.recursos.dto.UsuarioAutenticado;
+import br.com.senac.recursos.dto.request.RecursoRequest;
+import br.com.senac.recursos.dto.request.UsuarioRequest;
+import br.com.senac.recursos.dto.response.RecursoResponse;
+import br.com.senac.recursos.dto.response.ReservaResponse;
+import br.com.senac.recursos.enums.PerfilUsuario;
+import br.com.senac.recursos.enums.TipoRecurso;
+import br.com.senac.recursos.model.Periodo;
+import br.com.senac.recursos.model.Usuario;
+import br.com.senac.recursos.repository.UsuarioRepository;
+import br.com.senac.recursos.service.RecursoService;
+import br.com.senac.recursos.service.ReservaService;
+import br.com.senac.recursos.service.UsuarioService;
+import br.com.senac.recursos.web.FormatoDasTelas;
 import java.nio.file.Path;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.UUID;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
@@ -26,17 +44,22 @@ import org.testcontainers.containers.PostgreSQLContainer;
 /**
  * Base dos testes E2E (ADR-0004, RF-13): a aplicação real sobe numa porta aleatória contra PostgreSQL em
  * Testcontainers (nunca H2) e o Chromium do Playwright, sem tela, abre as páginas em <b>375 px</b> de largura
- * (celular, {@code isMobile}). As rotas reais das telas mostram só o estado vazio, porque o back-end ainda não
- * existe; por isso {@link TelasComDados} (só do teste, fora do component scan) renderiza os mesmos templates com
- * dados de exemplo em {@code /e2e/...}. Os {@code POST} que o back-end ainda não atende são interceptados no
- * navegador ({@link #segurarPosts(String)}), contados e respondidos com 204, sem conteúdo.
+ * (celular, {@code isMobile}). Desde a ligação das telas com o back-end (D12, ADR-0009) há dois tipos de teste:
+ * <ul>
+ *   <li><b>contra o back-end real</b>: entram pela tela de login ({@link #entrarComo}), usam dados gravados no
+ *       banco ({@link #salaReal}, {@link #reservaReal}) e conferem o resultado na tela;</li>
+ *   <li><b>de layout e comportamento do navegador</b> (375 px, foco, diálogo, envio único): {@link TelasComDados}
+ *       (só do teste, fora do component scan) renderiza os templates com dados de exemplo em {@code /e2e/...},
+ *       rotas abertas só no teste; quando o teste só quer medir o envio, o {@code POST} é interceptado no
+ *       navegador ({@link #segurarPosts(String)}), contado e respondido com 204.</li>
+ * </ul>
  *
  * <p>Esperas só pelo próprio Playwright (auto-wait e asserções), nunca {@code Thread.sleep}. Os prints de
  * evidência vão para {@code target/e2e/375}. O navegador vem do Playwright: no CI o passo "Navegador do E2E" do
  * {@code ci.yml} instala o Chromium; numa máquina sem ele o Playwright baixa na primeira execução.
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Import(TelasComDados.class)
+@Import({TelasComDados.class, TelasComDados.RotasDoE2EAbertas.class})
 abstract class E2ETeste {
 
     static final int LARGURA = 375;
@@ -54,8 +77,29 @@ abstract class E2ETeste {
     private static Playwright playwright;
     private static Browser navegador;
 
+    /** Senha dos usuários do E2E; só existe no banco do Testcontainers. */
+    static final String SENHA = "senha-do-e2e-123";
+
+    /** Dia das reservas reais do E2E: no futuro, porque o E2E usa o relógio de verdade. */
+    static final String DIA_REAL = "2027-03-10";
+
     @LocalServerPort
     int porta;
+
+    @Autowired
+    UsuarioService usuarios;
+
+    @Autowired
+    UsuarioRepository repositorioDeUsuarios;
+
+    @Autowired
+    RecursoService recursos;
+
+    @Autowired
+    ReservaService reservas;
+
+    @Autowired
+    FormatoDasTelas formato;
 
     BrowserContext contexto;
     Page pagina;
@@ -95,6 +139,45 @@ abstract class E2ETeste {
     @AfterEach
     void fecharContexto() {
         contexto.close();
+    }
+
+    /**
+     * Entra pela tela de login, como a pessoa faria (D12, opção (a)): o usuário {@code e2e-<perfil>} é criado na
+     * primeira vez. Volta com a sessão no contexto do navegador e a página na tela inicial do perfil.
+     */
+    UsuarioAutenticado entrarComo(PerfilUsuario perfil) {
+        String login = "e2e-" + perfil.name().toLowerCase();
+        if (!repositorioDeUsuarios.existsByLogin(login)) {
+            usuarios.criar(new UsuarioRequest(nomeDe(perfil), login, SENHA, perfil));
+        }
+        abrir("/login");
+        pagina.getByTestId("login-usuario").fill(login);
+        pagina.getByTestId("login-senha").fill(SENHA);
+        pagina.waitForNavigation(() -> pagina.getByTestId("login-entrar").click());
+        assertThat(pagina.getByTestId("menu-usuario").textContent()).isEqualTo(nomeDe(perfil));
+        Usuario usuario = repositorioDeUsuarios.findByLogin(login).orElseThrow();
+        return new UsuarioAutenticado(usuario.getId(), login, perfil);
+    }
+
+    static String nomeDe(PerfilUsuario perfil) {
+        return switch (perfil) {
+            case SOLICITANTE -> "Ana Lima";
+            case RESPONSAVEL -> "Carlos Souza";
+            case ADMINISTRADOR -> "Marta Reis";
+        };
+    }
+
+    /** Sala gravada no banco, com nome único (o banco do E2E é um só para todas as classes). */
+    RecursoResponse salaReal(String nome, boolean restrito) {
+        return recursos.criar(new RecursoRequest(TipoRecurso.SALA, nome + " " + UUID.randomUUID().toString()
+                .substring(0, 8), 30, restrito));
+    }
+
+    /** Reserva gravada pelo service (como se outra tela ou a API tivesse feito), no {@link #DIA_REAL}. */
+    ReservaResponse reservaReal(UsuarioAutenticado quem, RecursoResponse recurso, String inicio, String termino) {
+        LocalDate dia = LocalDate.parse(DIA_REAL);
+        return reservas.criar(List.of(recurso.id()), new Periodo(formato.instante(dia, LocalTime.parse(inicio)),
+                formato.instante(dia, LocalTime.parse(termino))), quem);
     }
 
     String url(String caminho) {

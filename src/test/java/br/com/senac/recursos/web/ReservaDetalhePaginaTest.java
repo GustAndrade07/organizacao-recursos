@@ -1,5 +1,7 @@
 package br.com.senac.recursos.web;
 
+import br.com.senac.recursos.enums.PerfilUsuario;
+import br.com.senac.recursos.support.ComoUsuario;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -10,6 +12,15 @@ import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.when;
+
+import br.com.senac.recursos.enums.EstadoReserva;
+import br.com.senac.recursos.exception.EntidadeNaoEncontradaException;
+import br.com.senac.recursos.service.RecursoService;
+import br.com.senac.recursos.service.ReservaService;
+import br.com.senac.recursos.support.Respostas;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.junit.jupiter.api.Test;
@@ -31,6 +42,7 @@ import org.springframework.web.bind.annotation.RequestParam;
  * {@code conflito}, {@code manutencao} ou {@code confirmacao}. O controller preenche {@code acao} com
  * {@code ?acao=alterar} ou {@code ?acao=cancelar}.
  */
+@ComoUsuario(PerfilUsuario.SOLICITANTE)
 @WebMvcTest({ReservaController.class, ReservaDetalhePaginaTest.PaginasDeTeste.class})
 @Import(ReservaDetalhePaginaTest.PaginasDeTeste.class)
 class ReservaDetalhePaginaTest {
@@ -49,6 +61,13 @@ class ReservaDetalhePaginaTest {
             reserva.put("estado", estado);
             reserva.put("iniciada", iniciada);
             return reserva;
+        }
+
+        /** O template sem {@code reserva}, com a ação pedida: não pode mostrar formulário nem diálogo. */
+        @GetMapping("/teste/reserva/sem-reserva")
+        String semReserva(@RequestParam(required = false) String acao, Model model) {
+            model.addAttribute("acao", acao);
+            return "reserva-detalhe";
         }
 
         @GetMapping("/teste/reserva")
@@ -129,6 +148,12 @@ class ReservaDetalhePaginaTest {
     @Autowired
     MockMvc mvc;
 
+    @Autowired
+    ReservaService reservas;
+
+    @Autowired
+    RecursoService recursos;
+
     private Document pagina(String caminho) throws Exception {
         String html = mvc.perform(get(caminho))
                 .andExpect(status().isOk())
@@ -139,8 +164,38 @@ class ReservaDetalhePaginaTest {
     // Rota real
 
     @Test
-    void rotaGetDetalheUsaOLayoutBaseEMostraSoTituloEVoltarSemReserva() throws Exception {
+    void rotaGetDetalheMostraAReservaQueOServiceDevolveComAlterarECancelarParaODono() throws Exception {
+        when(reservas.buscar(anyLong(), any())).thenReturn(
+                Respostas.reserva(42, 1, EstadoReserva.APROVADA, Respostas.sala(3, "Sala 203")));
+
         Document doc = pagina("/reservas/42");
+
+        assertThat(doc.selectFirst("h2[data-testid=reserva-recurso]").text()).isEqualTo("Sala 203");
+        assertThat(doc.text()).contains("12/11/2026").contains("14:00 às 15:30");
+        assertThat(doc.select("[data-testid=reserva-alterar], [data-testid=reserva-cancelar]")).hasSize(2);
+    }
+
+    @Test
+    void reservaDeOutraPessoaNaoOfereceAlterarNemCancelar() throws Exception {
+        when(reservas.buscar(anyLong(), any())).thenReturn(
+                Respostas.reserva(42, 99, EstadoReserva.APROVADA, Respostas.sala(3, "Sala 203")));
+
+        Document doc = pagina("/reservas/42?acao=cancelar");
+
+        assertThat(doc.select("[data-testid=reserva-alterar], [data-testid=reserva-cancelar], dialog")).isEmpty();
+        assertThat(doc.selectFirst("[data-testid=reserva-sem-acao]")).isNotNull();
+    }
+
+    @Test
+    void reservaQueNaoExisteResponde404() throws Exception {
+        when(reservas.buscar(anyLong(), any())).thenThrow(new EntidadeNaoEncontradaException("Reserva", 42L));
+
+        mvc.perform(get("/reservas/42")).andExpect(status().isNotFound());
+    }
+
+    @Test
+    void templateSemReservaMostraSoTituloEVoltar() throws Exception {
+        Document doc = pagina("/teste/reserva/sem-reserva");
 
         assertThat(doc.title()).isEqualTo("Detalhe da reserva · Organização de Recursos");
         assertThat(doc.select("title")).hasSize(1);
@@ -159,6 +214,7 @@ class ReservaDetalhePaginaTest {
 
     @Test
     void rotasLiteraisNaoSaoConfundidasComOId() throws Exception {
+        when(recursos.buscar(anyLong())).thenReturn(Respostas.sala(3, "Sala 203"));
         assertThat(pagina("/reservas/minhas").selectFirst("h1").text()).isEqualTo("Minhas reservas");
         assertThat(pagina("/reservas/nova").selectFirst("h1").text()).isEqualTo("Nova reserva");
     }
@@ -166,7 +222,7 @@ class ReservaDetalhePaginaTest {
     @ParameterizedTest
     @CsvSource({"alterar", "cancelar", "apagar", "''"})
     void acaoSemReservaNoModeloNaoMostraFormularioNemDialogo(String acao) throws Exception {
-        Document doc = pagina("/reservas/42?acao=" + acao);
+        Document doc = pagina("/teste/reserva/sem-reserva?acao=" + acao);
 
         assertThat(doc.select("main form, dialog, script[src*=dialogo], script[src*=reserva-form]")).isEmpty();
     }

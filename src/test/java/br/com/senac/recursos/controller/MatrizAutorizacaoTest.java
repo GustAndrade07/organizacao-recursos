@@ -1,9 +1,14 @@
 package br.com.senac.recursos.controller;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.request;
 
 import br.com.senac.recursos.enums.PerfilUsuario;
+import br.com.senac.recursos.web.sessao.UsuarioDaSessao;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import br.com.senac.recursos.enums.TipoRecurso;
 import br.com.senac.recursos.model.Usuario;
 import br.com.senac.recursos.support.ApiIntegracaoTest;
@@ -31,8 +36,10 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 /**
- * Lê {@code docs/seguranca/matriz-autorizacao.md} e confere cada célula pela API (Aula 12). A matriz é a fonte: o
- * teste não tem lista própria de permissões. Também falha se houver rota no código fora da matriz.
+ * Lê {@code docs/seguranca/matriz-autorizacao.md} e confere cada célula (Aula 12): as rotas {@code /api/**} com o token
+ * de cada perfil, e as telas com o usuário de cada perfil na sessão, como o {@code POST /login} deixa (D12, opção (a)),
+ * e todo {@code POST} de tela com o token CSRF. A matriz é a fonte: o teste não tem lista própria de permissões. Também
+ * falha se houver rota no código fora da matriz.
  */
 class MatrizAutorizacaoTest extends ApiIntegracaoTest {
 
@@ -49,6 +56,7 @@ class MatrizAutorizacaoTest extends ApiIntegracaoTest {
     private RequestMappingHandlerMapping mapeamentos;
 
     private final Map<PerfilUsuario, String> tokens = new EnumMap<>(PerfilUsuario.class);
+    private final Map<PerfilUsuario, Usuario> usuarios = new EnumMap<>(PerfilUsuario.class);
     private final Map<PerfilUsuario, Long> reservaPropria = new EnumMap<>(PerfilUsuario.class);
     private long reservaDeOutro;
     private long salaId;
@@ -58,7 +66,6 @@ class MatrizAutorizacaoTest extends ApiIntegracaoTest {
 
     @BeforeEach
     void cenario() throws Exception {
-        Map<PerfilUsuario, Usuario> usuarios = new EnumMap<>(PerfilUsuario.class);
         for (PerfilUsuario perfil : PerfilUsuario.values()) {
             usuarios.put(perfil, usuario(perfil.name().toLowerCase(), perfil));
             tokens.put(perfil, token(usuarios.get(perfil)));
@@ -110,14 +117,24 @@ class MatrizAutorizacaoTest extends ApiIntegracaoTest {
             boolean naPropria) throws Exception {
         PerfilUsuario perfil = perfilNome.equals("ANONIMO") ? null : PerfilUsuario.valueOf(perfilNome);
         long reserva = naPropria ? reservaPropria.get(perfil) : reservaDeOutro;
-        String url = rota.replace("{id}", Long.toString(rota.startsWith("/api/recursos") ? salaId : reserva))
+        boolean tela = !rota.startsWith("/api/");
+        boolean doRecurso = rota.startsWith("/api/recursos") || rota.startsWith("/admin/recursos");
+        String url = rota.replace("{id}", Long.toString(doRecurso ? salaId : reserva))
                 + (rota.equals("/api/recursos/disponiveis") || rota.startsWith("/api/relatorios") ? JANELA : "");
 
-        MockHttpServletRequestBuilder requisicao = comToken(request(metodo, url),
-                perfil == null ? null : tokens.get(perfil));
-        String corpo = corpo(metodo + " " + rota, perfil);
-        if (corpo != null) {
-            requisicao.content(corpo);
+        MockHttpServletRequestBuilder requisicao;
+        if (tela) {
+            requisicao = request(metodo, url).with(csrf());
+            if (perfil != null) {
+                requisicao.with(authentication(sessaoDe(usuarios.get(perfil))));
+            }
+            camposDaTela(metodo + " " + rota).forEach(requisicao::param);
+        } else {
+            requisicao = comToken(request(metodo, url), perfil == null ? null : tokens.get(perfil));
+            String corpo = corpo(metodo + " " + rota, perfil);
+            if (corpo != null) {
+                requisicao.content(corpo);
+            }
         }
         MockHttpServletResponse resposta = mvc.perform(requisicao).andReturn().getResponse();
         int status = resposta.getStatus();
@@ -125,6 +142,8 @@ class MatrizAutorizacaoTest extends ApiIntegracaoTest {
 
         switch (celula) {
             case "401" -> assertThat(status).as(descricao).isEqualTo(401);
+            case "login" -> assertThat(resposta.getRedirectedUrl()).as(descricao).isNotNull()
+                    .matches(destino -> status == 302 && destino.contains("/login"));
             case "403" -> assertThat(status).as(descricao).isEqualTo(403);
             case "ok" -> assertThat(status).as(descricao).isNotIn(401, 403);
             case "dono" -> assertThat(status).as(descricao).matches(s -> naPropria ? s != 401 && s != 403 : s == 403);
@@ -156,6 +175,33 @@ class MatrizAutorizacaoTest extends ApiIntegracaoTest {
                 .getResponse().getStatus()).isEqualTo(401);
         assertThat(mvc.perform(comToken(request(HttpMethod.DELETE, "/api/reservas/1"),
                 tokens.get(PerfilUsuario.ADMINISTRADOR))).andReturn().getResponse().getStatus()).isEqualTo(403);
+    }
+
+    /** O mesmo usuário que o {@code POST /login} põe na sessão. */
+    private static Authentication sessaoDe(Usuario usuario) {
+        UsuarioDaSessao daSessao = new UsuarioDaSessao(usuario.getId(), usuario.getNome(), usuario.getLogin(),
+                usuario.getPerfil(), null);
+        return UsernamePasswordAuthenticationToken.authenticated(daSessao, null, daSessao.getAuthorities());
+    }
+
+    /**
+     * Campos válidos para os formulários de tela que gravam, para a resposta refletir a autorização e não um 400. As
+     * datas são as do fuso das telas (São Paulo) e ficam em 10/11/2026, no futuro em relação ao relógio do teste.
+     */
+    private Map<String, String> camposDaTela(String chave) {
+        return switch (chave) {
+            case "POST /reservas" -> Map.of("recursoId", Long.toString(salaId), "data", "2026-11-10",
+                    "inicio", "18:00", "termino", "19:00");
+            case "POST /reservas/{id}" -> Map.of("data", "2026-11-10", "inicio", "19:00", "termino", "20:00");
+            case "POST /aprovacoes/{id}/rejeitar" -> Map.of("motivo", "Sala em obra.");
+            case "POST /admin/recursos" -> Map.of("tipo", "materiais", "nome", "Projetor");
+            case "POST /admin/usuarios" -> Map.of("nome", "Nova Pessoa", "login", "nova.pessoa",
+                    "senha", "senha-nova-123", "perfil", "SOLICITANTE");
+            case "POST /admin/recursos/{id}" -> Map.of("nome", "Sala renomeada", "capacidade", "10");
+            case "POST /admin/recursos/{id}/manutencao" -> Map.of("inicio", "2026-12-01T10:00",
+                    "fim", "2026-12-01T12:00", "confirmar", "true");
+            default -> Map.of();
+        };
     }
 
     /** Corpo válido para cada rota de escrita, para a resposta refletir a autorização e não um 400. */

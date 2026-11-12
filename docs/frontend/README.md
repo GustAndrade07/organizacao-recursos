@@ -40,11 +40,24 @@ O menu é montado a partir de dois atributos de modelo, que o back-end (RF-01) p
 | `usuario` | `nome`, `perfil` | Visitante: só a marca (login e erros 401) |
 | `menu` | lista de `id`, `rotulo`, `href`, `ativo` | Sem itens |
 
-Itens propostos por perfil (a confirmar com o Pedro): Solicitante: Buscar recursos e Minhas reservas. Responsável: Aprovações, Retirada e devolução e Relatórios. Administrador: Recursos e Relatórios.
+Itens por perfil (proposta em uso desde 12/11/2026): Solicitante: Buscar recursos e Minhas reservas. Responsável: Aprovações, Retirada e devolução e Relatórios. Administrador: Recursos e Relatórios.
 
-`Sair` é um formulário `POST /logout` (proposta, depende da decisão de autenticação). Detalhes de acessibilidade: link "Pular para o conteúdo", botão do menu com `aria-expanded`, item atual com `aria-current="page"`.
+`Sair` é um formulário `POST /logout`, atendido pelo Spring Security. Detalhes de acessibilidade: link "Pular para o conteúdo", botão do menu com `aria-expanded`, item atual com `aria-current="page"`.
 
 O teste `CssSemValoresSoltosTest` reprova cor, medida ou fonte solta em qualquer CSS de tela (só `tokens.css` pode ter valor literal).
+
+## Ligação com o back-end
+
+Desde 12/11/2026 (D12, opção (a), [ADR-0009](../adr/0009-autenticacao-das-telas.md)) as telas chamam os **mesmos services da API**, no mesmo processo (não a API por HTTP). A regra continua no service e no banco; o controller da tela só converte o formulário e monta o modelo de cada contrato abaixo.
+
+- **Quem pode abrir cada tela:** tabela "Telas" de [`docs/seguranca/matriz-autorizacao.md`](../seguranca/matriz-autorizacao.md), espelho da API, conferida por `MatrizAutorizacaoTest`. Sem sessão leva ao login; perfil sem permissão recebe a página 403; reserva de outra pessoa (posse no service) também responde 403.
+- **Menu:** `AtributosDasTelas` põe `usuario` e `menu` no modelo de toda tela (inclusive `/error`) a partir da sessão, com os itens propostos acima.
+- **Fuso:** data e hora dos formulários e das listas são de `America/Sao_Paulo` (`recursos.telas.fuso-horario`, em `FormatoDasTelas`); o banco guarda o instante em UTC.
+- **Erros de regra:** os que a tela sabe mostrar no formulário (409 de horário, manutenção, campo inválido, rejeição sem motivo, autoaprovação) voltam à própria tela; os demais viram as páginas de erro (`TratadorDeErrosDasTelas`: 403, 404, 400 e 409 na página genérica 4xx).
+- **O que o esquema ainda não guarda** (V2, área do Gustavo): localização, patrimônio, competências e motivo do bloqueio. As telas mostram "Não informado" e o que for digitado nesses campos **não é gravado**. Por isso o filtro de local da busca fica sem opções.
+- **Relatório:** horas e conflitos vêm do `RelatorioService`; a contagem de reservas por linha é feita na tela, com a regra das consultas (estados que ocupam horário, D5, e período que cruza a janela).
+- **Rotas das telas × API:** `POST /reservas/{id}` chama `alterarPeriodo` (API: `PUT /api/reservas/{id}/periodo`) e `POST /reservas/{id}/cancelar` chama `cancelar` (API: `POST /api/reservas/{id}/cancelamento`); as demais seguem a tabela da matriz.
+- **Testes:** `TelasComBancoTest` (cada tela contra PostgreSQL real, conferindo HTML e banco), `PaginaNaoEncontradaIntegracaoTest` (login com servidor real) e os E2E com `entrarComo`. Os recortes `@WebMvcTest` de contrato usam services dublês sem resposta (`support/TelasNoRecorte`) e entram com `@ComoUsuario`.
 
 ## Páginas de erro
 
@@ -56,23 +69,18 @@ O Spring escolhe o template pelo status: `templates/error/401.html`, `403.html`,
 
 ## Login
 
-`GET /login` (`LoginController`, template `login.html`) só mostra o formulário; **não autentica**. Contrato com o back-end (RF-01, ADR-0001), a confirmar com o Pedro:
+`GET /login` (`LoginController`, template `login.html`) mostra o formulário; quem autentica é o **Spring Security**, no `POST /login` da cadeia das telas (D12, opção (a), [ADR-0009](../adr/0009-autenticacao-das-telas.md), `config/SegurancaDasTelasConfig`).
 
 | O quê | Valor |
 |---|---|
-| Envio | `POST /login` com os campos `email` e `senha` (e `destino`, se houver) |
-| Falha | O back-end redireciona para `/login?erro` (basta o parâmetro existir) e a tela mostra "E-mail ou senha incorretos", sem dizer qual dos dois errou |
-| Sessão expirada (401) | O back-end leva a `/login?expirou` (basta o parâmetro existir); a tela mostra "Sua sessão expirou. Entre novamente." Se vierem `erro` e `expirou` juntos, só o aviso de credencial aparece |
-| Sucesso | Decisão do back-end (cookie ou header com o JWT e para onde redirecionar) |
+| Envio | `POST /login` com os campos `login` e `senha` (e `destino`, se houver) e o `_csrf` |
+| Falha | Volta a `/login?erro` (repetindo o `destino` na URL) e a tela mostra "Login ou senha incorretos", sem dizer qual dos dois errou. O login digitado volta por **atributo flash** (`login`), nunca na URL; a senha nunca volta |
+| Sessão expirada | Quem abre uma tela com o cookie de sessão vencido vai para `/login?expirou` (e `&destino=` no `GET`); a tela mostra "Sua sessão expirou. Entre novamente." Se vierem `erro` e `expirou` juntos, só o aviso de credencial aparece |
+| Sem sessão | Qualquer tela leva a `/login?destino=<página pedida>` (só no `GET`, só se o destino passar em `CaminhoDoSite`) |
+| Sucesso | Redireciona para o `destino` **revalidado** com `CaminhoDoSite` (o campo oculto é editável); sem destino válido, `/`, que leva à primeira tela do menu do perfil |
+| Sair | `POST /logout` (botão "Sair" do menu) encerra a sessão, apaga o cookie e volta a `/login` |
 
-| Atributo de modelo / parâmetro | Conteúdo | Sem ele |
-|---|---|---|
-| `email` (atributo de modelo) | E-mail digitado, que o back-end devolve depois de uma falha **por atributo flash** do redirect para `/login?erro` (nunca na URL, para não ir a logs e histórico). O Thymeleaf escapa o valor. A senha **nunca** volta | Campo vazio |
-| `?destino=` (parâmetro de **URL**) | Página anterior, por exemplo `/login?expirou&destino=/reservas/minhas`. O `LoginController` só põe no modelo o valor que passa em `CaminhoDoSite`; a tela o repassa no `POST /login` num campo oculto `destino`. **Quem decide o redirecionamento é o back-end** | Sem campo oculto |
-
-**`destino` vai SÓ pela URL** (`/login?...&destino=...`); **`email` vai só por flash**. Se o back-end redirecionar de volta a `/login?erro`, deve repetir o `destino` na URL, senão o usuário o perde na segunda tentativa.
-
-**O back-end DEVE revalidar o `destino` recebido no `POST /login`** com a mesma regra: o campo oculto é editável pelo cliente, então a tela não é uma barreira. Se for inválido, redirecionar para `/`.
+O campo é **Login** (`type=text`, `autocomplete=username`), não e-mail: o cadastro aceita `[a-z0-9._-]` (`UsuarioRequest`), e um `type=email` recusava esses logins no navegador.
 
 Regra de `CaminhoDoSite` (`br.com.senac.recursos.web`, usada no login e nas páginas de erro): começa com `/`; o segundo caractere não é `/` nem `\`; não tem `\` em posição nenhuma; não tem caractere de controle (TAB, LF, CR, NUL...), espaço (inclusive Unicode) nem caractere invisível; não tem `%2f`, `%5c` nem `%25` (sem diferenciar maiúsculas); no máximo 2000 caracteres; é uma URI válida, sem esquema nem autoridade. Isso fecha `/<TAB>/evil.com` (o navegador remove TAB, LF e CR e lê `//evil.com`) e `/\evil.com`. Um valor que não passa não vai ao formulário (login) nem vira link (páginas de erro, que caem em `/`). Os templates chamam a regra por `${caminhoDoSite.valido(x)}`, atributo que um `@ControllerAdvice` (`AtributosDasTelas`) põe no modelo de todas as telas, inclusive `/error`.
 
@@ -83,7 +91,7 @@ Envio: no evento `submit`, o `login.js` desabilita o botão Entrar, mostra "Entr
 
 ## Busca e resultados
 
-`GET /recursos/disponiveis` (`BuscaController`, template `busca.html`) serve as telas 4 e 5. **Não consulta disponibilidade**; contrato com o back-end (RF-03), a confirmar com o Pedro:
+`GET /recursos/disponiveis` (`BuscaController`, template `busca.html`) serve as telas 4 e 5.  Desde 12/11/2026 o controller preenche estes atributos com o back-end (ver "Ligação com o back-end"). Atributos:
 
 | Atributo de modelo | Conteúdo | Sem ele |
 |---|---|---|
@@ -99,7 +107,7 @@ Envio: no evento `submit`, o `login.js` desabilita o botão Entrar, mostra "Entr
 
 ## Nova reserva
 
-`GET /reservas/nova` (`ReservaController`, template `reserva-nova.html`) mostra o formulário preenchido com o que veio da busca (`recursoId`, `data`, `inicio`, `termino`) e envia por `POST /reservas`. **Não grava a reserva**; contrato com o back-end (RF-04 a RF-06), a confirmar com o Pedro:
+`GET /reservas/nova` (`ReservaController`, template `reserva-nova.html`) mostra o formulário preenchido com o que veio da busca (`recursoId`, `data`, `inicio`, `termino`) e envia por `POST /reservas`.  Desde 12/11/2026 o controller preenche estes atributos com o back-end (ver "Ligação com o back-end"). Atributos:
 
 | Atributo de modelo | Conteúdo | Sem ele |
 |---|---|---|
@@ -119,7 +127,7 @@ Envio: no evento `submit`, o `login.js` desabilita o botão Entrar, mostra "Entr
 
 ## Minhas reservas e detalhe
 
-Telas 7 e 8 do Solicitante (`ReservaController`, RF-04, RN-01, RN-05 e RN-07; spec 02 do Notion). **Não listam, alteram nem cancelam nada**; o controller só devolve o filtro e a ação pedida. Contrato com o back-end, a confirmar com o Pedro:
+Telas 7 e 8 do Solicitante (`ReservaController`, RF-04, RN-01, RN-05 e RN-07; spec 02 do Notion).  Desde 12/11/2026 o controller preenche estes atributos com o back-end (ver "Ligação com o back-end"). Atributos:
 
 | Rota | Template | Para quê |
 |---|---|---|
@@ -159,7 +167,7 @@ Telas 7 e 8 do Solicitante (`ReservaController`, RF-04, RN-01, RN-05 e RN-07; sp
 
 ## Recursos e bloqueio por manutenção
 
-Telas 13, 14 e 15 do Administrador (`RecursoController`, RF-02 e RF-08). O controller **só recebe os parâmetros e devolve a tela**; quem lista, grava e consulta reservas afetadas é o back-end, que responde aos `POST` e preenche o modelo. Rotas propostas, a confirmar com o Pedro.
+Telas 13, 14 e 15 do Administrador (`RecursoController`, RF-02 e RF-08). Desde 12/11/2026 o controller lista, grava e consulta as reservas afetadas pelo `RecursoService`, pelo `ManutencaoService` e pelo `ReservaService` (ver "Ligação com o back-end"; localização, patrimônio, competências e motivo ainda não são gravados).
 
 | Rota | Template | Para quê |
 |---|---|---|
@@ -221,7 +229,7 @@ O back-end pode usar DTO próprio no lugar de `FormularioRecurso`, `FormularioBl
 **Testes e JavaScript.** Os testes de contrato só conferem que cada tela carrega o seu script. O E2E em 375 px cobre o bloqueio de fim antes do início do `manutencao-form.js` (`ResponsavelEAdministradorE2ETest`); a troca de tipo do `recurso-form.js` continua sem E2E (ver "E2E em 375 px").
 ## Fila de aprovação
 
-`GET /aprovacoes` (`AprovacaoController`, template `aprovacoes.html`) é a tela 9, do Responsável (RF-07, RN-06). **Não lista nem decide pedidos**; o controller só devolve a view. Contrato com o back-end, a confirmar com o Pedro:
+`GET /aprovacoes` (`AprovacaoController`, template `aprovacoes.html`) é a tela 9, do Responsável (RF-07, RN-06).  Desde 12/11/2026 o controller preenche estes atributos com o back-end (ver "Ligação com o back-end"). Atributos:
 
 | Atributo de modelo | Conteúdo | Sem ele |
 |---|---|---|
@@ -238,7 +246,7 @@ O back-end pode usar DTO próprio no lugar de `FormularioRecurso`, `FormularioBl
 
 ## Retirada e devolução
 
-`GET /retirada-devolucao` (`RetiradaDevolucaoController`, template `retirada-devolucao.html`) é a tela 10, do Responsável (RF-09, RN-05, RN-08). **Não lista nem registra nada**; o controller devolve o filtro de estado escolhido. Contrato com o back-end, a confirmar com o Pedro:
+`GET /retirada-devolucao` (`RetiradaDevolucaoController`, template `retirada-devolucao.html`) é a tela 10, do Responsável (RF-09, RN-05, RN-08).  Desde 12/11/2026 o controller preenche estes atributos com o back-end (ver "Ligação com o back-end"). Atributos:
 
 | Atributo de modelo | Conteúdo | Sem ele |
 |---|---|---|
@@ -302,7 +310,7 @@ O E2E em 375 px prova o POST único com clique duplo nas telas 8 e 10 (botão de
 
 ## Histórico da reserva
 
-`GET /reservas/{id}/historico` (`HistoricoController`, template `historico.html`) é a tela 11, só leitura (RF-10, RN-09, RN-10). **Não lê a auditoria**; contrato com o back-end, a confirmar com o Pedro:
+`GET /reservas/{id}/historico` (`HistoricoController`, template `historico.html`) é a tela 11, só leitura (RF-10, RN-09, RN-10).  Desde 12/11/2026 o controller preenche estes atributos com o back-end (ver "Ligação com o back-end"). Atributos:
 
 | Atributo de modelo | Conteúdo | Sem ele |
 |---|---|---|
@@ -320,7 +328,7 @@ O E2E em 375 px prova o POST único com clique duplo nas telas 8 e 10 (botão de
 
 ## Relatório de utilização
 
-`GET /relatorios/utilizacao?inicio=&fim=` (`RelatorioController`, template `relatorio.html`) é a tela 12 (RF-12, RN-13; a rota já está no [PRD](../prd.md)). O controller devolve o período ao filtro e recusa fim anterior ao início. **Não calcula o relatório**; contrato com o back-end, a confirmar com o Pedro:
+`GET /relatorios/utilizacao?inicio=&fim=` (`RelatorioController`, template `relatorio.html`) é a tela 12 (RF-12, RN-13; a rota já está no [PRD](../prd.md)). O controller devolve o período ao filtro e recusa fim anterior ao início. Desde 12/11/2026 calcula com o `RelatorioService` (ver \"Ligação com o back-end\"). Atributos:
 
 | Atributo de modelo | Conteúdo | Sem ele |
 |---|---|---|
@@ -334,6 +342,27 @@ O E2E em 375 px prova o POST único com clique duplo nas telas 8 e 10 (botão de
 - `relatorio-form.js` bloqueia fim anterior ao início antes do envio, com o mesmo texto do servidor (`#relatorio-fim-erro`, sempre presente no HTML e escondido quando não há erro), e leva o foco ao campo. Sem JavaScript o servidor devolve o erro. Parâmetros vazios ou só o início não são erro.
 - Tabelas no desktop e cartões no mobile com o mesmo HTML (cada célula traz o rótulo em `data-rotulo`).
 - Acessibilidade: rótulos visíveis ligados por `for`, erro em texto junto ao campo (`role="alert"`, `aria-invalid`, `aria-describedby`), `<caption>` em cada tabela e um único `<h1>`.
+
+## Usuários (tela 16)
+
+`GET /admin/usuarios` (lista) e `GET /admin/usuarios/novo` (cadastro), templates `usuarios.html` e `usuario-form.html` (`UsuarioController`), só do Administrador (matriz). Usa o `UsuarioService`, o mesmo de `POST /api/usuarios`.
+
+| Atributo de modelo | Conteúdo | Sem ele |
+|---|---|---|
+| `usuarios` | lista de `id`, `nome`, `login` e `perfil` (por extenso), em ordem de nome | Lista vazia mostra "Nenhum usuário cadastrado" |
+| `confirmacao` | `titulo` e `texto`, depois de cadastrar (flash) | Sem aviso |
+| `usuario` | `nome`, `login`, `perfil` do formulário; **a senha nunca volta** | — |
+| `perfis` | `valor` (`SOLICITANTE`, `RESPONSAVEL`, `ADMINISTRADOR`) e `rotulo` | — |
+| `erros` | mapa de `nome`, `login`, `senha` ou `perfil` para a mensagem, na ordem do formulário | Sem erros |
+
+- As regras dos campos são as do `UsuarioRequest` da API, com as mesmas mensagens (nome até 120; login `[a-z0-9._-]{3,60}`; senha de 8 a 72; perfil obrigatório). Login repetido: "Já existe um usuário com este login." no campo.
+- A senha é `type=password` com `autocomplete="new-password"` e só é guardada como hash BCrypt pelo service.
+- Não há editar nem desativar usuário: o service ainda não tem essas operações.
+- O menu do Administrador ganhou o item "Usuários".
+
+## Link para o histórico (tela 11)
+
+"Ver histórico" aparece em cada linha da retirada e devolução (tela 10, só Responsável) e no detalhe da reserva (tela 8) quando o controller põe `verHistorico` verdadeiro, só para Responsável e Administrador (RN-11). É um link de leitura: na tela 10 ele não conta como ação, e as linhas sem transição continuam com "Sem ação disponível".
 
 ## E2E em 375 px
 

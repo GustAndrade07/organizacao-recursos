@@ -86,6 +86,10 @@
                     </div>
                     <p class="tabela__nota" th:unless="${aprovada or emUso}"
                        th:attr="data-testid='retirada-devolucao-sem-acao-' + ${reserva.id}">Sem ação disponível</p>
+                    <!--/* Histórico (tela 11): leitura, não muda o estado; aparece em toda linha com id */-->
+                    <a class="botao botao--secundario" th:if="${reserva.id != null}"
+                       th:href="@{/reservas/{id}/historico(id=${reserva.id})}"
+                       th:attr="data-testid='retirada-devolucao-historico-' + ${reserva.id}, aria-label='Ver histórico da reserva de ' + ${reserva.recurso} + ' por ' + ${reserva.solicitante}">Ver histórico</a>
                 </td>
             </tr>
             </tbody>

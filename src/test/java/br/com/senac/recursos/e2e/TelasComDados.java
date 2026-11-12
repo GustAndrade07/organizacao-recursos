@@ -1,5 +1,10 @@
 package br.com.senac.recursos.e2e;
 
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
+import org.springframework.core.annotation.Order;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.web.SecurityFilterChain;
 import br.com.senac.recursos.web.FiltrosBusca;
 import br.com.senac.recursos.web.FormularioReserva;
 import br.com.senac.recursos.web.TipoRecurso;
@@ -26,6 +31,21 @@ import org.springframework.web.server.ResponseStatusException;
 @TestComponent
 @Controller
 class TelasComDados {
+
+    /**
+     * As rotas {@code /e2e/**} só existem no teste e ficam abertas numa cadeia própria; as rotas reais das telas
+     * continuam exigindo login (D12, ADR-0009), e os testes que as usam entram pela tela de login ({@code entrarComo}).
+     */
+    @TestConfiguration(proxyBeanMethods = false)
+    static class RotasDoE2EAbertas {
+
+        @Bean
+        @Order(0)
+        SecurityFilterChain rotasDoE2E(HttpSecurity http) throws Exception {
+            http.securityMatcher("/e2e/**").authorizeHttpRequests(rota -> rota.anyRequest().permitAll());
+            return http.build();
+        }
+    }
 
     static final LocalDate DIA = LocalDate.of(2026, 11, 12);
 
