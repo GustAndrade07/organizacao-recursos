@@ -35,3 +35,5 @@
 - (1) Sem limite de tentativas no login: risco no relatório de qualidade.
 - (2) Cookie de sessão: agora com `HttpOnly` e `SameSite=Lax` (`application.yml`) e teste em `PaginaNaoEncontradaIntegracaoTest`; `Secure` por `SESSAO_COOKIE_SEGURO=true`.
 - (3) Sem `test(red)`: desvio de processo no relatório, seção 5.
+
+**DEF-002 (12/11/2026, CI do PR #51).** `ReservaDetalhePaginaTest` ficou vermelho às 17:00 UTC: o recorte usava o relógio real e a reserva de exemplo (12/11/2026) passou a ter começado. Corrigido com `Clock` fixo nos recortes de tela (`support/TelasNoRecorte`); regra 14 nova no `AGENTS.md`. O defeito entrou no PR #48 e afeta a `main` até este PR ser mesclado. `./mvnw -B verify` depois da correção, às 18:20 UTC: 1085 testes, 0 falhas, 0 ignorados.

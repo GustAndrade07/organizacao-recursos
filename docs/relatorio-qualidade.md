@@ -67,6 +67,7 @@
 | Defeito | Severidade | Situação | Correção | Regressão |
 |---|---|---|---|---|
 | [DEF-001](defeitos/DEF-001.md): Quality Gate da `main` reprovado (Reliability C) por páginas de erro sem `<title>` | Alta (pipeline vermelho é limitador de nota) | **Corrigido** (PR #32, 09/11/2026); Quality Gate da `main` de volta a Passed, conferido na API pública do SonarCloud em 09/11/2026 (spec principal do Notion) | `fix(DEF-001): páginas de erro declaram title e lang` | `TemplatesComTituloTest`, que varre todos os templates (regra 10 do `AGENTS.md`) |
+| [DEF-002](defeitos/DEF-002.md): teste de tela dependia do relógio real e ficou vermelho depois do horário da reserva de exemplo (12/11/2026, 17:00 UTC) | Alta (`verify` vermelho na `main` e nos PRs é limitador de nota) | **Corrigido** no PR #51, 12/11/2026 | `fix(DEF-002): relógio fixo nos recortes de tela` | Todos os recortes de tela com `Clock` fixo (`support/TelasNoRecorte`), conferido rodando a suíte depois do horário da reserva |
 
 **Totais:** 1 defeito registrado. Alta: 1 corrigido. Média: 0. Baixa: 0. Abertos: 0.
 
