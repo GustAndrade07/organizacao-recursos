@@ -1,13 +1,20 @@
 package br.com.senac.recursos.config;
 
+import br.com.senac.recursos.service.TentativasDeLogin;
+import br.com.senac.recursos.web.sessao.LoginComLimite;
 import br.com.senac.recursos.web.sessao.PortaDeEntradaDasTelas;
 import br.com.senac.recursos.web.sessao.ResultadoDoLogin;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 /**
@@ -23,6 +30,9 @@ import org.springframework.security.web.SecurityFilterChain;
  *       {@code ?destino=} com a página pedida).</li>
  *   <li>Perfil sem permissão: 403, a página {@code error/403.html}.</li>
  *   <li>{@code POST /logout} encerra a sessão, apaga o cookie e volta ao login.</li>
+ *   <li>{@code POST /login} com limite de tentativas ({@link TentativasDeLogin}, ressalva 1 do PR #48): 5 falhas do
+ *       mesmo login em 15 minutos bloqueiam esse login por 15 minutos, com a mesma resposta de uma senha errada. O
+ *       contador é o mesmo do login da API (bean em {@code SegurancaConfig}).</li>
  * </ul>
  */
 @Configuration(proxyBeanMethods = false)
@@ -34,8 +44,16 @@ public class SegurancaDasTelasConfig {
 
     @Bean
     @Order(2)
-    SecurityFilterChain cadeiaDasTelas(HttpSecurity http) throws Exception {
+    SecurityFilterChain cadeiaDasTelas(HttpSecurity http, ObjectProvider<UserDetailsService> usuarios,
+            PasswordEncoder senhas, TentativasDeLogin tentativas) throws Exception {
+        // Buscado só no POST /login: os recortes @WebMvcTest não têm o UsuariosDaTela (entram com @ComoUsuario).
+        UserDetailsService usuariosDaTela = login -> usuarios.getObject().loadUserByUsername(login);
+        DaoAuthenticationProvider loginESenha = new DaoAuthenticationProvider(usuariosDaTela);
+        loginESenha.setPasswordEncoder(senhas);
         http
+                // Gerenciador próprio e sem pai: com o global como pai, a recusa por bloqueio seria tentada de novo
+                // no pai, e a senha certa entraria durante o bloqueio (ver LoginComLimite).
+                .authenticationManager(new ProviderManager(new LoginComLimite(loginESenha, tentativas)))
                 .authorizeHttpRequests(rota -> rota
                         // páginas de erro, arquivos estáticos e o health check (fora da matriz)
                         .requestMatchers("/error", "/error/**", "/css/**", "/js/**", "/img/**", "/favicon.ico",

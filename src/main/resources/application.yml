@@ -36,6 +36,11 @@ server:
 
 recursos:
   seguranca:
+    login:
+      # Limite de tentativas do login (ressalva 1 do PR #48, ADR-0009), telas e API com um contador só: este número de
+      # falhas do mesmo login dentro da duração abaixo bloqueia esse login pela mesma duração. Em memória (uma instância).
+      tentativas: ${LOGIN_TENTATIVAS:5}
+      bloqueio: ${LOGIN_BLOQUEIO:PT15M}
     jwt:
       # Segredo HS256 com no mínimo 32 bytes, só por variável de ambiente (AGENTS.md, seção 7).
       # Vazio: a aplicação gera um segredo aleatório a cada start (tokens antigos deixam de valer).
