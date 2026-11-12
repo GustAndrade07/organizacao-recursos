@@ -80,3 +80,43 @@ Demais riscos do Spring Framework 6.2.19 (`spring-web`, `spring-beans`, `spring-
 - **Decisão:** **aceito com justificativa**, responsável Gustavo. Revisão: se sair `jaxb-core` 4.0.10 ou superior (subir por `glassfish-jaxb.version` no `pom.xml`), ou se alguma rota passar a aceitar XML.
 - **Alternativa não adotada:** excluir `jaxb-runtime` do `hibernate-core` tiraria a biblioteca do runtime, mas mexe na subida do Hibernate a dois dias da entrega. Não foi testada (não medido).
 - **Painel na mesma leitura (branch `main`, análise mais recente; commit da análise não conferido):** **22 riscos abertos em 141 dependências**, 0 Critical, 1 High (este), 4 Medium (`commons-compress` 1.24.0 ×2 e `json-smart` 2.5.2, todos de teste; `spring-data-jpa` 3.5.13), 3 Low e 14 sem nota ("Unscored (pending)"). Subiu de 19 em 123 (seção 6) porque o back-end (PR #44) trouxe o Spring Security 6.5.11: 3 riscos novos, ainda sem nota (`spring-security-oauth2-jose` CVE-2026-41707, `spring-security-crypto` CVE-2026-47842, `spring-security-core` CVE-2026-59276). Esses 3 **não foram avaliados**.
+
+## 8. Spring Security 6.5.11: 3 riscos avaliados em 12/11/2026 (Gustavo)
+
+**Fontes:**
+- Painel "Dependency risks" do SonarCloud, logado, branch `main`, lido em 12/11/2026: abas "What's the risk?", "Where is it?" e "How can I fix it?".
+- `maven-metadata.xml` de `org.springframework.security:spring-security-core` no Maven Central, lido em 12/11/2026 (`lastUpdated` 22/10/2026).
+- Bytecode dos jars 6.5.11 do repositório Maven local (`javap`).
+- `git grep` em `src/` na `main` (`2610d6a`).
+
+**Por onde entram:** os três são transitivos, de escopo compile, por `spring-boot-starter-oauth2-resource-server` 3.5.16 → Spring Security 6.5.11. A API usa esse starter para o JWT (ADR-0001).
+
+**Versão corrigida:** só na linha 7.x (a mais próxima é a 7.0.7; a mais nova, a 7.1.2). No Maven Central, a última 6.5.x publicada é a **6.5.11**, a que usamos. Subir para a 7.x exige o Spring Boot 4 (Spring Framework 7), uma migração grande demais para a véspera da entrega (não testada).
+
+| CVE | Pacote | O que é | CVSS | EPSS | Por que não nos atinge (ou o que falta saber) |
+|---|---|---|---|---|---|
+| CVE-2026-41707 | `spring-security-oauth2-jose` | Replay de prova DPoP: o cache de `jti` do `DPoPProofJwtDecoderFactory` tem tamanho fixo, e quem inunda o servidor consegue expulsar entradas e reusar uma prova DPoP interceptada (CWE-294) | 7,4 High | 0,39% | **Não atinge.** Detalhe abaixo da tabela. |
+| CVE-2026-47842 | `spring-security-crypto` | `AesBytesEncryptor` com o construtor de dois argumentos (ou gerador de IV nulo) em CBC cifra com vetor de inicialização zerado (CWE-326) | 6,5 Medium | 0,15% | **Não atinge.** O projeto não usa `Encryptors` nem nenhum `*BytesEncryptor`/`TextEncryptor` (0 ocorrências em `src/`). Do `crypto`, usa só o `BCryptPasswordEncoder`. |
+| CVE-2026-59276 | `spring-security-core` | Comparações de valores sensíveis com `String.equals()`, que termina no primeiro caractere diferente e deixa o tempo de resposta vazar quanto do valor bate (CWE-208) | 5,9 Medium | 0,33% | **Provavelmente não atinge; não verificado.** Detalhe abaixo da tabela. |
+
+**Por que o CVE-2026-41707 não nos atinge:**
+- O suporte a DPoP liga **sozinho** no resource server: o `OAuth2ResourceServerConfigurer` 6.5.11 aplica o `DPoPAuthenticationConfigurer` quando a classe `DPoPProofJwtDecoderFactory` está no classpath, o que foi conferido no bytecode. Ou seja, o código vulnerável roda.
+- Mas o `DPoPAuthenticationProvider` só aceita um token de acesso que tenha o claim `cnf.jkt` ("jkt claim is required"), e o nosso `TokenService` emite JWT HS256 sem `cnf`.
+- Resultado: toda requisição DPoP é recusada antes de o replay importar, e não existe prova DPoP válida emitida para ser interceptada.
+
+**O que falta saber sobre o CVE-2026-59276:**
+- A descrição não diz quais componentes do Spring Security fazem a comparação vulnerável.
+- O que usamos de sensível:
+  - o token CSRF das telas;
+  - a assinatura HS256 do JWT, verificada pela biblioteca Nimbus, não pelo Spring;
+  - o BCrypt.
+- **Não foi conferido** se algum desses passa pelo código afetado. Um ataque de tempo pela rede, com a variação normal de latência, é difícil, o que combina com a nota Medium.
+
+Nenhum dos três está na lista KEV de exploração conhecida. Na mesma leitura, o painel mostrava os três com severidade de impacto "Low" e "Reachability: Not analyzed".
+
+**Decisão:** os três ficam **aceitos com justificativa**.
+- Responsável: Gustavo.
+- Revisão: quando sair uma 6.5.12 (o Spring Boot 3.5.x a traz pelo BOM) ou quando o projeto migrar para o Spring Boot 4.
+- O CVE-2026-59276 fica marcado como **não verificado** até alguém conferir os componentes afetados.
+- A marcação **Accepted** no painel do SonarCloud ainda não foi feita (ação manual do Gustavo, como nas seções 6 e 7).
+- Esses três riscos entram como risco residual em `docs/decisao-qualidade.md`, do Leandro.
