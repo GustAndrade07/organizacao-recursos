@@ -29,9 +29,9 @@ Resumo (detalhes e diagramas C4 em [`docs/arquitetura.md`](../arquitetura.md), s
 | [0001](../adr/0001-login-jwt.md) | Login com JWT | aceito |
 | [0002](../adr/0002-anti-reserva-dupla.md) | Reserva dupla barrada por `EXCLUDE USING gist` no banco | aceito |
 | [0003](../adr/0003-thymeleaf.md) | Thymeleaf no mesmo projeto | aceito |
-| [0005](../adr/0005-notificacao-cliente-http-isolado.md) | Notificação por cliente HTTP isolado | proposto |
-| [0006](../adr/0006-flyway-dono-do-esquema.md) | Flyway como único dono do esquema | proposto |
-| [0007](../adr/0007-modelagem-protecao-reserva-dupla.md) | Uma constraint para recurso e professor, estado copiado por FK composta, trava por recurso | proposto (D6 e D7; a confirmar com o Pedro) |
+| [0005](../adr/0005-notificacao-cliente-http-isolado.md) | Notificação por cliente HTTP isolado | aceito em 12/11/2026 (OK do Pedro; proposto quando este ciclo foi escrito) |
+| [0006](../adr/0006-flyway-dono-do-esquema.md) | Flyway como único dono do esquema | aceito em 12/11/2026 (OK do Pedro; proposto quando este ciclo foi escrito) |
+| [0007](../adr/0007-modelagem-protecao-reserva-dupla.md) | Uma constraint para recurso e professor, estado copiado por FK composta, trava por recurso | aceito em 12/11/2026 (D6 e D7, OK do Pedro; proposto quando este ciclo foi escrito) |
 
 O que **existe no código** da `main` (conferido em 09/11/2026 em `a6d6374`): a V1 do banco e seus testes, as consultas do relatório e os testes de auditoria no nível do banco, as telas Thymeleaf (em `src/main/java` só há controllers de tela, sem lógica de reserva), o `verify` no CI e a checagem de migração imutável no CI. O que **não existe**: serviço de reserva, API REST, autenticação JWT, auditoria no serviço, endpoint do relatório. Toda conclusão sobre esses itens é, portanto, **sobre o desenho**, não sobre código.
 
@@ -180,7 +180,7 @@ O trade-off decisivo do ciclo é **T1**: a decisão que protege o limitador de m
 
 - Escrito por uma pessoa, sem sessão com os outros dois integrantes: os "dono" da seção 8 são **proposta**.
 - Os cenários C2, C3 e C5 não têm medição; C1 e C4 têm medição **só no nível do banco**, em **uma máquina**, e fora do CI.
-- Os ADRs 0005, 0006 e 0007 estão como "proposto"; este ciclo não os aceita. Eles só viram "aceito" na revisão dos PRs.
+- Os ADRs 0005, 0006 e 0007 estavam como "proposto" quando este ciclo foi escrito; este ciclo não os aceita. Viraram "aceito" em 12/11/2026, com o OK do Pedro.
 - As fontes 3 e 5 entraram na `main` com o PR #33 (merge em 09/11/2026); os links agora valem na `main`. As medições citadas continuam sendo as de 07/11/2026, só na máquina do Gustavo: o merge não as repetiu no CI.
 
 ## 10. Fontes

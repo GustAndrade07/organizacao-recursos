@@ -26,4 +26,4 @@
 ## Pendências e divisão
 (preencher: ordem de prioridade e quem pega cada uma)
 
-Decisões do grupo que travam itens acima (seção 9 do plano, pendentes; a D12, autenticação das telas, foi decidida em 12/11/2026 pela opção (a), ADR-0009): D8 (premissas do relatório, RF-12), D9 (quando o Solicitante altera e cancela, RF-04), D10 (estado inicial e limites de perfil, RF-07), D11 (manutenção sobre reservas existentes, RF-08), D13 (RN-04 consulta e depois grava, RF-08).
+Decisões do grupo que travam itens acima (seção 9 do plano, pendentes; decididas em 12/11/2026: a D12, autenticação das telas, pela opção (a), ADR-0009, e a D13, RN-04 consulta e depois grava, com o risco aceito, ADR-0008): D8 (premissas do relatório, RF-12), D9 (quando o Solicitante altera e cancela, RF-04), D10 (estado inicial e limites de perfil, RF-07) e D11 (manutenção sobre reservas existentes, RF-08).

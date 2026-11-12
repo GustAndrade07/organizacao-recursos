@@ -1,0 +1,1 @@
+- D13 decidida: o risco da recusa por manutenção ser "consulta e depois grava" fica aceito e registrado (ADR-0008); ADR-0005, ADR-0006 e ADR-0007 aceitos.

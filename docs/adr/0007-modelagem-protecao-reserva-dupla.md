@@ -1,5 +1,5 @@
 # ADR-0007 — Modelagem da proteção contra reserva dupla: uma constraint, estado copiado e trava por recurso
-- **Status:** proposto (decisões D6 e D7 do Gustavo em 06/11/2026; a validar com o Pedro, que escreve o serviço). Em 11/11/2026: este ADR e a V1 entraram pelo PR #28 e o serviço do PR #44 grava sobre esse modelo, mas o Pedro ainda não confirmou D6 e D7 por escrito; vira "aceito" quando ele confirmar)
+- **Status:** aceito (decisões D6 e D7 do Gustavo em 06/11/2026; OK do Pedro, que escreve o serviço, em 12/11/2026). Este ADR e a V1 entraram pelo PR #28 e o serviço do PR #44 grava sobre esse modelo
 - **Contexto:** o [ADR-0002](0002-anti-reserva-dupla.md) decidiu que a reserva dupla é barrada por uma constraint de exclusão no banco, parcial pelo estado da reserva (D5), com intervalo semiaberto (D1), e deixou três pontos para a migração V1: como cobrir recurso **e** professor, como o predicado enxerga o estado da reserva (que fica em outra tabela) e a tabela das tentativas recusadas (D2). Na V1 apareceu um quarto ponto, achado ao rodar os 20 pedidos simultâneos: deadlock. Este ADR **não substitui** o ADR-0002; completa o que ele deixou para a V1.
 - **Decisão:**
   1. **Professor é recurso** (`recurso.tipo = 'PROFESSOR'`, como já dizia a spec do Banco) e há **uma única** constraint `reserva_recurso_sem_sobreposicao`: `EXCLUDE USING gist (recurso_id WITH =, periodo WITH &&) WHERE (estado IN ('SOLICITADA','APROVADA','EM_USO','CONCLUIDA'))`. Uma reserva de sala com docente grava **duas linhas** em `reserva_recurso` (sala e professor) na mesma transação; qualquer violação desfaz tudo. (D6)
@@ -26,6 +26,6 @@
 - **Pendências:**
   - **Para o Pedro (serviço de reserva):** gravar as linhas de `reserva_recurso` de uma reserva em ordem crescente de `recurso_id` (evita duas reservas se travarem em ordem oposta); traduzir `23P01` em 409; tratar `40P01` como defesa (nova tentativa ou 409), embora a trava deva evitá-lo; gravar a tentativa recusada em transação própria. O teste de API (409 de ponta a ponta) é dele e **não existe**.
   - **Ponto em aberto:** impor no banco que as linhas da mesma reserva tenham o mesmo período (hoje é regra do serviço).
-  - **D6 e D7** estão na seção 9 do [plano](../plano-execucao.md), decididas pelo Gustavo em 06/11/2026 e **a confirmar com o Pedro**.
+  - **D6 e D7** estão na seção 9 do [plano](../plano-execucao.md), decididas pelo Gustavo em 06/11/2026, com OK do Pedro em 12/11/2026.
   - A extensão `btree_gist` fora da imagem `postgres:16` continua **não conferida** ([ADR-0006](0006-flyway-dono-do-esquema.md)).
 - **Fonte:** `src/main/resources/db/migration/V1__nucleo_da_reserva.sql`, `src/test/java/br/com/senac/recursos/banco/`, [ADR-0002](0002-anti-reserva-dupla.md), [ADR-0006](0006-flyway-dono-do-esquema.md), `docs/plano-execucao.md` (seção 9), `docs/prd.md` (RN-02, RN-03, RN-05, RF-12). Medições: execuções do `mvnw` de 06/11/2026 na máquina do Gustavo; não há `.jtl` nem run de CI com esses números.
