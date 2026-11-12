@@ -1,0 +1,1 @@
+- Segurança: `jaxb-core` 4.0.9 (CVE-2026-92877, High) avaliado e aceito com justificativa; sem versão corrigida e o projeto não lê XML.
