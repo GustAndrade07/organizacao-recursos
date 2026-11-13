@@ -28,7 +28,7 @@ Este é o ponto de entrada do professor: cada linha diz **qual evidência existe
 | BDD (cenários) | [bdd-aprovacao-bloqueio.md](../testes/bdd-aprovacao-bloqueio.md) | na `main`; `.feature` (Cucumber) **não existe** |
 | Mutação manual das regras críticas | [mutacao-manual.md](../testes/mutacao-manual.md) | na `main`, seção do banco |
 | Evidência de TDD (commits `test(red)` → `feat(green)` → `refactor`) | `docs/testes/evidencia-tdd.md` | **não existe** |
-| Concorrência (20 pedidos → 1 aceito, 19 recusados, contagem no banco) | `ConcorrenciaReservaBancoTest` (banco, na `main`); `ConcorrenciaReservaApiTest` (HTTP, PR #44) | nível banco na `main`; nível API em PR aberto |
+| Concorrência (20 pedidos → 1 aceito, 19 recusados, contagem no banco) | `ConcorrenciaReservaBancoTest` (banco); `ConcorrenciaReservaApiTest` (HTTP) | os dois na `main`; API no run 43302104277 e vermelho com a mutação M1 (12/11/2026) |
 | Matriz de autorização (teste parametrizado) | `docs/seguranca/matriz-autorizacao.md` e `MatrizAutorizacaoTest` | no PR #44 (Pedro), ainda não na `main` |
 | E2E em 375 px (Playwright) | `docs/evidencias/e2e-375/` | no PR #42 (Leandro), ainda não na `main` |
 

@@ -2,7 +2,7 @@
 
 Plano de execução, Etapa 5 [Aula 12]: quebrar cada regra crítica de propósito, ver o teste falhar e desfazer a quebra com `git restore`. Teste que continua verde com a regra quebrada é lacuna: escrever o teste que falta. **Nenhuma mutação pode sobrar no código.**
 
-Este arquivo tem a seção do banco (Gustavo, 07/11/2026) e a **seção do serviço** (13/11/2026): aprovação, manutenção, autorização e auditoria, que eram as regras pendentes.
+Este arquivo tem a seção do banco (Gustavo, 07/11/2026), a M1 repetida no nível da API (Pedro, 12/11/2026, seção "Mutações do back-end") e a **seção do serviço** (13/11/2026): aprovação, manutenção, autorização e auditoria, que eram as regras pendentes.
 
 ## Como foi medido (vale para todas as linhas)
 
@@ -72,6 +72,23 @@ Não estão entre as seis regras, mas servem para provar que os valores calculad
 
 Não mutei ainda `relatorio-carga-por-professor.sql` nem `relatorio-conflitos-evitados.sql` (não medido): têm teste próprio, mas sem rodada de mutação.
 
+## Mutações do back-end
+
+### M1 no nível da API — 20 pedidos HTTP sem a constraint de exclusão
+
+- **Data e máquina:** 12/11/2026, máquina do Pedro (Windows 11, OpenJDK 21.0.13, Docker Desktop 29.9.3, PostgreSQL 16.15 em Testcontainers). **Medido só nesta máquina; não generalizar.**
+- **Base:** `main` no commit `986e1cd`.
+- **Comando:**
+
+```powershell
+.\mvnw.cmd -B test "-Dtest=ConcorrenciaReservaApiTest" "-Djacoco.skip=true"
+```
+
+- **Linha de base, sem mutação:** 10 testes, 0 falhas, 0 erros, 0 ignorados.
+- **Quebra:** a mesma da M1 do banco: em `V1__nucleo_da_reserva.sql`, o predicado da constraint `reserva_recurso_sem_sobreposicao` trocado por `WHERE (false)`. A migração alterada nunca foi commitada: `git restore` logo depois da rodada e `git status --short` vazio.
+- **Resultado:** **10 de 10 vermelhos** (`vintePedidosParaAMesmaSalaGeramUmaReserva` e `vintePedidosParaOMesmoProfessorEmSalasDiferentesGeramUmaReserva`, 5 rodadas cada). Em todas as rodadas, as 20 respostas foram 201 (`{201=20}` em vez de `{201=1, 409=19}`).
+- **Conclusão:** o serviço não tem checagem própria de sobreposição; de ponta a ponta, quem barra a reserva dupla é o banco, e o teste de API pega a falta da constraint.
+- **CI:** o `ConcorrenciaReservaApiTest` faz parte do `verify`; o run 43302104277 (`main`, `986e1cd`) terminou verde. O log por teste não foi aberto (pede login).
 ## Mutações do serviço (aprovação, manutenção, autorização e auditoria)
 
 > Feitas em **13/11/2026** pelo Leandro (com IA) na área do Pedro, com o OK do Leandro; Pedro revisa. Fecham a lacuna 6 do plano: até aqui, aprovação, manutenção e autorização estavam como "pendente (Pedro)".
