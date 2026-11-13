@@ -41,7 +41,7 @@
 - o painel de dependências do SonarCloud, que exige login e não foi relido;
 - o clone limpo (lacuna 11).
 
-**Depende do PR #56:** as linhas de RNF-01 e RNF-03 citam arquivos de `perf/` e `docs/performance/` que entram com ele. A ordem de merge é o #56 primeiro; depois, merge da `main` nesta branch.
+**Dependia do PR #56** (mergeado em 13/11/2026; a `main` foi juntada nesta branch, com o conflito da `docs/rtm.md` resolvido pela recontagem deste PR): as linhas de RNF-01 e RNF-03 citam arquivos de `perf/` e `docs/performance/` que entram com ele. A ordem de merge é o #56 primeiro; depois, merge da `main` nesta branch.
 
 **Specs atualizadas:** Notion, spec principal (KPI "Requisitos com teste citado", critério de aceite da RTM e riscos), 12/11/2026.
 
