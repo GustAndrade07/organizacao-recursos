@@ -48,10 +48,10 @@ Em ordem de prioridade, primeiro o que bloqueia a tag `v1.0.0-rc1` (entrega em 1
 
 | # | Pendência | Bloqueia a tag? | Quem pega | Situação em 12/11/2026, noite |
 |---|---|---|---|---|
-| 1 | Clone limpo seguindo só o README e `docs/entrega/checklist.md` (lacuna 11). É o único limitador sem prova: "aplicação executa" | Sim | Leandro ou Pedro (quem não escreveu o README) | Roteiro pronto em `docs/entrega/roteiro-clone-limpo.md`; não executado |
-| 2 | `docs/decisao-qualidade.md` (lacuna 2): decisão, critérios com evidência, riscos aceitos e quem fez o quê | Sim | Leandro | Não existe; depende deste relatório e da RTM |
+| 1 | Clone limpo seguindo só o README e `docs/entrega/checklist.md` (lacuna 11). É o único limitador sem prova: "aplicação executa" | Sim | Leandro ou Pedro (quem não escreveu o README) | Roteiro em `docs/entrega/roteiro-clone-limpo.md`. Rodada feita **pela IA** em 13/11/2026 (PR #60, `9acbbcd`): verde. **Falta a rodada humana** (Pedro) |
+| 2 | `docs/decisao-qualidade.md` (lacuna 2): decisão, critérios com evidência, riscos aceitos e quem fez o quê | Sim | Leandro | Mergeada no PR #59 e atualizada em 13/11/2026; faltam as declarações dos integrantes e a conferência no commit da tag |
 | 3 | Números no commit da tag: refazer a seção 4 do relatório e o run da RTM no commit que receber a tag | Sim | Leandro (com o Gustavo, que faz a tag) | Números de `6ce4478` neste PR |
-| 4 | Merge do PR #56 (carga JMeter, lacuna 1) | Sim | Pedro (revisão) | Aberto, aguardando revisão |
+| 4 | Merge do PR #56 (carga JMeter, lacuna 1) | Sim | Pedro (revisão) | Mergeado em 13/11/2026 |
 | 5 | D4: perguntar ao professor se "0 vulnerabilidades críticas" vale pelo CVSS das dependências ou pelo Quality Gate | Não, mas muda a decisão de qualidade | Gustavo | Pergunta pessoalmente na Aula 14 (13/11) |
 | 6 | Decisões pendentes D8 (relatório) e D9 (alterar e cancelar). D10 (estado inicial e limites de perfil) e D11 (manutenção sobre reservas existentes) decididas em 12/11/2026 no PR #58: "fica como está no código" | Não: o código segue a proposta, testada | Grupo (Pedro propõe) | Pendentes desde 11/11; se não forem decididas, entram como premissa na decisão de qualidade |
 | 7 | BDD executável com Cucumber e `docs/testes/evidencia-tdd.md` (lacuna 4) | Não, mas pesa em "qualidade dos testes" | Pedro | Feito em 13/11/2026 (PR #61): 13 cenários Cucumber no `verify` e `docs/testes/evidencia-tdd.md` |
@@ -59,7 +59,7 @@ Em ordem de prioridade, primeiro o que bloqueia a tag `v1.0.0-rc1` (entrega em 1
 | 9 | `docs/testes/plano-tdd.md` (lacuna 7) e OpenAPI do RF-14 (lacuna 8) | Não | Pedro | Feitos em 13/11/2026 (PR #61): `plano-tdd.md` e OpenAPI com `OpenApiDocumentacaoTest` |
 | 10 | RF-11 (notificação com WireMock) | Não (risco aceito se ficar de fora) | Pedro | Fora desta entrega: risco aceito (ver `docs/decisao-qualidade.md`) |
 | 11 | RN-08: conferir a auditoria do cancelamento e do não comparecimento em teste | Não | Pedro | Feito em 13/11/2026 (PR #61): `AuditoriaDeCadaTransicao`, 4 testes |
-| 12 | Perguntas da prova oral (4 de 15) e ensaio (lacuna 12) | Não (Semana 47) | Todos | Não começado |
+| 12 | Perguntas da prova oral e ensaio (lacuna 12) | Não (Semana 47) | Todos | Perguntas: 15 de 15 (PR #62, 13/11/2026). **Ensaio cronometrado não feito** (humano) |
 | 13 | Pedro confirmar a mudança no `AutenticacaoService` feita pelo Leandro no PR #52 (pendência da aprovação do Gustavo) | Não | Pedro | Aguardando |
 
 Decisões já tomadas em 12/11/2026: D12 (autenticação das telas, opção (a), ADR-0009) e D13 (RN-04 "consulta e depois grava", risco aceito, ADR-0008).
