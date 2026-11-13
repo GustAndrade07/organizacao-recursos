@@ -102,7 +102,7 @@ class RodapeNosTemplatesTest {
         Document layout = ler(TEMPLATES.resolve("layout.html"));
         assertThat(layout.selectFirst("footer").html()).contains("${@rodapeDoSite.ano()}");
 
-        Pattern anoFixo = Pattern.compile("©\\s*(?:&copy;)?\\s*\\d{4}");
+        Pattern anoFixo = Pattern.compile("(?:©|&copy;)\\s?\\d{4}");
         List<String> comAnoFixo = new ArrayList<>();
         for (Path template : todosOsTemplates()) {
             if (anoFixo.matcher(Files.readString(template, StandardCharsets.UTF_8)).find()) {
