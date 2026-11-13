@@ -52,10 +52,10 @@ No bullet do back-end (PR #44), "ADR-0008, proposto" virou "ADR-0008, aceito no 
 - **Migração V2:** não entra antes da tag; fica como risco aceito (risco 6 de `docs/decisao-qualidade.md`). A V2 completa pode sair como `v1.0.0-rc2` antes da prova oral. Registrada na caixa das entidades (Etapa 3) do plano.
 - **Declaração do Gustavo** escrita na seção 4 de `docs/decisao-qualidade.md`. O arquivo é do Leandro; a edição foi combinada com ele e mexe só na linha do Gustavo.
 - **Commits com autor "Claude" na `main`:** não serão corrigidos. Reescrever a `main` exigiria force push (bloqueado pelo ruleset), mudaria hashes citados nos documentos e quebraria o histórico red → green. **Achado:** são **8**, não 7 — além dos 2 de 04/11 (`3ae747c`, `07606da`) e dos 5 do PR #52 (`cd14f8c`, `e86c777`, `f0777de`, `5c13534`, `eb6ad27`), há o `2c6c8f6` (09/11, merge de `origin/main` no PR #32). Conferido com `git log origin/main --author=noreply@anthropic.com`. A contagem "7" em `docs/decisao-qualidade.md` (seção 4) e em `docs/relatorio-qualidade.md` (seção 5) é do Leandro corrigir.
-
+- **D4:** decidida pelo grupo com a leitura mais rígida (duas medições separadas; os 2 Critical do `spring-webmvc` como risco residual aceito, responsável Gustavo). Registrada na linha da D4 (seção 9 do plano). A condição 3 da seção 1 de `docs/decisao-qualidade.md` ("pergunta na Aula 14") é do Leandro atualizar.
 - **SonarCloud (logado, 13/11/2026):** painel "Dependency risks" lido (54 riscos em 174 dependências; nenhum das dependências novas, então nada a marcar); comentário novo no CVE-2026-59276 com o veredito "não atinge" (continua Accepted); gate da `main` Passed. Registrado em `docs/seguranca/riscos-dependencias.md`, seções 8.1 e 9.
 
 ## Pendências manuais do Gustavo (fora deste PR)
-- [ ] D4: registrar a decisão (texto a combinar; hoje o plano e a decisão de qualidade dizem "pergunta na Aula 14").
 - [ ] Pedir ao Leandro para corrigir "7" → "8" commits com autor "Claude" em `docs/decisao-qualidade.md` e `docs/relatorio-qualidade.md` (incluir o `2c6c8f6`).
+- [ ] Pedir ao Leandro para trocar, na condição 3 da seção 1 de `docs/decisao-qualidade.md`, "pergunta na Aula 14" pela D4 decidida (leitura rígida; risco 1 aceito).
 - [ ] Tag anotada `v1.0.0-rc1` só depois do clone limpo humano (Pedro) e com CI e SonarCloud verdes no commit da tag.
