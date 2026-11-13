@@ -1,0 +1,1 @@
+- Decisão de qualidade da `v1.0.0-rc1` em `docs/decisao-qualidade.md`: liberar com ressalvas, condicionada ao clone limpo (se não passar, bloquear); critérios com evidência, 11 riscos aceitos com impacto, motivo e responsável, o que cada integrante fez e o limite do que foi provado.

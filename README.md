@@ -20,15 +20,16 @@ Cucumber entrou em 13/11/2026: os cenários de `docs/testes/bdd-aprovacao-bloque
 git clone https://github.com/GustAndrade07/organizacao-recursos.git
 cd organizacao-recursos
 docker compose up -d          # PostgreSQL 16 em localhost:5432
-./mvnw spring-boot:run        # aplicação em http://localhost:8080
+ADMIN_LOGIN=admin ADMIN_SENHA='<escolha uma senha>' ./mvnw spring-boot:run   # http://localhost:8080
 ```
 Conferir que subiu: abrir http://localhost:8080/actuator/health (deve responder `{"status":"UP"}`).
 No Windows (PowerShell) use `.\mvnw.cmd` no lugar de `./mvnw`.
 
+**Por que as duas variáveis:** o banco começa vazio e o cadastro de usuário exige um Administrador. `ADMIN_LOGIN` e `ADMIN_SENHA` criam o **primeiro Administrador** no start (`AdministradorInicialConfig`); sem elas a aplicação sobe, mas **ninguém consegue entrar** nem nas telas nem na API. Escolha a senha na hora e nunca a escreva no repositório. Esse mesmo login serve para o formulário em http://localhost:8080/login e para o `POST /api/auth/login`.
+
 ### API REST e primeiro acesso
-As telas ficam em `http://localhost:8080/login` e demais rotas do inventário; a API REST fica sob `/api/**` (ADR-0008). Para usar a API, crie o primeiro Administrador: suba a aplicação com duas variáveis de ambiente (escolha a senha na hora, nunca a escreva no repositório):
+As telas ficam em `http://localhost:8080/login` e demais rotas do inventário; a API REST fica sob `/api/**` (ADR-0008). Com o Administrador inicial criado acima ("Como subir"), pegue o token:
 ```bash
-ADMIN_LOGIN=admin ADMIN_SENHA='<sua senha>' ./mvnw spring-boot:run
 curl -s -X POST localhost:8080/api/auth/login -H 'Content-Type: application/json' \
      -d '{"login":"admin","senha":"<sua senha>"}'     # devolve {"token": ...}
 ```
@@ -36,7 +37,7 @@ Mande o token em cada requisição: `Authorization: Bearer <token>`. Rotas e per
 
 **Documentação da API (RF-14):** com a aplicação de pé e **depois de entrar pelo `/login`**, abra http://localhost:8080/swagger-ui/index.html (o JSON fica em `/v3/api-docs`). É gerada do próprio código pelo `springdoc-openapi`, e um teste (`OpenApiDocumentacaoTest`) falha se ela deixar de bater com a matriz de autorização. Fora do desenvolvimento, defina também `JWT_SECRET` (32 bytes ou mais); sem ele, os tokens deixam de valer quando a aplicação reinicia.
 
-> Passo a passo ainda **não validado em clone limpo** por outra pessoa (etapa 6 do plano).
+> Passo a passo **rodado em clone limpo pela IA em 13/11/2026**, no commit `9acbbcd`, num container novo: sobe, responde `UP`, grava reserva pela API e pela tela e recusa a sobreposição com 409 (`docs/entrega/roteiro-clone-limpo.md`, seção 4). A conferência da Aula 14 pede **uma pessoa que não escreveu o README**, e essa continua pendente (etapa 6 do plano).
 
 ## Como testar
 ```bash
