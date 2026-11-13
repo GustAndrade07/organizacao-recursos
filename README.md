@@ -32,7 +32,9 @@ ADMIN_LOGIN=admin ADMIN_SENHA='<sua senha>' ./mvnw spring-boot:run
 curl -s -X POST localhost:8080/api/auth/login -H 'Content-Type: application/json' \
      -d '{"login":"admin","senha":"<sua senha>"}'     # devolve {"token": ...}
 ```
-Mande o token em cada requisição: `Authorization: Bearer <token>`. Rotas e permissões: `docs/seguranca/matriz-autorizacao.md`. Fora do desenvolvimento, defina também `JWT_SECRET` (32 bytes ou mais); sem ele, os tokens deixam de valer quando a aplicação reinicia.
+Mande o token em cada requisição: `Authorization: Bearer <token>`. Rotas e permissões: `docs/seguranca/matriz-autorizacao.md`.
+
+**Documentação da API (RF-14):** com a aplicação de pé e **depois de entrar pelo `/login`**, abra http://localhost:8080/swagger-ui/index.html (o JSON fica em `/v3/api-docs`). É gerada do próprio código pelo `springdoc-openapi`, e um teste (`OpenApiDocumentacaoTest`) falha se ela deixar de bater com a matriz de autorização. Fora do desenvolvimento, defina também `JWT_SECRET` (32 bytes ou mais); sem ele, os tokens deixam de valer quando a aplicação reinicia.
 
 > Passo a passo ainda **não validado em clone limpo** por outra pessoa (etapa 6 do plano).
 

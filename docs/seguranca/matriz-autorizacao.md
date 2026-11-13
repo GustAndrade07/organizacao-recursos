@@ -2,7 +2,7 @@
 
 > **Fonte única.** `MatrizAutorizacaoTest` lê as duas tabelas abaixo e confere cada célula com token de cada perfil (ou sem token). O mesmo teste falha se existir rota no código (API em `br.com.senac.recursos.controller` ou tela em `br.com.senac.recursos.web`) que não esteja aqui, ou linha aqui que não exista no código (regra 13 do `AGENTS.md`). Para mudar uma permissão: mude a linha, mude `SegurancaConfig` (ou a regra de posse no serviço) e rode o teste. **Nenhuma célula é apagada para o teste passar** (Etapa 5 do plano): célula vermelha vira `docs/defeitos/DEF-xxx.md` antes da correção.
 >
-> Última atualização: 12/11/2026 (telas ligadas aos services, D12 opção (a), ADR-0009). Antes: 11/11/2026 (PR #44, API sob `/api/**` ao lado das telas, ADR-0008).
+> Última atualização: 13/11/2026 (seção nova "Rotas da documentação", RF-14). Antes: 12/11/2026 (telas ligadas aos services, D12 opção (a), ADR-0009). Antes: 11/11/2026 (PR #44, API sob `/api/**` ao lado das telas, ADR-0008).
 
 ## Legenda
 
@@ -44,6 +44,16 @@
 | GET | /api/relatorios/utilizacao | 401 | 403 | ok | ok | RF-12, RN-13 |
 
 Rota sob `/api/**` fora desta tabela: **negada** (`denyAll` em `SegurancaConfig`): sem token 401, com token 403. Esquecer de cadastrar uma rota fecha o acesso em vez de abrir.
+
+## Rotas da documentação (RF-14, springdoc)
+
+Decidido em 13/11/2026, com a entrada do `springdoc-openapi`: `GET /v3/api-docs`, `GET /v3/api-docs/**`, `GET /swagger-ui.html` e `GET /swagger-ui/**` **exigem sessão** (qualquer perfil logado), como as telas. Sem sessão, 302 para `/login`.
+
+Por que ficam **fora das duas tabelas acima:** elas não são rotas do projeto — quem as serve é a biblioteca (pacote `org.springdoc`), e `MatrizAutorizacaoTest` compara a matriz com as rotas dos pacotes `controller` e `web`. Pôr uma linha aqui quebraria essa comparação sem acrescentar segurança.
+
+Por que **autenticada e não pública:** a documentação descreve cada rota, parâmetro e código de resposta da API; é informação útil para quem já entrou e desnecessária para quem não entrou. Quem for demonstrar abre `http://localhost:8080/swagger-ui/index.html` **depois** de entrar pelo `/login`. Se o grupo quiser a documentação aberta, muda esta linha, muda `SegurancaDasTelasConfig` e o `OpenApiDocumentacaoTest.semSessaoADocumentacaoLevaAoLogin` fica vermelho até ser ajustado — de propósito.
+
+Conferido por `OpenApiDocumentacaoTest`: sem sessão vai para o login; com sessão, o JSON descreve **exatamente** as rotas `/api/**` desta matriz (nem a mais, nem a menos).
 
 ## Telas Thymeleaf (cadeia própria, sessão do `/login`)
 
