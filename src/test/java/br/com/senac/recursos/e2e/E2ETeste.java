@@ -219,8 +219,18 @@ abstract class E2ETeste {
     }
 
     void semRolagemHorizontal() {
+        semRolagemHorizontal(LARGURA);
+    }
+
+    void semRolagemHorizontal(int largura) {
         int larguraDoDocumento = ((Number) pagina.evaluate("() => document.documentElement.scrollWidth")).intValue();
-        assertThat(larguraDoDocumento).as("largura do documento em %s", caminhoAtual()).isLessThanOrEqualTo(LARGURA);
+        assertThat(larguraDoDocumento).as("largura do documento em %s a %d px", caminhoAtual(), largura)
+                .isLessThanOrEqualTo(largura);
+    }
+
+    /** Muda a largura da janela só neste teste (os testes de 375 px continuam como estão). Chamar antes de {@link #abrir}. */
+    void redimensionar(int largura) {
+        pagina.setViewportSize(largura, ALTURA);
     }
 
     /**

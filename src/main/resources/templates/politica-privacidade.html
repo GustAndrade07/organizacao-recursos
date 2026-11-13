@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<!--/*
+  Tela 17 do inventário (prefixos "politica-" e "rodape-politicas-"). Página pública, sem modelo.
+  O texto é rascunho técnico: cada dado que o repositório não tem é um elemento com data-pendente (o aviso de rascunho
+  some quando a última pendência sair). O texto vem do Anexo A da Spec do vault (Spec - Políticas do site).
+  A data de atualização é literal, nunca do relógio (regra 14 do AGENTS.md).
+*/-->
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: pagina(titulo='Política de privacidade', conteudo=~{::#conteudo-pagina})}">
+<head>
+    <title>Política de privacidade</title>
+</head>
+<body>
+<div id="conteudo-pagina">
+    <article class="documento" data-testid="politica-privacidade">
+      <div class="documento__cabecalho">
+        <h1 data-testid="politica-titulo">Política de privacidade</h1>
+        <p class="documento__atualizacao" data-testid="politica-atualizacao">Última atualização: 13/11/2026</p>
+      </div>
+      <p class="alerta alerta--aviso" data-testid="politica-rascunho">Rascunho técnico, ainda não revisado por quem responde juridicamente pelo sistema. Não é parecer jurídico.</p>
+      <p class="documento__resumo">Esta página explica quais dados pessoais o Organização de Recursos guarda, para que servem e como você pode pedir ajuda com eles.</p>
+      <nav class="documento__indice" aria-label="Nesta página">
+        <p class="documento__indice-titulo">Nesta página</p>
+        <ul>
+          <li><a href="#quem-e-responsavel-por-este-sistema">Quem é responsável por este sistema?</a></li>
+          <li><a href="#quem-usa-o-sistema">Quem usa o sistema?</a></li>
+          <li><a href="#quais-dados-coletamos">Quais dados coletamos?</a></li>
+          <li><a href="#que-dados-ficam-so-na-memoria-do-servidor">Que dados ficam só na memória do servidor?</a></li>
+          <li><a href="#o-que-o-registro-tecnico-log-guarda">O que o registro técnico (log) guarda?</a></li>
+          <li><a href="#quem-dentro-do-sistema-pode-ver-seus-dados">Quem dentro do sistema pode ver seus dados?</a></li>
+          <li><a href="#para-que-usamos-seus-dados">Para que usamos seus dados?</a></li>
+          <li><a href="#qual-e-a-base-legal">Qual é a base legal?</a></li>
+          <li><a href="#com-quem-compartilhamos-seus-dados">Com quem compartilhamos seus dados?</a></li>
+          <li><a href="#por-quanto-tempo-guardamos-seus-dados">Por quanto tempo guardamos seus dados?</a></li>
+          <li><a href="#quais-sao-seus-direitos">Quais são seus direitos?</a></li>
+          <li><a href="#como-faco-um-pedido">Como faço um pedido?</a></li>
+          <li><a href="#o-sistema-e-para-criancas">O sistema é para crianças?</a></li>
+          <li><a href="#como-saberei-se-esta-politica-mudar">Como saberei se esta política mudar?</a></li>
+        </ul>
+      </nav>
+      <section class="documento__secao" aria-labelledby="quem-e-responsavel-por-este-sistema">
+        <h2 id="quem-e-responsavel-por-este-sistema">Quem é responsável por este sistema?</h2>
+        <p>O responsável pelo tratamento dos dados é <span data-pendente>a definir (nome de quem responde pelo sistema)</span>.</p>
+        <p>O Organização de Recursos é um trabalho acadêmico (Senac, Qualidade de Software 2026.2). Ele serve para reservar salas, professores e materiais sem conflito de horário.</p>
+        <p>Para falar sobre seus dados, escreva para <span data-pendente>a definir (e-mail de contato)</span>. A pessoa encarregada pelo tema de dados pessoais é <span data-pendente>a definir (pessoa encarregada, ou decisão de não haver uma)</span>.</p>
+      </section>
+      <section class="documento__secao" aria-labelledby="quem-usa-o-sistema">
+        <h2 id="quem-usa-o-sistema">Quem usa o sistema?</h2>
+        <p>Três tipos de pessoa entram com login e senha:</p>
+        <ul>
+          <li>Solicitantes, que pedem reservas.</li>
+          <li>Responsáveis, que aprovam, rejeitam ou cancelam reservas.</li>
+          <li>Administradores, que cuidam do sistema.</li>
+        </ul>
+      </section>
+      <section class="documento__secao" aria-labelledby="quais-dados-coletamos">
+        <h2 id="quais-dados-coletamos">Quais dados coletamos?</h2>
+        <p>Guardamos estes dados no banco de dados (PostgreSQL):</p>
+        <ul>
+          <li><strong>Seu usuário:</strong> nome, e-mail (que é o seu login) e perfil (Solicitante, Responsável ou Administrador). A senha é guardada só como hash, que é um código embaralhado. Ninguém consegue ler a senha original.</li>
+          <li><strong>Suas reservas:</strong> quem pediu, o estado da reserva, a data em que foi criada, o recurso e o período.</li>
+          <li><strong>O histórico de cada reserva:</strong> quem mudou o estado, quando mudou, o estado anterior, o estado novo e o motivo. O motivo é um texto livre, de até 500 caracteres, que a pessoa digita. Não escreva nele nada que não precise estar lá.</li>
+          <li><strong>Tentativas de reserva recusadas por conflito de horário:</strong> quem tentou, qual recurso, qual período e quando.</li>
+          <li><strong>Recursos:</strong> salas, materiais e professores. O professor aparece como um recurso que se pode reservar, com nome. Ele pode não ser usuário do sistema.</li>
+        </ul>
+        <p>O seu login é o seu endereço de e-mail. Ele é dado pessoal, porque identifica você. Guardamos o e-mail em letras minúsculas. Contas antigas, criadas com um nome de usuário sem "@", não conseguem mais entrar: o Administrador precisa cadastrar a pessoa de novo.</p>
+      </section>
+      <section class="documento__secao" aria-labelledby="que-dados-ficam-so-na-memoria-do-servidor">
+        <h2 id="que-dados-ficam-so-na-memoria-do-servidor">Que dados ficam só na memória do servidor?</h2>
+        <p>O sistema conta os erros de senha de cada login. Com 5 erros do mesmo login em 15 minutos, esse login fica bloqueado por 15 minutos. Esse contador fica só na memória do servidor. O texto digitado no campo de e-mail fica nele até o servidor reiniciar (ou até a lista ficar grande e ser limpa). Não prometemos que suma em 15 minutos.</p>
+      </section>
+      <section class="documento__secao" aria-labelledby="o-que-o-registro-tecnico-log-guarda">
+        <h2 id="o-que-o-registro-tecnico-log-guarda">O que o registro técnico (log) guarda?</h2>
+        <p>O registro técnico da aplicação não grava senha nem endereço IP. Ele registra erros inesperados. Quando o administrador inicial é criado, o registro diz só que ele foi criado, sem o e-mail. Um erro do banco (por exemplo, dois cadastros do mesmo e-mail ao mesmo tempo) pode citar o e-mail no registro; isso não foi medido.</p>
+        <p>Ainda não sabemos o que a hospedagem do site registra. Por isso, esta página não afirma nada sobre isso.</p>
+      </section>
+      <section class="documento__secao" aria-labelledby="quem-dentro-do-sistema-pode-ver-seus-dados">
+        <h2 id="quem-dentro-do-sistema-pode-ver-seus-dados">Quem dentro do sistema pode ver seus dados?</h2>
+        <ul>
+          <li>O Solicitante vê só as próprias reservas.</li>
+          <li>O Responsável e o Administrador veem o histórico das reservas (quem mudou o quê) e o relatório de utilização, que mostra a carga de horas por professor.</li>
+          <li>Só o Administrador vê a lista de usuários.</li>
+        </ul>
+      </section>
+      <section class="documento__secao" aria-labelledby="para-que-usamos-seus-dados">
+        <h2 id="para-que-usamos-seus-dados">Para que usamos seus dados?</h2>
+        <ul>
+          <li>Para você entrar no sistema e usar só o que o seu perfil permite.</li>
+          <li>Para criar, aprovar, rejeitar e cancelar reservas sem conflito de horário.</li>
+          <li>Para manter o histórico das reservas e saber quem mudou o quê.</li>
+          <li>Para proteger o sistema contra uso indevido e tentativas de invasão.</li>
+        </ul>
+      </section>
+      <section class="documento__secao" aria-labelledby="qual-e-a-base-legal">
+        <h2 id="qual-e-a-base-legal">Qual é a base legal?</h2>
+        <p>A Lei Geral de Proteção de Dados (LGPD, Lei 13.709/2018) pede um motivo legal para usar dados pessoais. Propomos estes, para quem responde juridicamente confirmar:</p>
+        <ul>
+          <li>Execução de contrato ou de procedimentos ligados a ele (art. 7º): para você poder usar o sistema e fazer reservas.</li>
+          <li>Legítimo interesse (art. 7º): para garantir segurança e prevenir fraude.</li>
+        </ul>
+      </section>
+      <section class="documento__secao" aria-labelledby="com-quem-compartilhamos-seus-dados">
+        <h2 id="com-quem-compartilhamos-seus-dados">Com quem compartilhamos seus dados?</h2>
+        <p>Com ninguém, hoje. O sistema não tem integração com serviços de fora. A notificação por e-mail ou SMS ainda não existe.</p>
+        <p>Se isso mudar, esta página será atualizada antes.</p>
+      </section>
+      <section class="documento__secao" aria-labelledby="por-quanto-tempo-guardamos-seus-dados">
+        <h2 id="por-quanto-tempo-guardamos-seus-dados">Por quanto tempo guardamos seus dados?</h2>
+        <p>O prazo de guarda é <span data-pendente>a definir (prazo de guarda)</span>.</p>
+      </section>
+      <section class="documento__secao" aria-labelledby="quais-sao-seus-direitos">
+        <h2 id="quais-sao-seus-direitos">Quais são seus direitos?</h2>
+        <p>Pelo art. 18 da LGPD, você pode pedir:</p>
+        <ul>
+          <li>confirmação de que tratamos seus dados;</li>
+          <li>acesso aos seus dados;</li>
+          <li>correção de dado errado ou desatualizado;</li>
+          <li>anonimização, bloqueio ou eliminação de dado, quando a lei permitir;</li>
+          <li>portabilidade dos dados;</li>
+          <li>informação sobre com quem compartilhamos seus dados;</li>
+          <li>retirada do seu consentimento, quando o consentimento for o motivo legal do uso.</li>
+        </ul>
+      </section>
+      <section class="documento__secao" aria-labelledby="como-faco-um-pedido">
+        <h2 id="como-faco-um-pedido">Como faço um pedido?</h2>
+        <p>Ainda não existe tela nem rotina automática para exportar ou apagar dados. Os pedidos são atendidos à mão.</p>
+        <p>Escreva para <span data-pendente>a definir (e-mail de contato)</span>. A resposta vem em até <span data-pendente>a definir (prazo de resposta)</span>.</p>
+        <p>Pode ser que não seja possível apagar o histórico de reservas. Ele é um registro de auditoria, ou seja, serve para provar quem fez o quê e quando. Por isso, o sistema só inclui e lê esse histórico. A aplicação nunca o apaga.</p>
+      </section>
+      <section class="documento__secao" aria-labelledby="o-sistema-e-para-criancas">
+        <h2 id="o-sistema-e-para-criancas">O sistema é para crianças?</h2>
+        <p>Não. O sistema não é voltado a crianças.</p>
+      </section>
+      <section class="documento__secao" aria-labelledby="como-saberei-se-esta-politica-mudar">
+        <h2 id="como-saberei-se-esta-politica-mudar">Como saberei se esta política mudar?</h2>
+        <p>Esta página mostra a data da última atualização. Quando o texto mudar, a data muda junto.</p>
+      </section>
+    </article>
+</div>
+</body>
+</html>

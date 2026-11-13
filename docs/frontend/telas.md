@@ -23,6 +23,11 @@ Os critérios de aceite de cada tela estão na spec do módulo, no Notion ([Spec
 | 14 | Formulário de recurso | 05 | Administrador | `GET /admin/recursos/novo`, `/admin/recursos/{id}` | RF-02 | `recurso-form-` | `html` |
 | 15 | Bloqueio por manutenção | 05 | Administrador | `GET /admin/recursos/{id}/manutencao` | RF-08 | `manutencao-` | `html` |
 | 16 | Usuários (lista e cadastro) | 05 | Administrador | `GET /admin/usuarios`, `/admin/usuarios/novo` | RF-01 | `usuarios-`, `usuario-form-` | `html` |
+| 17 | Política de privacidade | — | Todos, sem login | `GET /privacidade` | LGPD (transparência; fora dos 14 RF) | `politica-` | `html` |
+| 18 | Política de cookies | — | Todos, sem login | `GET /cookies` | LGPD (transparência) | `politica-` | `html` |
+| 19 | Termos de uso | — | Todos, sem login | `GET /termos` | LGPD (transparência) | `politica-` | `html` |
+
+**Rodapé de página (parte da tela 2, `layout.html`):** em toda tela, inclusive login e páginas de erro: `© <ano> Organização de Recursos` (o ano vem do `Clock` por `RodapeDoSite`, nunca do HTML) e os links Política de privacidade, Política de cookies e Termos de uso (`data-testid` `rodape-direitos`, `rodape-privacidade`, `rodape-cookies`, `rodape-termos`; classe `rodape-site`, que **não** é o `menu__rodape` do menu). O texto das três páginas é rascunho técnico: cada dado que falta é um `<span data-pendente>`, e o aviso de rascunho some quando a última pendência sair. Spec: `Spec - Políticas do site` no vault.
 
 A rota do relatório (`/relatorios/utilizacao`) já está definida no [PRD](../prd.md). RF-14 (OpenAPI) é o Swagger UI e não tem tela própria.
 

@@ -1202,3 +1202,157 @@ a {
     flex: 1;
   }
 }
+
+/* Rodapé de página (todas as telas, Spec "Políticas do site"): direitos e links das políticas. O menu__rodape é outra
+   coisa (usuário e Sair, dentro do menu). Só tokens; texto em text-secondary e links em text-brand, sobre bg-page. */
+.rodape-site {
+  border-top: var(--border-width-default) solid var(--color-border-default);
+  background: var(--color-bg-surface);
+  color: var(--color-text-secondary);
+}
+
+.rodape-site__linha {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  width: 100%;
+  max-width: var(--breakpoint-desktop);
+  margin: 0 auto;
+  padding: var(--space-4);
+}
+
+.rodape-site__direitos {
+  margin: 0;
+  font: var(--font-body-small);
+}
+
+.rodape-site__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--space-6);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rodape-site a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--size-control-md);
+  font: var(--font-body-small);
+}
+
+@media (min-width: 768px) {
+  .rodape-site__linha {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-2) var(--space-8);
+  }
+}
+
+/* Páginas de política (telas 17 a 19): documento de leitura, coluna estreita, sóbrio */
+.documento {
+  max-width: 70ch;
+  margin: 0 auto;
+  color: var(--color-text-primary);
+}
+
+.documento__cabecalho {
+  margin-bottom: var(--space-4);
+}
+
+.documento__atualizacao {
+  margin: 0;
+  color: var(--color-text-secondary);
+}
+
+.documento__resumo {
+  margin: var(--space-4) 0;
+}
+
+.documento__indice {
+  margin-bottom: var(--space-6);
+  padding: var(--space-4);
+  border: var(--border-width-default) solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-surface);
+}
+
+.documento__indice-titulo {
+  margin: 0 0 var(--space-2);
+  font: var(--font-label-default);
+  color: var(--color-text-secondary);
+}
+
+.documento__indice ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.documento__indice a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--size-control-md);
+}
+
+.documento__secao {
+  margin-top: var(--space-6);
+}
+
+.documento__secao h2 {
+  margin: 0 0 var(--space-2);
+  font: var(--font-heading-h2);
+}
+
+.documento__secao h3 {
+  margin: 0 0 var(--space-2);
+  font: var(--font-heading-h3);
+}
+
+.documento__secao p,
+.documento__secao li {
+  font: var(--font-body-default);
+}
+
+.documento__secao p {
+  margin: 0 0 var(--space-3);
+}
+
+.documento__secao ul {
+  margin: 0 0 var(--space-3);
+  padding-left: var(--space-6);
+}
+
+.documento a {
+  color: var(--color-text-brand);
+}
+
+.documento__cookie {
+  margin: var(--space-3) 0;
+  padding: var(--space-4);
+  border: var(--border-width-default) solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-surface);
+}
+
+.documento__cookie dd {
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 767px) {
+  .documento__cookie .lista-dados {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-1) 0;
+  }
+
+  .documento__cookie .lista-dados dd {
+    margin-bottom: var(--space-3);
+  }
+}
+
+/* Dado que o repositório não tem e o grupo ainda precisa informar: destacado para ninguém publicar sem ver */
+[data-pendente] {
+  background: var(--color-bg-warning-subtle);
+}

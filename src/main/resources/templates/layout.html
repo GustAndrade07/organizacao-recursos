@@ -59,6 +59,25 @@
     <th:block th:replace="${conteudo}"></th:block>
 </main>
 
+<!--/* Rodapé de página (Spec "Políticas do site"): em toda tela, inclusive login e erros. Não é o menu__rodape, que
+       fica dentro do menu (usuário e Sair). O ano vem do Clock (RodapeDoSite), nunca escrito aqui. caminhoAtual vem
+       do AtributosDasTelas e marca o link da página aberta. */-->
+<footer class="rodape-site" data-testid="rodape-site">
+    <div class="rodape-site__linha">
+        <p class="rodape-site__direitos" data-testid="rodape-direitos">© <span th:text="${@rodapeDoSite.ano()}">2026</span> Organização de Recursos</p>
+        <nav class="rodape-site__nav" aria-label="Políticas do site">
+            <ul class="rodape-site__links">
+                <li><a th:href="@{/privacidade}" data-testid="rodape-privacidade"
+                       th:aria-current="${caminhoAtual == '/privacidade'} ? 'page'">Política de privacidade</a></li>
+                <li><a th:href="@{/cookies}" data-testid="rodape-cookies"
+                       th:aria-current="${caminhoAtual == '/cookies'} ? 'page'">Política de cookies</a></li>
+                <li><a th:href="@{/termos}" data-testid="rodape-termos"
+                       th:aria-current="${caminhoAtual == '/termos'} ? 'page'">Termos de uso</a></li>
+            </ul>
+        </nav>
+    </div>
+</footer>
+
 <script th:src="@{/js/menu.js}" defer></script>
 <script th:src="@{/js/envio-unico.js}" defer></script>
 </body>

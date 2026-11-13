@@ -12,7 +12,7 @@
 - **Sem emoji** em nome e e-mail: `@SemEmoji`, uma anotação só para API e tela; `SemEmojiVarreduraTest` descobre os campos de texto de `UsuarioRequest` por reflexão, sem lista.
 - **V2** (`V2__login_e_email.sql`): índice único em `lower(login)` e `CHECK usuario_login_e_email` **`NOT VALID`** (vale só para gravações novas). Não converte, não apaga e **não inventa e-mail** de usuário antigo.
 - **`ADMIN_LOGIN`** passa a ser e-mail e é validado com a mesma regra; valor inválido interrompe a subida com mensagem clara. O e-mail do administrador deixou de ir para o log.
-- Documentação: README, roteiro da demo, roteiro de clone limpo (nota), `perf/` (CSV com e-mails), `docs/frontend/README.md`, ADR-0010 (**proposto**, substitui a parte do campo do ADR-0009 sem apagá-lo), D14 e D15 no plano, regra 16 do `AGENTS.md`, RTM e `status-requisitos.md`.
+- Documentação: README, roteiro da demo, roteiro de clone limpo (nota), `perf/` (CSV com e-mails), `docs/frontend/README.md`, ADR-0010 (**proposto**, substitui a parte do campo do ADR-0009 sem apagá-lo), D14 e D15 no plano, regra 17 do `AGENTS.md`, RTM e `status-requisitos.md`.
 
 ## Decisões deste PR que **não** são do grupo (propostas, ficam na D14)
 1. **Regra do nome completo** (acima). O PRD não decide.
