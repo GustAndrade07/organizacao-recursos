@@ -4,25 +4,60 @@
 > Situação: `feito` · `parcial` · `ausente`. Atualizar a cada PR e ao fim de cada etapa.
 > Ordem das pendências: primeiro o que zera a nota (aplicação não roda, CI ausente, falha de autorização, reserva dupla).
 
-Última atualização: 12/11/2026 (RF-06 feito: run do CI 43302104277 e mutação M1 no nível da API; D10 e D11 decididas, ver `docs/status/2026-11-12-docs-d10-d11-adr0008-concorrencia-api.md`). Antes: 11/11/2026, PR #44 (back-end em camadas como API `/api/**` ao lado das telas; RF-01 a RF-10, RF-12 e RF-14 do back-end com testes de API; `verify` local com 965 testes, 0 falhas, ver `docs/status/2026-11-11-feat-backend-camadas.md`). Antes: 11/11/2026 (RF-13: telas 7 e 8 com teste de contrato e E2E Playwright em 375 px). Antes: 07/11/2026, noite (RF-10 e RF-12 ganham testes de banco da auditoria e do relatório; antes: RF-13 `parcial` com as telas em Thymeleaf; RF-05, RF-06, RF-10 e RF-12 `parcial` só no nível do banco, com a migração V1; os demais seguem `ausente`).
+**Última atualização: 12/11/2026, noite (Leandro).** Recontagem junto com a RTM, sobre a `main` em `6ce4478`:
+- run do CI **43303372662** verde (`verify` e SonarCloud);
+- `./mvnw -B verify` local com **1116 testes, 0 falhas, 0 erros, 0 ignorados**;
+- carga do PR #56.
+
+Depois da recontagem, 12/11/2026 (Pedro, PR #58): RF-06 ganha o vermelho sem a proteção no nível da API (mutação M1); D10 e D11 decididas ("fica como está no código"). Ver `docs/status/2026-11-12-docs-d10-d11-adr0008-concorrencia-api.md`.
+
+A lista completa de testes por requisito está na [RTM](rtm.md). Aqui fica a situação, com os testes principais.
+
+**Histórico:**
+- 11/11/2026, PR #44: back-end em camadas, `verify` local com 965 testes;
+- 11/11/2026: RF-13, telas 7 e 8 com teste de contrato e E2E;
+- 07/11/2026: RF-05, RF-06, RF-10 e RF-12 só no nível do banco, com a V1.
 
 | Requisito | Situação | Evidência (arquivo e nome do teste) | Risco se ficar de fora | Dono |
 |---|---|---|---|---|
-| RF-01 Login e permissão por perfil | parcial | `AutenticacaoApiControllerTest` (token certo, credencial errada sem revelar login, sem token, token expirado com `Clock`, token adulterado) e `MatrizAutorizacaoTest` (210 testes desde 12/11/2026: API com token e telas com o usuário na sessão, casos lidos de `docs/seguranca/matriz-autorizacao.md`; falha se surgir rota fora da matriz). Login das telas (D12, opção (a), ADR-0009): `PaginaNaoEncontradaIntegracaoTest` (servidor real) e `AcessoE2ETest` (login, senha errada, sair, 403). Limite de tentativas no login (5 falhas em 15 min bloqueiam por 15 min, telas e API com um contador só): `LimiteDeTentativasDoLoginIntegracaoTest`, `LimiteDeTentativasApiTest`, `LimiteDeTentativasE2ETest` (Playwright), `TentativasDeLoginTest` e `LoginComLimiteTest`, desde 12/11/2026. Falta o run do CI | Falha de autorização zera a nota | Pedro |
-| RF-02 Cadastro e consulta | parcial | `RecursoApiControllerTest` (cadastro, alteração sem trocar o tipo, 404, filtros) e `UsuarioApiControllerTest`. Localização, patrimônio e competências não existem na V1 (pendente de V2, Gustavo) | | Pedro |
-| RF-03 Pesquisa | parcial | `RecursoApiControllerTest.disponiveisExcluiReservaQueOcupaEManutencaoMasNaoACancelada` (tipo, capacidade e disponibilidade, fronteira `[início, fim)`). Falta localização e competência (dependem da V2) | | Pedro |
-| RF-04 Criar, alterar e cancelar reservas | parcial | `ReservaApiControllerTest` (`Criar`, `Alterar`, `Cancelar`: RN-01, dono, RN-07 com fronteira de 1 s). Falta o run do CI | | Pedro |
-| RF-05 Sobreposição de horário (inclusive professor) | parcial | Banco: `SobreposicaoBancoTest`. API: `ReservaApiControllerTest.Sobreposicao` (trinca de fronteiras da D1, professor em outra sala, cancelar libera). Falta o run do CI | | Pedro |
-| RF-06 Reserva dupla em pedidos simultâneos | feito | Banco: `ConcorrenciaReservaBancoTest`. Ponta a ponta: `ConcorrenciaReservaApiTest` (20 pedidos HTTP → 1 × 201 e 19 × 409, contagem no banco, sala e professor, 5 rodadas cada). CI: run 43302104277 (`main`, `986e1cd`, verde). Vermelho sem a proteção nos dois níveis: mutação M1 de `docs/testes/mutacao-manual.md` (API: 10 de 10 vermelhos em 12/11/2026) | Reserva dupla zera a nota | Gustavo / Pedro |
-| RF-07 Aprovação de recurso restrito | parcial | `ReservaApiControllerTest.Aprovacao` (Responsável aprova; RN-06 para Responsável e Solicitante, reserva continua SOLICITADA; rejeição libera). Estado inicial sem recurso restrito = APROVADA (D10 decidida em 12/11/2026): `ReservaApiControllerTest.Criar.salaComProfessorSemRestritoNasceAprovadaComAuditoria`. Falta o teste de o Responsável rejeitar a própria reserva (D10 (c)) | | Pedro |
-| RF-08 Bloqueio por manutenção | parcial | `ReservaApiControllerTest.Manutencao` (trinca de fronteiras 10:00 a 12:00 e 409 próprio) e `RecursoApiControllerTest.manutencaoECadastradaEListadaComPeriodoInvalidoRecusado`. Efeito sobre reservas já existentes (D11 decidida em 12/11/2026: continuam como estão): `TelasComBancoTest.bloqueioComReservaNoPeriodoPedeConfirmacaoAntesDeGravar` (tela 15); sem teste da mesma regra na API | | Pedro |
-| RF-09 Retirada e devolução | parcial | `ReservaApiControllerTest.CicloDeUso` (APROVADA → EM_USO → CONCLUIDA, auditoria de cada passo). Sem registro de movimentação de material (`movimentacao_material` é V2) | | Pedro |
-| RF-10 Histórico auditável | parcial | Banco: `EsquemaBancoTest`, `AuditoriaBancoTest`. Serviço: `AuditoriaServiceTest` (auditoria fora de transação recusada; rollback leva a auditoria junto). API: histórico com quem, quando e motivo e 403 do Solicitante (`ReservaApiControllerTest.Aprovacao`, `MatrizAutorizacaoTest`) | | Gustavo / Pedro |
-| RF-11 Notificação externa | ausente | | | Pedro |
-| RF-12 Relatório de utilização | parcial | Banco: `TentativaRecusadaBancoTest`, `RelatorioUtilizacaoBancoTest`. API: `RelatorioApiControllerTest` (valores calculados à mão: borda, cancelada, conflito dentro e fora da janela, período vazio, 401 e 403). Premissas pendentes (D8) | | Gustavo / Pedro / Leandro |
-| RF-13 Telas responsivas e erros claros | parcial | Telas em Thymeleaf com teste de contrato: `LayoutBaseTest`, `PaginasDeErroTest`, `LoginPaginaTest`, `CaminhoDoSiteTest`, `ContrasteBotaoDesabilitadoTest`, `BuscaPaginaTest`, `ResultadosBuscaTest`, `NovaReservaPaginaTest`, `NovaReservaEstadosTest`, `MinhasReservasPaginaTest`, `ReservaDetalhePaginaTest`, `HistoricoPaginaTest`, `RelatorioPaginaTest`, `FilaAprovacaoTest`, `RetiradaDevolucaoTest`, `DialogoCssTest`, `ListaRecursosTest`, `RecursoFormTest`, `ManutencaoPaginaTest`, `RecursoControllerTest`; nenhum valor solto no CSS: `CssSemValoresSoltosTest`. As 15 telas do inventário têm HTML (`docs/frontend/telas.md`, 11/11/2026). E2E Playwright em 375 px: `Responsividade375E2ETest`, `AcessoE2ETest`, `ReservaE2ETest` e `ResponsavelEAdministradorE2ETest` (52 testes, prints em `docs/evidencias/e2e-375/`). Continua `parcial` porque o E2E usa telas com dados de teste: falta rodar os mesmos fluxos contra o back-end real (login, 409 de verdade, 401 e 403 da autorização) | | Leandro |
-| RF-14 Documentação da API | ausente | Rotas e regras descritas em `docs/seguranca/matriz-autorizacao.md`; falta OpenAPI | | Pedro |
+| RF-01 Login e permissão por perfil | feito | `AutenticacaoApiControllerTest`; `MatrizAutorizacaoTest` (222 casos, API e telas, `matrizCobreExatamenteAsRotasDoCodigo`); `PaginaNaoEncontradaIntegracaoTest` (login das telas com servidor real); limite de tentativas em `LimiteDeTentativasDoLoginIntegracaoTest`, `LimiteDeTentativasApiTest` e `LimiteDeTentativasE2ETest`; `AcessoE2ETest`. Run 43303372662 | Falha de autorização zera a nota | Pedro |
+| RF-02 Cadastro e consulta | parcial | `RecursoApiControllerTest` (`administradorCadastraEAlteraSemMudarOTipo`, `filtraPorTipoECapacidadeMinima`), `UsuarioApiControllerTest`, `TelasComBancoTest.administradorCadastraEEditaRecurso`. Falta gravar localização, patrimônio e competências (V2, Gustavo) | Catálogo incompleto | Pedro |
+| RF-03 Pesquisa | parcial | `RecursoApiControllerTest.disponiveisExcluiReservaQueOcupaEManutencaoMasNaoACancelada`, `TelasComBancoTest.buscaMostraSoOQueEstaLivreNoHorario`. Falta localização e competência (V2) | Busca sem dois dos filtros do PRD | Pedro |
+| RF-04 Criar, alterar e cancelar reservas | feito | `ReservaApiControllerTest` (`Criar`, `Alterar`, `Cancelar`), `TelasComBancoTest.alterarTrocaOPeriodoNoBancoECancelarLiberaOHorario`, `ReservaE2ETest`. Regra de quando alterar e cancelar: proposta D9 testada, decisão pendente | | Pedro |
+| RF-05 Sobreposição de horário (inclusive professor) | feito | `SobreposicaoBancoTest`; `ReservaApiControllerTest.Sobreposicao.agendaDoProfessorTambemEhProtegidaMesmoEmOutraSala`; `ReservaE2ETest.conflitoRealDeHorarioExplicaOMotivoComFocoEOfereceVoltarABusca` | Duas turmas na mesma sala | Pedro |
+| RF-06 Reserva dupla em pedidos simultâneos | feito | `ConcorrenciaReservaBancoTest`; `ConcorrenciaReservaApiTest` (20 pedidos HTTP → 1 × 201 e 19 × 409, sala e professor, 5 rodadas); carga do RNF-03. Vermelho sem a proteção nos dois níveis: mutação M1 de `docs/testes/mutacao-manual.md` (API: 10 de 10 vermelhos em 12/11/2026, só local) | Reserva dupla zera a nota | Gustavo / Pedro |
+| RF-07 Aprovação de recurso restrito | feito | `ReservaApiControllerTest.Aprovacao`, `TelasComBancoTest.recursoRestritoEsperaAprovacaoEOResponsavelAprovaNaFila`. Estado inicial sem restrito = APROVADA (D10, decidida em 12/11/2026): `ReservaApiControllerTest.Criar.salaComProfessorSemRestritoNasceAprovadaComAuditoria`. Sem teste para o Responsável rejeitar a própria reserva (D10 (c)) | | Pedro |
+| RF-08 Bloqueio por manutenção | feito | `ReservaApiControllerTest.Manutencao.fronteirasDaManutencaoDe10a12`, `RecursoApiControllerTest.manutencaoECadastradaEListadaComPeriodoInvalidoRecusado`. Efeito sobre reservas existentes (D11, decidida em 12/11/2026: continuam como estão): `TelasComBancoTest.bloqueioComReservaNoPeriodoPedeConfirmacaoAntesDeGravar`, sem teste da mesma regra na API; corrida da D13 aceita (ADR-0008) | | Pedro |
+| RF-09 Retirada e devolução | feito | `ReservaApiControllerTest.CicloDeUso.retiradaEDevolucaoLevamAteConcluidaComAuditoriaDeCadaPasso`, `TelasComBancoTest.retiradaEDevolucaoMudamOEstadoEOHistoricoMostraCadaPasso` | | Pedro |
+| RF-10 Histórico auditável | feito | `AuditoriaBancoTest`, `AuditoriaServiceTest`, `ReservaApiControllerTest.Aprovacao.responsavelAprovaRestritoEHistoricoGuardaQuemEQuando`, `HistoricoPaginaTest` | | Gustavo / Pedro |
+| RF-11 Notificação externa | ausente | Sem código, sem WireMock | Requisito do PRD sem entrega | Pedro |
+| RF-12 Relatório de utilização | parcial | `RelatorioUtilizacaoBancoTest`, `RelatorioApiControllerTest.valoresCalculadosAMaoComBordaCanceladaEConflito`, `TelasComBancoTest.relatorioContaReservasEHorasNoPeriodoDoFusoDasTelas`. Premissas de cálculo pendentes (D8) | Número do relatório contestado | Gustavo / Pedro / Leandro |
+| RF-13 Telas responsivas e erros claros | feito (375 px) | 27 classes de contrato de tela (511 testes), `TelasComBancoTest` (24), E2E Playwright em 375 px (62 testes em 5 classes, contra o back-end real); prints em `docs/evidencias/e2e-375/`. 768 e 1280 px só conferidos à mão | | Leandro |
+| RF-14 Documentação da API | ausente | Rotas descritas só em `docs/seguranca/matriz-autorizacao.md`; sem OpenAPI | Integrador sem contrato | Pedro |
+| RNF-01 Busca: p95 ≤ 300 ms com 50 usuários | feito (local) | `perf/reservas.jmx`; `perf/resultados/rodada-01.jtl` (p95 = 17 ms) e `rodada-02.jtl` (p95 = 8 ms, 50 ativos); `docs/performance/resultado-01.md`. Meta a validar com o professor | Perde o RNF-01 | Leandro |
+| RNF-02 Cobertura ≥ 80% linhas, ≥ 70% branches | feito | Gate do JaCoCo no run 43303372662; 95,8% das linhas e 81,3% dos branches no `verify` local de `6ce4478` | Pipeline vermelho | Gustavo |
+| RNF-03 Criação sob carga: só 201 ou 409 | feito (local) | Asserção de `perf/reservas.jmx`: 80 × 201 e 3920 × 409, nenhum outro código; `ConcorrenciaReservaApiTest` | Erro 500 sob disputa | Leandro |
+
+As regras de negócio (RN-01 a RN-13) estão na [RTM](rtm.md): 12 `feito` e 1 `parcial` (RN-08, sem a auditoria do cancelamento e do não comparecimento conferida em teste).
 
 ## Pendências e divisão
 
-Decisões do grupo que travam itens acima (seção 9 do plano, pendentes; decididas em 12/11/2026: a D12, autenticação das telas, pela opção (a), ADR-0009; a D13, RN-04 consulta e depois grava, com o risco aceito, ADR-0008; a D10, estado inicial e limites de perfil, e a D11, manutenção sobre reservas existentes, "fica como está no código"): D8 (premissas do relatório, RF-12) e D9 (quando o Solicitante altera e cancela, RF-04).
+Em ordem de prioridade, primeiro o que bloqueia a tag `v1.0.0-rc1` (entrega em 13/11/2026). Fonte das lacunas: `docs/plano-execucao.md`, conferência de 12/11/2026.
+
+| # | Pendência | Bloqueia a tag? | Quem pega | Situação em 12/11/2026, noite |
+|---|---|---|---|---|
+| 1 | Clone limpo seguindo só o README e `docs/entrega/checklist.md` (lacuna 11). É o único limitador sem prova: "aplicação executa" | Sim | Leandro ou Pedro (quem não escreveu o README) | Roteiro pronto em `docs/entrega/roteiro-clone-limpo.md`; não executado |
+| 2 | `docs/decisao-qualidade.md` (lacuna 2): decisão, critérios com evidência, riscos aceitos e quem fez o quê | Sim | Leandro | Não existe; depende deste relatório e da RTM |
+| 3 | Números no commit da tag: refazer a seção 4 do relatório e o run da RTM no commit que receber a tag | Sim | Leandro (com o Gustavo, que faz a tag) | Números de `6ce4478` neste PR |
+| 4 | Merge do PR #56 (carga JMeter, lacuna 1) | Sim | Pedro (revisão) | Aberto, aguardando revisão |
+| 5 | D4: perguntar ao professor se "0 vulnerabilidades críticas" vale pelo CVSS das dependências ou pelo Quality Gate | Não, mas muda a decisão de qualidade | Gustavo | Pergunta pessoalmente na Aula 14 (13/11) |
+| 6 | Decisões pendentes D8 (relatório) e D9 (alterar e cancelar). D10 (estado inicial e limites de perfil) e D11 (manutenção sobre reservas existentes) decididas em 12/11/2026 no PR #58: "fica como está no código" | Não: o código segue a proposta, testada | Grupo (Pedro propõe) | Pendentes desde 11/11; se não forem decididas, entram como premissa na decisão de qualidade |
+| 7 | BDD executável com Cucumber e `docs/testes/evidencia-tdd.md` (lacuna 4) | Não, mas pesa em "qualidade dos testes" | Pedro | Não começado |
+| 8 | Mutação manual das regras do serviço (aprovação, manutenção, autorização) em `docs/testes/mutacao-manual.md` (lacuna 6) | Não | Pedro | "pendente (Pedro)" no roteiro |
+| 9 | `docs/testes/plano-tdd.md` (lacuna 7) e OpenAPI do RF-14 (lacuna 8) | Não | Pedro | Não começados |
+| 10 | RF-11 (notificação com WireMock) | Não (risco aceito se ficar de fora) | Pedro | Não começado |
+| 11 | RN-08: conferir a auditoria do cancelamento e do não comparecimento em teste | Não | Pedro | Não começado |
+| 12 | Perguntas da prova oral (4 de 15) e ensaio (lacuna 12) | Não (Semana 47) | Todos | Não começado |
+| 13 | Pedro confirmar a mudança no `AutenticacaoService` feita pelo Leandro no PR #52 (pendência da aprovação do Gustavo) | Não | Pedro | Aguardando |
+
+Decisões já tomadas em 12/11/2026: D12 (autenticação das telas, opção (a), ADR-0009) e D13 (RN-04 "consulta e depois grava", risco aceito, ADR-0008).
