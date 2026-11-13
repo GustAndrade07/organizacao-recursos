@@ -7,10 +7,6 @@ public final class Textos {
 
     static final int NOME_MAXIMO = 120;
 
-    /** Duas ou mais palavras separadas por um espaço; cada uma começa por letra e só tem letras, marcas, apóstrofo, ponto e hífen. */
-    private static final Pattern NOME = Pattern.compile(
-            "\\p{L}[\\p{L}\\p{M}'’.-]*( \\p{L}[\\p{L}\\p{M}'’.-]*)+");
-
     private static final Pattern ESPACOS = Pattern.compile("[\\s\\p{Z}]+");
 
     private Textos() {
@@ -37,8 +33,37 @@ public final class Textos {
         return nome == null ? null : ESPACOS.matcher(nome.strip()).replaceAll(" ");
     }
 
-    /** O nome, já normalizado, é um nome completo (pelo menos duas palavras, até 120 caracteres)? */
+    /**
+     * O nome, já normalizado, é um nome completo (pelo menos duas palavras, até 120 caracteres)? Conferido palavra a
+     * palavra, sem expressão regular com repetição (regra S5998 do Sonar): palavras separadas por um espaço, cada uma
+     * começando por letra e só com letras, marcas (acentos soltos), apóstrofo, ponto e hífen.
+     */
     public static boolean nomeCompleto(String normalizado) {
-        return normalizado != null && normalizado.length() <= NOME_MAXIMO && NOME.matcher(normalizado).matches();
+        if (normalizado == null || normalizado.length() > NOME_MAXIMO) {
+            return false;
+        }
+        String[] palavras = normalizado.split(" ", -1);
+        if (palavras.length < 2) {
+            return false;
+        }
+        for (String palavra : palavras) {
+            if (!palavraDeNome(palavra)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static boolean palavraDeNome(String palavra) {
+        if (palavra.isEmpty() || !Character.isLetter(palavra.codePointAt(0))) {
+            return false;
+        }
+        return palavra.codePoints().allMatch(c -> Character.isLetter(c) || marca(c) || "'’.-".indexOf(c) >= 0);
+    }
+
+    private static boolean marca(int ponto) {
+        int tipo = Character.getType(ponto);
+        return tipo == Character.NON_SPACING_MARK || tipo == Character.COMBINING_SPACING_MARK
+                || tipo == Character.ENCLOSING_MARK;
     }
 }
