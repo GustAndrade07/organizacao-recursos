@@ -38,7 +38,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @Testcontainers
 class PoliticasPublicasIntegracaoTest {
 
-    private static final String LOGIN = "admin.politicas";
+    private static final String LOGIN = "admin.politicas@exemplo.com";
     private static final String SENHA = "senha-de-teste-123";
 
     @Container
