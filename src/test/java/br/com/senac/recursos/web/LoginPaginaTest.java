@@ -55,7 +55,7 @@ class LoginPaginaTest {
         assertThat(doc.select("link[rel=stylesheet]").eachAttr("href")).containsExactly("/css/tokens.css", "/css/app.css");
         assertThat(doc.selectFirst("main#conteudo h1[data-testid=login-titulo]").text()).isEqualTo("Entrar");
         assertThat(doc.selectFirst("[data-testid=login-descricao]").text())
-                .isEqualTo("Use seu login e senha para acessar o sistema de reservas.");
+                .isEqualTo("Use seu e-mail e senha para acessar o sistema de reservas.");
         assertThat(doc.select("h1")).hasSize(1);
     }
 
@@ -77,16 +77,18 @@ class LoginPaginaTest {
     }
 
     @Test
-    void campoDeLoginTemRotuloVisivelTipoEAutocompletarParaGerenciadorDeSenhas() throws Exception {
+    void campoDeEmailTemRotuloVisivelTipoEAutocompletarParaGerenciadorDeSenhas() throws Exception {
         Document doc = pagina("/login");
 
-        // O usuário entra com o login do cadastro ([a-z0-9._-]), não com e-mail: type=email recusaria "laura.mendes"
+        // DEF-010: o login é o e-mail. O campo continua chamado "login" (contrato do POST /login), mas é type=email.
         var campo = doc.selectFirst("input[data-testid=login-usuario]");
-        assertThat(campo.attr("type")).isEqualTo("text");
+        assertThat(campo.attr("type")).isEqualTo("email");
         assertThat(campo.attr("name")).isEqualTo("login");
+        assertThat(campo.attr("inputmode")).isEqualTo("email");
+        assertThat(campo.attr("placeholder")).isEqualTo("nome@exemplo.com");
         assertThat(campo.attr("autocomplete")).isEqualTo("username");
         assertThat(campo.hasAttr("required")).isTrue();
-        assertThat(doc.selectFirst("label[for=" + campo.id() + "]").text()).isEqualTo("Login");
+        assertThat(doc.selectFirst("label[for=" + campo.id() + "]").text()).isEqualTo("E-mail");
     }
 
     @Test
@@ -124,7 +126,7 @@ class LoginPaginaTest {
 
         var aviso = doc.selectFirst("[data-testid=login-erro]");
         assertThat(aviso.attr("role")).isEqualTo("alert");
-        assertThat(aviso.text()).isEqualTo("Login ou senha incorretos. Confira os dados e tente novamente.");
+        assertThat(aviso.text()).isEqualTo("E-mail ou senha incorretos. Confira os dados e tente novamente.");
         assertThat(doc.selectFirst("input[data-testid=login-usuario]")).isNotNull();
     }
 

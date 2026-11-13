@@ -26,7 +26,7 @@ class MigracoesBancoTest extends BancoIntegracaoTest {
                 String.class);
 
         assertThat(falhas).isZero();
-        assertThat(versoes).contains("1");
+        assertThat(versoes).contains("1", "2");
     }
 
     @Test

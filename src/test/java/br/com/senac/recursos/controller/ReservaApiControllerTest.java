@@ -340,7 +340,7 @@ class ReservaApiControllerTest extends ApiIntegracaoTest {
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$[0].estadoAnterior").doesNotExist())
                     .andExpect(jsonPath("$[0].estadoNovo").value("SOLICITADA"))
-                    .andExpect(jsonPath("$[1].usuarioLogin").value("resp"))
+                    .andExpect(jsonPath("$[1].usuarioLogin").value("resp@exemplo.com"))
                     .andExpect(jsonPath("$[1].instante").value("2026-11-02T08:00:00Z"))
                     .andExpect(jsonPath("$[1].estadoAnterior").value("SOLICITADA"))
                     .andExpect(jsonPath("$[1].estadoNovo").value("APROVADA"))
@@ -458,7 +458,7 @@ class ReservaApiControllerTest extends ApiIntegracaoTest {
 
             obter(responsavel, "/api/reservas/" + id + "/historico")
                     .andExpect(jsonPath("$.length()").value(2))
-                    .andExpect(jsonPath("$[1].usuarioLogin").value("sol"))
+                    .andExpect(jsonPath("$[1].usuarioLogin").value("sol@exemplo.com"))
                     .andExpect(jsonPath("$[1].instante").value("2026-11-05T09:00:00Z"))
                     .andExpect(jsonPath("$[1].estadoAnterior").value("APROVADA"))
                     .andExpect(jsonPath("$[1].estadoNovo").value("CANCELADA"))
@@ -476,7 +476,7 @@ class ReservaApiControllerTest extends ApiIntegracaoTest {
 
             obter(administrador, "/api/reservas/" + id + "/historico")
                     .andExpect(jsonPath("$.length()").value(2))
-                    .andExpect(jsonPath("$[1].usuarioLogin").value("resp"))
+                    .andExpect(jsonPath("$[1].usuarioLogin").value("resp@exemplo.com"))
                     .andExpect(jsonPath("$[1].instante").value("2026-11-10T10:20:00Z"))
                     .andExpect(jsonPath("$[1].estadoAnterior").value("APROVADA"))
                     .andExpect(jsonPath("$[1].estadoNovo").value("NAO_COMPARECEU"))
@@ -493,7 +493,7 @@ class ReservaApiControllerTest extends ApiIntegracaoTest {
 
             obter(responsavel, "/api/reservas/" + id + "/historico")
                     .andExpect(jsonPath("$.length()").value(2))
-                    .andExpect(jsonPath("$[1].usuarioLogin").value("resp"))
+                    .andExpect(jsonPath("$[1].usuarioLogin").value("resp@exemplo.com"))
                     .andExpect(jsonPath("$[1].instante").value("2026-11-01T12:00:00Z"))
                     .andExpect(jsonPath("$[1].estadoAnterior").value("SOLICITADA"))
                     .andExpect(jsonPath("$[1].estadoNovo").value("REJEITADA"))

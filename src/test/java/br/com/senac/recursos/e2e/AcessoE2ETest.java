@@ -82,7 +82,7 @@ class AcessoE2ETest extends E2ETeste {
         abrir("/login?erro");
 
         assertThat(testid("login-erro")).isVisible();
-        assertThat(testid("login-erro")).containsText("Login ou senha incorretos");
+        assertThat(testid("login-erro")).containsText("E-mail ou senha incorretos");
         assertThat(focado()).isEqualTo("login-erro");
     }
 

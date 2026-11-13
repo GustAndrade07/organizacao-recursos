@@ -171,7 +171,7 @@ class ResponsavelEAdministradorE2ETest extends E2ETeste {
     @Test
     void administradorCadastraUsuarioPelaTelaEOUsuarioNovoEntra() {
         entrarComo(PerfilUsuario.ADMINISTRADOR);
-        String login = "e2e-novo-" + java.util.UUID.randomUUID().toString().substring(0, 6);
+        String login = "e2e-novo-" + java.util.UUID.randomUUID().toString().substring(0, 6) + "@exemplo.com";
 
         abrir("/admin/usuarios/novo");
         testid("usuario-form-nome").fill("Pessoa Nova");
@@ -187,7 +187,7 @@ class ResponsavelEAdministradorE2ETest extends E2ETeste {
         testid("usuario-form-senha").fill("senha-nova-123");
         testid("usuario-form-perfil").selectOption("RESPONSAVEL");
         pagina.waitForNavigation(() -> testid("usuario-form-salvar").click());
-        assertThat(testid("usuarios-sucesso")).containsText("Pessoa Nova já pode entrar com o login " + login);
+        assertThat(testid("usuarios-sucesso")).containsText("Pessoa Nova já pode entrar com o e-mail " + login);
         semRolagemHorizontal();
         print("05-usuarios-lista");
         contexto.clearCookies();
