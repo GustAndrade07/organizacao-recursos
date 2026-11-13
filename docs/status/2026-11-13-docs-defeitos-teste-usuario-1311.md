@@ -3,7 +3,7 @@
 **Quem:** quem abrir o PR, com IA; a IA só escreveu os arquivos. Cada área decide o que fazer com os defeitos da sua parte (Gustavo: banco; Pedro: back-end; Leandro: front-end).
 
 ## O que mudou
-- `docs/defeitos/DEF-003.md` a `DEF-009.md`: sete defeitos achados num teste como usuário, com Playwright, em 13/11/2026, na `main` em `bc40183`. Nenhum está corrigido; cada um traz o teste de regressão **proposto**.
+- `docs/defeitos/DEF-003.md` a `DEF-010.md`: oito defeitos achados num teste como usuário, com Playwright, em 13/11/2026, na `main` em `bc40183`. Nenhum está corrigido; cada um traz o teste de regressão **proposto**.
 - Nenhum código, teste, migração ou configuração mudou.
 
 | Defeito | Resumo | Severidade | Depende de decisão do grupo? |
@@ -15,6 +15,7 @@
 | DEF-007 | Retirada e devolução antes do horário da reserva | baixa a média | sim |
 | DEF-008 | Login bloqueado mostra "senha incorreta" | baixa | sim (segurança × usabilidade) |
 | DEF-009 | URL inexistente logado dá 403; favicon 404 | baixa | não |
+| DEF-010 | Login é nome de usuário; o usuário decidiu que tem que ser e-mail (com `@`, obrigatório) | média | **decidido pelo usuário do teste; falta alinhar com o grupo** (Pedro: RF-01; Gustavo: migração V2; Leandro: telas) |
 
 DEF-003, DEF-005, DEF-006, DEF-007 e DEF-008 tocam ponto que o PRD não decide: entram como **proposta** e pergunta em aberto, não como política (regra 4 da seção 9 do `AGENTS.md`).
 
