@@ -97,7 +97,7 @@ Demais riscos do Spring Framework 6.2.19 (`spring-web`, `spring-beans`, `spring-
 |---|---|---|---|---|---|
 | CVE-2026-41707 | `spring-security-oauth2-jose` | Replay de prova DPoP: o cache de `jti` do `DPoPProofJwtDecoderFactory` tem tamanho fixo, e quem inunda o servidor consegue expulsar entradas e reusar uma prova DPoP interceptada (CWE-294) | 7,4 High | 0,39% | **Não atinge.** Detalhe abaixo da tabela. |
 | CVE-2026-47842 | `spring-security-crypto` | `AesBytesEncryptor` com o construtor de dois argumentos (ou gerador de IV nulo) em CBC cifra com vetor de inicialização zerado (CWE-326) | 6,5 Medium | 0,15% | **Não atinge.** O projeto não usa `Encryptors` nem nenhum `*BytesEncryptor`/`TextEncryptor` (0 ocorrências em `src/`). Do `crypto`, usa só o `BCryptPasswordEncoder`. |
-| CVE-2026-59276 | `spring-security-core` | Comparações de valores sensíveis com `String.equals()`, que termina no primeiro caractere diferente e deixa o tempo de resposta vazar quanto do valor bate (CWE-208) | 5,9 Medium | 0,33% | **Provavelmente não atinge; não verificado.** Detalhe abaixo da tabela. |
+| CVE-2026-59276 | `spring-security-core` | Comparações de valores sensíveis com `String.equals()`, que termina no primeiro caractere diferente e deixa o tempo de resposta vazar quanto do valor bate (CWE-208) | 5,9 Medium | 0,33% | ~~Provavelmente não atinge; não verificado.~~ **Não atinge** (verificado em 13/11/2026 no advisory oficial, seção 8.1). |
 
 **Por que o CVE-2026-41707 não nos atinge:**
 - O suporte a DPoP liga **sozinho** no resource server: o `OAuth2ResourceServerConfigurer` 6.5.11 aplica o `DPoPAuthenticationConfigurer` quando a classe `DPoPProofJwtDecoderFactory` está no classpath, o que foi conferido no bytecode. Ou seja, o código vulnerável roda.
@@ -117,6 +117,54 @@ Nenhum dos três está na lista KEV de exploração conhecida. Na mesma leitura,
 **Decisão:** os três ficam **aceitos com justificativa**.
 - Responsável: Gustavo.
 - Revisão: quando sair uma 6.5.12 (o Spring Boot 3.5.x a traz pelo BOM) ou quando o projeto migrar para o Spring Boot 4.
-- O CVE-2026-59276 fica marcado como **não verificado** até alguém conferir os componentes afetados.
+- O CVE-2026-59276 fica marcado como **não verificado** até alguém conferir os componentes afetados. — **conferido em 13/11/2026: não atinge** (seção 8.1).
 - Marcados como **Accepted** no painel do SonarCloud em 12/11/2026, cada um com o motivo desta seção, e conferidos no filtro "Accepted". O filtro mostrava 6 riscos aceitos: os 2 do Spring Framework (seção 6), o `jaxb-core` (seção 7) e estes 3.
 - Esses três riscos entram como risco residual em `docs/decisao-qualidade.md`, do Leandro.
+
+### 8.1 CVE-2026-59276 conferido no advisory oficial em 13/11/2026 (Gustavo)
+
+**Veredito: não atinge o projeto.** Sai de "não verificado" para "verificado: não atinge".
+
+**Fontes (todas lidas em 13/11/2026):**
+- Advisory oficial do Spring: https://spring.io/security/cve-2026-59276 (publicado em 20/08/2026, severidade Medium, vetor CVSS 3.1 `AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:N/A:N`).
+- NVD (`services.nvd.nist.gov/rest/json/cves/2.0?cveId=CVE-2026-59276`, situação "Analyzed"): 6.5.0 a 6.5.11 afetadas, correção a partir da 6.5.12.
+- OSV (`api.osv.dev/v1/vulns/CVE-2026-59276`): mesmas faixas, referência ao mesmo advisory.
+- `git grep` em `src/` e no `pom.xml` na `main` `bc40183`, e `dependency:tree` do mesmo commit.
+
+**Componentes afetados, segundo o advisory, e o que o projeto usa:**
+
+| Componente afetado | Condição para ser atingido (advisory) | No projeto |
+|---|---|---|
+| `DigestAuthenticationFilter` | Usar autenticação HTTP Digest | Não usa: API com JWT Bearer e telas com formulário (`SegurancaConfig`, `SegurancaDasTelasConfig`) |
+| `KeyBasedPersistenceTokenService` | Usar essa classe (nenhum componente do Spring Security a liga por padrão) | Não usa |
+| `BalloonHashingPassword4jPasswordEncoder` e `Pbkdf2Password4jPasswordEncoder` | Verificar senha com esses codificadores | Não usa: o único codificador é o `BCryptPasswordEncoder` (`SegurancaConfig`, linha 160); a biblioteca Password4j nem está no `dependency:tree` |
+| `InMemoryOAuth2AuthorizationService` | Rodar um servidor de autorização OAuth2 com o serviço em memória | Não usa: o projeto é só *resource server*; `spring-security-oauth2-authorization-server` não está no `dependency:tree` |
+
+`git grep -i -E 'DigestAuthentication|KeyBasedPersistenceTokenService|Password4j|BalloonHashing|Pbkdf2|InMemoryOAuth2AuthorizationService|authorization-server|httpDigest'` em `src/` e no `pom.xml`: **0 ocorrências**. Os três valores sensíveis que a seção 8 citava (token CSRF, assinatura HS256 verificada pela Nimbus, BCrypt) **não** estão na lista de componentes afetados.
+
+**Versão corrigida:** a 6.5.12 existe, mas o advisory a marca como **"Enterprise Support only"**; no Maven Central a última 6.5.x continua sendo a 6.5.11 (`maven-metadata.xml` de `spring-security-core` lido em 13/11/2026). As correções abertas (OSS) são 7.0.7 e 7.1.1, que exigem o Spring Boot 4. A decisão da seção 8 (aceito com justificativa, responsável Gustavo) continua, agora com o motivo "componente afetado não usado" em vez de "provavelmente não atinge".
+
+**Painel atualizado em 13/11/2026 (logado):** o risco continua **Accepted**, com um comentário novo que registra o veredito "verificado, não atinge" e aponta para esta seção. O comentário de 12/11 ("não verificado") ficou no histórico; o painel não abriu a edição dele na largura usada.
+
+## 9. Dependências novas desde o último registro (13/11/2026, Gustavo)
+
+Comparação do `pom.xml` da `main` `bc40183` com o que este documento citava até a seção 8: entraram o springdoc (RF-14), o Cucumber com o `junit-platform-suite` (BDD), o Playwright (E2E) e o override do `commons-lang3`. Nenhuma delas aparecia aqui.
+
+**Como foi verificado (13/11/2026):**
+- Versões e escopo: `.\mvnw.cmd -B dependency:tree` na `main` `bc40183`.
+- CVE conhecido: consulta à base pública **OSV** (`api.osv.dev/v1/query`, que agrega GitHub Security Advisories e NVD), pacote a pacote, com a versão exata resolvida. Para o CVE do `commons-lang3`, também o registro do **NVD**.
+- Versão mais nova: `maven-metadata.xml` de cada artefato no **Maven Central**.
+- Painel "Dependency risks" do SonarCloud, logado, branch `main`, lido em 13/11/2026 (a API sem login respondeu 401): **54 riscos em 174 dependências**, e **nenhum** é das dependências desta seção (0 menções a `commons-lang3`, springdoc, swagger, webjars, Cucumber, gherkin, Playwright ou `junit-platform`).
+
+| Dependência (versão resolvida) | Escopo | Motivo | CVE conhecido (OSV, 13/11/2026) | Observação |
+|---|---|---|---|---|
+| `org.springdoc:springdoc-openapi-starter-webmvc-ui` 2.8.17 (e `-webmvc-api`, `-common` 2.8.17) | **compile** (vai no jar e roda em produção) | RF-14: documentação OpenAPI gerada do código, `/v3/api-docs` e `/swagger-ui` (PR #61) | Nenhum | 2.8.17 é a última da linha 2.8 (Spring Boot 3.5) no Maven Central; a 3.x é a linha do Spring Boot 4. O Swagger exige sessão (`docs/seguranca/matriz-autorizacao.md`) |
+| ↳ transitivos: `io.swagger.core.v3:swagger-core-jakarta` 2.2.47 (e `-models`, `-annotations`), `org.webjars:swagger-ui` 5.32.2, `org.webjars:webjars-locator-lite` 1.1.3 | compile | Trazidos pelo springdoc | Nenhum (também conferido o pacote npm `swagger-ui` 5.32.2) | — |
+| `org.apache.commons:commons-lang3` **3.22.0** (override por `commons-lang3.version`) | compile | Trazido pelo `swagger-core-jakarta`. O Spring Boot 3.5.16 gerencia a **3.17.0**, que tem o **CVE-2025-48924** (GHSA-j288-q9x7-2f5v): recursão sem limite em `ClassUtils.getClass(...)`, que pode lançar `StackOverflowError` com entrada muito longa; NVD: CVSS 3.1 5,3 Medium (`AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L`), corrigido na 3.18.0 | 3.22.0: nenhum. 3.17.0: CVE-2025-48924 | Subida na mesma linha 3.x (regra 5 do `AGENTS.md`), PR #61, depois de o SonarCloud acusar "1 new dependency risk". 3.22.0 é a última no Maven Central (13/11/2026) |
+| `io.cucumber:cucumber-java`, `cucumber-spring`, `cucumber-junit-platform-engine` 7.23.0, com o `io.cucumber:cucumber-bom` 7.23.0 no `dependencyManagement` | **test** (não vai no jar) | BDD executável: `aprovacao-bloqueio.feature` roda no `verify` (PR #61) | Nenhum (também conferidos `cucumber-core` 7.23.0, `gherkin` 32.1.1, `messages` 27.2.0, `html-formatter` 21.10.1) | Fica na 7.23.0 de propósito: da 7.26 em diante o engine exige JUnit Platform 1.13 e o Spring Boot 3.5.16 gerencia a 1.12.2 (comentário no `pom.xml`). A última no Maven Central é a 8.0.4 |
+| `org.junit.platform:junit-platform-suite` 1.12.2 (versão do Spring Boot) | test | Suíte JUnit que dispara os cenários do Cucumber | Nenhum (também `junit-platform-suite-engine` 1.12.2) | — |
+| `com.microsoft.playwright:playwright` 1.63.0 (e `driver`, `driver-bundle` 1.63.0) | test | E2E das telas em navegador real | Nenhum | A última no Maven Central é a 1.65.0 (12/11/2026); não há CVE que justifique subir a esta altura |
+
+**Leitura:** só uma dependência nova vai para produção com risco conhecido na versão gerenciada pelo Boot, o `commons-lang3`, e ela já está corrigida pelo override. As de escopo test não entram no jar. Nenhum CVE foi inventado: onde a OSV não devolve nada, a coluna diz "Nenhum", com a data da consulta, e isso não garante que o SonarCloud não acuse algo que a OSV ainda não tem.
+
+**Painel, mesma leitura (13/11/2026):** nada a marcar para as dependências desta seção. Seguem **abertos** riscos que não são delas: `commons-compress` 1.24.0 (2, test), `json-smart` 2.5.2 (test), `spring-web`, `spring-webmvc`, `spring-beans` e `spring-expression` 6.2.19 (vários, quase todos "Unscored (pending)"), `HdrHistogram` e `LatencyUtils` (Low, runtime) e um novo no `logback-classic` 1.5.38 (CVE-2026-104721, "Unscored (pending)"). Não foram avaliados neste PR; ficam para a próxima leitura (seção 5). Lidos 52 dos 54 itens da lista; 2 não carregaram na página.
