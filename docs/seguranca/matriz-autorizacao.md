@@ -63,6 +63,9 @@ Decisão **D12, opção (a)** (12/11/2026, ADR-0009): formulário em `/login` co
 |---|---|---|---|---|---|---|
 | GET | / | login | ok | ok | ok | RF-01 (leva à primeira tela do menu do perfil) |
 | GET | /login | ok | ok | ok | ok | RF-01, tela 1 |
+| GET | /privacidade | ok | ok | ok | ok | RF-15 (LGPD, transparência), tela 17; pública |
+| GET | /cookies | ok | ok | ok | ok | RF-15, tela 18; pública |
+| GET | /termos | ok | ok | ok | ok | RF-15, tela 19; pública |
 | GET | /recursos/disponiveis | login | ok | ok | ok | RF-03 (como `GET /api/recursos/disponiveis`) |
 | GET | /reservas/nova | login | ok | ok | ok | RF-04 |
 | POST | /reservas | login | ok | ok | ok | RF-04 (como `POST /api/reservas`) |
