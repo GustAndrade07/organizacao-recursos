@@ -95,6 +95,18 @@ class TentativasDeLoginTest {
         assertThat(tentativas.bloqueado("")).isTrue();
     }
 
+    /** Texto enorme não vira chave enorme: passa de 254 caracteres nenhum e-mail é válido, então todos dividem um balde. */
+    @Test
+    void chaveDeTextoEnormeEhLimitadaEOMapaNaoCresceComEle() {
+        for (int i = 0; i < 5; i++) {
+            tentativas.falhou("a".repeat(300) + i);
+        }
+
+        assertThat(tentativas.registrosNaMemoria()).isEqualTo(1);
+        assertThat(tentativas.bloqueado("a".repeat(300) + "outro")).isTrue();
+        assertThat(tentativas.bloqueado("a".repeat(100))).isFalse();
+    }
+
     @Test
     void registrosVencidosSaemDaMemoriaQuandoOMapaPassaDoLimite() {
         for (int i = 0; i <= TentativasDeLogin.LIMPAR_ACIMA_DE; i++) {

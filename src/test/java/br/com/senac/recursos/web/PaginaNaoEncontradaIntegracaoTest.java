@@ -35,7 +35,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @Testcontainers
 class PaginaNaoEncontradaIntegracaoTest {
 
-    private static final String LOGIN = "admin.teste";
+    private static final String LOGIN = "admin.teste@exemplo.com";
     private static final String SENHA = "senha-de-teste-123";
 
     @Container

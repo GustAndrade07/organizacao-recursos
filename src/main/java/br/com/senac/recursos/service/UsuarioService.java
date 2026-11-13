@@ -8,6 +8,7 @@ import br.com.senac.recursos.exception.EntidadeNaoEncontradaException;
 import br.com.senac.recursos.exception.LoginEmUsoException;
 import br.com.senac.recursos.model.Usuario;
 import br.com.senac.recursos.repository.UsuarioRepository;
+import br.com.senac.recursos.validation.Emails;
 import java.util.List;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -33,7 +34,7 @@ public class UsuarioService {
         if (usuarios.existsByLogin(pedido.login())) {
             throw new LoginEmUsoException(pedido.login());
         }
-        Usuario usuario = new Usuario(pedido.nome().trim(), pedido.login(),
+        Usuario usuario = new Usuario(pedido.nome(), pedido.login(),
                 codificadorDeSenha.encode(pedido.senha()), pedido.perfil());
         try {
             return conversor.paraResposta(usuarios.saveAndFlush(usuario));
@@ -55,17 +56,23 @@ public class UsuarioService {
     }
 
     /**
-     * Cria o primeiro Administrador se ainda não existir usuário com esse login. Idempotente: rodar de novo não muda
+     * Cria o primeiro Administrador se ainda não existir usuário com esse e-mail (o login é o e-mail, DEF-010; um
+     * valor que não seja e-mail interrompe a subida). Idempotente: rodar de novo não muda
      * nada, nem a senha de quem já existe.
      *
      * @return {@code true} se criou
      */
     @Transactional
     public boolean garantirAdministrador(String nome, String login, String senha) {
-        if (usuarios.existsByLogin(login)) {
+        String email = Emails.normalizar(login);
+        if (!Emails.valido(email)) {
+            throw new IllegalArgumentException("ADMIN_LOGIN precisa ser um e-mail válido (nome@dominio.com, até "
+                    + Emails.TAMANHO_MAXIMO + " caracteres). A aplicação não sobe com outro valor.");
+        }
+        if (usuarios.existsByLogin(email)) {
             return false;
         }
-        usuarios.save(new Usuario(nome, login, codificadorDeSenha.encode(senha), PerfilUsuario.ADMINISTRADOR));
+        usuarios.save(new Usuario(nome, email, codificadorDeSenha.encode(senha), PerfilUsuario.ADMINISTRADOR));
         return true;
     }
 }

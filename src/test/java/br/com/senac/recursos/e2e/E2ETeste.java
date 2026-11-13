@@ -146,7 +146,7 @@ abstract class E2ETeste {
      * primeira vez. Volta com a sessão no contexto do navegador e a página na tela inicial do perfil.
      */
     UsuarioAutenticado entrarComo(PerfilUsuario perfil) {
-        String login = "e2e-" + perfil.name().toLowerCase();
+        String login = "e2e-" + perfil.name().toLowerCase() + "@exemplo.com";
         if (!repositorioDeUsuarios.existsByLogin(login)) {
             usuarios.criar(new UsuarioRequest(nomeDe(perfil), login, SENHA, perfil));
         }

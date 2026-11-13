@@ -22,7 +22,7 @@ Java 21 · Spring Boot 3 · Maven Wrapper · Thymeleaf · Spring Security (JWT n
 git clone https://github.com/GustAndrade07/organizacao-recursos.git
 cd organizacao-recursos
 docker compose up -d          # PostgreSQL 16 em localhost:5432
-ADMIN_LOGIN=admin ADMIN_SENHA='<escolha uma senha>' ./mvnw spring-boot:run   # http://localhost:8080
+ADMIN_LOGIN=admin@exemplo.com ADMIN_SENHA='<escolha uma senha>' ./mvnw spring-boot:run   # http://localhost:8080
 ```
 Conferir que subiu: abrir http://localhost:8080/actuator/health (deve responder `{"status":"UP"}`).
 
@@ -43,11 +43,13 @@ A forma do PowerShell foi rodada em 13/11/2026 no Windows 11 (commit `bc40183`, 
 
 **Por que as duas variáveis:** o banco começa vazio e o cadastro de usuário exige um Administrador. `ADMIN_LOGIN` e `ADMIN_SENHA` criam o **primeiro Administrador** no start (`AdministradorInicialConfig`); sem elas a aplicação sobe, mas **ninguém consegue entrar** nem nas telas nem na API. Escolha a senha na hora e nunca a escreva no repositório. Esse mesmo login serve para o formulário em http://localhost:8080/login e para o `POST /api/auth/login`.
 
+**O login é o e-mail** (minúsculas, até 254 caracteres, formato `nome@dominio.com`). O campo continua chamado `login` no formulário, no JSON da API e em `ADMIN_LOGIN`, mas o valor é o e-mail; o cadastro de usuário pede nome completo, e-mail, senha e perfil. Banco local criado antes dessa mudança (usuários sem `@`) não é convertido: recrie com `docker compose down -v` e suba de novo, ou peça ao Administrador que recadastre as pessoas.
+
 ### API REST e primeiro acesso
 As telas ficam em `http://localhost:8080/login` e demais rotas do inventário; a API REST fica sob `/api/**` (ADR-0008). Com o Administrador inicial criado acima ("Como subir"), pegue o token:
 ```bash
 curl -s -X POST localhost:8080/api/auth/login -H 'Content-Type: application/json' \
-     -d '{"login":"admin","senha":"<sua senha>"}'     # devolve {"token": ...}
+     -d '{"login":"admin@exemplo.com","senha":"<sua senha>"}'     # devolve {"token": ...}
 ```
 Mande o token em cada requisição: `Authorization: Bearer <token>`. Rotas e permissões: `docs/seguranca/matriz-autorizacao.md`.
 

@@ -94,7 +94,7 @@ class LimiteDeTentativasE2ETest extends E2ETeste {
         tentarPelaTela(login, SENHA);
 
         assertThat(caminhoAtual()).doesNotStartWith("/login");
-        assertThat(testid("menu-usuario")).hasText("Pessoa " + login);
+        assertThat(testid("menu-usuario")).hasText("Pessoa Limite");
     }
 
     @Test
@@ -119,11 +119,13 @@ class LimiteDeTentativasE2ETest extends E2ETeste {
         return pagina.getByTestId(id);
     }
 
-    private String usuario(String login) {
-        if (!repositorioDeUsuarios.existsByLogin(login)) {
-            usuarios.criar(new UsuarioRequest("Pessoa " + login, login, SENHA, PerfilUsuario.SOLICITANTE));
+    /** Cria o usuário e devolve o e-mail dele ({@code apelido@exemplo.com}). */
+    private String usuario(String apelido) {
+        String email = apelido + "@exemplo.com";
+        if (!repositorioDeUsuarios.existsByLogin(email)) {
+            usuarios.criar(new UsuarioRequest("Pessoa Limite", email, SENHA, PerfilUsuario.SOLICITANTE));
         }
-        return login;
+        return email;
     }
 
     /** Preenche e envia o formulário como a pessoa faria, e espera a página seguinte. */
