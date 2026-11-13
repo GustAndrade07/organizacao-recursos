@@ -25,4 +25,4 @@
 
 ## Não verificado
 - Run do CI (só depois do push).
-- `docs/rtm.md` e `docs/status-requisitos.md` **não foram tocados de propósito**: o PR #57 reescreve os dois e qualquer edição aqui daria conflito. Depois do merge do #57, a linha RN-08 sai de `parcial` para feito, citando `ReservaApiControllerTest.AuditoriaDeCadaTransicao`; está anotado na descrição do PR.
+- `docs/rtm.md` e `docs/status-requisitos.md`: atualizados depois do merge do PR #57 na `main` (RN-08 `feito`, `.feature` como evidência de RF-07, RF-08, RN-04, RN-05 e RN-06).

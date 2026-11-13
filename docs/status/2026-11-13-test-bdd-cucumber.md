@@ -26,4 +26,4 @@
 ## Não verificado
 - Run do CI (só depois do push).
 - Quanto o Cucumber aumenta o tempo do `verify` no CI (local: +15 s mais a subida de um contêiner a mais).
-- **RTM e `status-requisitos.md` não foram tocados de propósito:** o PR #57 reescreve os dois e qualquer edição aqui daria conflito. Depois do merge do #57, as linhas RF-07, RF-08, RN-04, RN-05 e RN-06 ganham o `.feature` como evidência; está anotado na descrição do PR.
+- RTM e `status-requisitos.md`: atualizados depois do merge do PR #57 na `main`; o `.feature` entra como evidência de RF-07, RF-08, RN-04, RN-05 e RN-06.

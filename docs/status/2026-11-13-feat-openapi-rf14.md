@@ -32,4 +32,4 @@ As rotas do Swagger **exigem login**. Não é um ponto da seção 9 do plano (ne
 - Swagger UI aberto num navegador de verdade (o teste lê o JSON e o redirecionamento, não a página).
 - Run do CI e efeito do springdoc no tempo do build no CI.
 - Se o SonarCloud aponta algo na dependência nova (`docs/seguranca/riscos-dependencias.md` é do Gustavo).
-- `docs/status-requisitos.md` e `docs/rtm.md` **não foram tocados de propósito**: o PR #57 reescreve os dois. Depois do merge dele, o RF-14 passa de `ausente` para feito, citando `OpenApiDocumentacaoTest`; anotado na descrição do PR.
+- `docs/status-requisitos.md` e `docs/rtm.md`: atualizados depois do merge do PR #57 na `main`; RF-14 passa a `feito`, citando `OpenApiDocumentacaoTest`.
