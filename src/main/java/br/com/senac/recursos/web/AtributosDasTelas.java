@@ -46,6 +46,12 @@ class AtributosDasTelas {
         return new CaminhoDoSite();
     }
 
+    /** Caminho da página aberta (sem o contexto), para o rodapé marcar o link da própria página com aria-current. */
+    @ModelAttribute("caminhoAtual")
+    String caminhoAtual(HttpServletRequest requisicao) {
+        return requisicao.getRequestURI().substring(requisicao.getContextPath().length());
+    }
+
     @ModelAttribute("usuario")
     UsuarioDaBarra usuario() {
         UsuarioDaSessao logado = logado();

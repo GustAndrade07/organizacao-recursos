@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<!--/*
+  Tela 18 do inventário (prefixos "politica-" e "rodape-politicas-"). Página pública, sem modelo.
+  Descreve o conjunto de cookies que o sistema emite (hoje só o JSESSIONID); PoliticasPublicasIntegracaoTest confere
+  que nenhum outro cookie sai e PoliticasPaginaTest, que esta página descreve só o que o teste espera. Um cookie novo
+  muda esta página no mesmo PR (regra 16 do AGENTS.md). Lista de definição e não tabela: é um cookie só.
+  O texto vem do Anexo A da Spec do vault (Spec - Políticas do site). Data literal (regra 14 do AGENTS.md).
+*/-->
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: pagina(titulo='Política de cookies', conteudo=~{::#conteudo-pagina})}">
+<head>
+    <title>Política de cookies</title>
+</head>
+<body>
+<div id="conteudo-pagina">
+    <article class="documento" data-testid="politica-cookies">
+      <div class="documento__cabecalho">
+        <h1 data-testid="politica-titulo">Política de cookies</h1>
+        <p class="documento__atualizacao" data-testid="politica-atualizacao">Última atualização: 13/11/2026</p>
+      </div>
+      <p class="alerta alerta--aviso" data-testid="politica-rascunho">Rascunho técnico, ainda não revisado por quem responde juridicamente pelo sistema. Não é parecer jurídico.</p>
+      <p class="documento__resumo">Esta página explica quais cookies o Organização de Recursos usa e por quê.</p>
+      <nav class="documento__indice" aria-label="Nesta página">
+        <p class="documento__indice-titulo">Nesta página</p>
+        <ul>
+          <li><a href="#o-que-e-um-cookie">O que é um cookie?</a></li>
+          <li><a href="#quais-cookies-usamos">Quais cookies usamos?</a></li>
+          <li><a href="#ele-e-criado-mesmo-se-eu-nao-entrar">Ele é criado mesmo se eu não entrar?</a></li>
+          <li><a href="#o-que-nao-usamos">O que não usamos?</a></li>
+          <li><a href="#e-a-api">E a API?</a></li>
+          <li><a href="#por-que-nao-ha-aviso-de-cookies">Por que não há aviso de cookies?</a></li>
+          <li><a href="#posso-recusar-ou-apagar-o-cookie">Posso recusar ou apagar o cookie?</a></li>
+          <li><a href="#onde-tiro-duvidas">Onde tiro dúvidas?</a></li>
+        </ul>
+      </nav>
+      <section class="documento__secao" aria-labelledby="o-que-e-um-cookie">
+        <h2 id="o-que-e-um-cookie">O que é um cookie?</h2>
+        <p>É um pequeno arquivo que o site guarda no seu navegador. Ele ajuda o site a lembrar de você enquanto você navega.</p>
+      </section>
+      <section class="documento__secao" aria-labelledby="quais-cookies-usamos">
+        <h2 id="quais-cookies-usamos">Quais cookies usamos?</h2>
+        <p>Usamos um só.</p>
+        <div class="documento__cookie" data-cookie>
+          <h3>JSESSIONID</h3>
+          <dl class="lista-dados">
+            <dt>Para que serve</dt>
+            <dd>Manter você logado enquanto usa o sistema e proteger os formulários contra pedidos falsos feitos em seu nome (token anti-falsificação de requisição).</dd>
+            <dt>Quanto dura</dt>
+            <dd>É um cookie de sessão: o navegador o apaga quando você o fecha, e ele também é apagado quando você sai do sistema. No servidor, a sessão termina depois de um tempo sem uso. O prazo padrão do Spring, a ferramenta que usamos, é de 30 minutos; esse prazo ainda precisa ser confirmado.</dd>
+            <dt>Atributos</dt>
+            <dd><strong>HttpOnly</strong>: programas rodando na página não conseguem ler o cookie. <strong>SameSite=Lax</strong>: o navegador não envia o cookie na maioria dos pedidos que vêm de outros sites. <strong>Secure</strong>: o cookie só viaja por conexão segura; isso vale quando o site roda em HTTPS e depende da configuração do ambiente, então não prometemos que esteja ligado.</dd>
+          </dl>
+        </div>
+      </section>
+      <section class="documento__secao" aria-labelledby="ele-e-criado-mesmo-se-eu-nao-entrar">
+        <h2 id="ele-e-criado-mesmo-se-eu-nao-entrar">Ele é criado mesmo se eu não entrar?</h2>
+        <p>Sim. O cookie é criado até quando você só abre a tela de login, porque ele é necessário para proteger o formulário de login. As páginas de política, como esta, não criam cookie.</p>
+      </section>
+      <section class="documento__secao" aria-labelledby="o-que-nao-usamos">
+        <h2 id="o-que-nao-usamos">O que não usamos?</h2>
+        <ul>
+          <li>Cookies de análise ou de estatística.</li>
+          <li>Cookies de publicidade.</li>
+          <li>Cookies de preferências.</li>
+          <li>Google Analytics.</li>
+          <li>Fontes, scripts ou imagens de terceiros.</li>
+          <li><code>localStorage</code>, que é outro espaço de guarda do navegador.</li>
+        </ul>
+      </section>
+      <section class="documento__secao" aria-labelledby="e-a-api">
+        <h2 id="e-a-api">E a API?</h2>
+        <p>A API (<code>/api</code>) usa um token JWT. O cliente que a usa envia o token no cabeçalho <code>Authorization</code> e é ele quem o guarda. O token não é cookie. Ele vale por 1 hora, e esse prazo pode ser mudado na configuração.</p>
+      </section>
+      <section class="documento__secao" aria-labelledby="por-que-nao-ha-aviso-de-cookies">
+        <h2 id="por-que-nao-ha-aviso-de-cookies">Por que não há aviso de cookies?</h2>
+        <p>Usamos só cookie estritamente necessário, sem o qual o sistema não funciona. Para esse tipo de cookie, não é preciso pedir consentimento. Esta página existe para ser transparente com você.</p>
+        <p>Se um dia o site tiver cookie que não seja essencial, ele pedirá o seu consentimento antes de usá-lo.</p>
+      </section>
+      <section class="documento__secao" aria-labelledby="posso-recusar-ou-apagar-o-cookie">
+        <h2 id="posso-recusar-ou-apagar-o-cookie">Posso recusar ou apagar o cookie?</h2>
+        <p>Você pode apagar cookies nas configurações do seu navegador. Sem o <code>JSESSIONID</code>, você não consegue entrar no sistema nem enviar formulários.</p>
+      </section>
+      <section class="documento__secao" aria-labelledby="onde-tiro-duvidas">
+        <h2 id="onde-tiro-duvidas">Onde tiro dúvidas?</h2>
+        <p>Escreva para <span data-pendente>a definir (e-mail de contato)</span>. Para saber como tratamos seus dados, leia a <a th:href="@{/privacidade}">Política de privacidade</a>.</p>
+      </section>
+    </article>
+</div>
+</body>
+</html>

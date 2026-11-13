@@ -66,7 +66,7 @@ class PoliticasE2ETest extends E2ETeste {
             semRolagemHorizontal(largura);
             // texto corrido legível: 16 px ou mais e coluna de no máximo 75 caracteres
             double fonte = ((Number) pagina.evaluate(
-                    "() => parseFloat(getComputedStyle(document.querySelector('.documento p')).fontSize)")).doubleValue();
+                    "() => parseFloat(getComputedStyle(document.querySelector('.documento__secao p')).fontSize)")).doubleValue();
             assertThat(fonte).isGreaterThanOrEqualTo(16.0);
             print("politica-" + destino[1].substring(1) + "-" + largura);
         }
