@@ -73,14 +73,20 @@ class EsquemaBancoTest extends BancoComDadosTest {
     }
 
     @Test
-    void emailJaCadastradoNaoRepeteEOIndiceUnicoEmLowerExiste() {
-        // "ana@exemplo.com" já existe (cenarioBase). Maiúsculas caem no CHECK; o índice em lower(login) é a segunda
-        // trava, contra qualquer caminho que um dia grave sem normalizar. Aqui se confere que ele existe e é único.
-        List<String> indices = jdbc.queryForList(
-                "select indexdef from pg_indexes where tablename = 'usuario' and indexname = 'usuario_login_minusculo_uq'",
-                String.class);
-        assertThat(indices).hasSize(1);
-        assertThat(indices.get(0)).contains("UNIQUE").contains("lower(login)");
+    void emailJaCadastradoNaoRepeteEOIndiceUnicoEmLowerBarraOutraCaixa() {
+        // "ana@exemplo.com" já existe (cenarioBase). A mesma conta com outra caixa já cai no CHECK; para provar o
+        // índice em lower(login) sozinho, uma transação tira o CHECK, insere "ANA@exemplo.com" e é desfeita no erro
+        // (DDL é transacional no PostgreSQL).
+        SQLException erro = violacaoDe(() -> tx.executeWithoutResult(status -> {
+            jdbc.execute("alter table usuario drop constraint usuario_login_e_email");
+            jdbc.update("insert into usuario (nome, login, senha_hash, perfil) values "
+                    + "('Ana Souza', 'ANA@exemplo.com', 'hash-de-teste', 'SOLICITANTE')");
+        }));
+
+        assertThat(erro.getSQLState()).isEqualTo("23505");
+        assertThat(erro.getMessage()).contains("usuario_login_minusculo_uq");
+        // a transação foi desfeita: o CHECK continua no banco
+        assertThat(inserirLogin("sem-arroba").getSQLState()).isEqualTo("23514");
         assertThat(inserirLogin("ana@exemplo.com").getSQLState()).isEqualTo("23505");
     }
 
@@ -100,7 +106,10 @@ class EsquemaBancoTest extends BancoComDadosTest {
                 bancoAceita = true;
                 jdbc.update("delete from usuario where login = ?", amostra);
             } catch (org.springframework.dao.DataIntegrityViolationException recusa) {
-                bancoAceita = !recusa.getMessage().contains("usuario_login_e_email");
+                String estado = ((java.sql.SQLException) recusa.getCause()).getSQLState();
+                assertThat(estado).as("a amostra '" + amostra + "' só pode cair no CHECK (23514) ou na UNIQUE (23505)")
+                        .isIn("23514", "23505");
+                bancoAceita = !"23514".equals(estado);
             }
             assertThat(bancoAceita).as("banco e Java sobre '" + amostra + "'")
                     .isEqualTo(br.com.senac.recursos.validation.Emails.valido(amostra));

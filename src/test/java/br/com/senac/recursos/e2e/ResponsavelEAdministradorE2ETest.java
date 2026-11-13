@@ -169,6 +169,29 @@ class ResponsavelEAdministradorE2ETest extends E2ETeste {
     }
 
     @Test
+    void cadastroRecusaEmojiNomeSemSobrenomeEEmailSemDominioEFicaNaTela() {
+        entrarComo(PerfilUsuario.ADMINISTRADOR);
+        String emoji = new String(Character.toChars(0x1F600));
+
+        abrir("/admin/usuarios/novo");
+        testid("usuario-form-nome").fill("Pessoa " + emoji);
+        testid("usuario-form-login").fill("pessoa@exemplo");
+        testid("usuario-form-senha").fill("senha-nova-123");
+        pagina.waitForNavigation(() -> testid("usuario-form-salvar").click());
+
+        assertThat(testid("usuario-form-nome-erro")).hasText("Não use emojis neste campo.");
+        assertThat(testid("usuario-form-login-erro")).hasText("Informe um e-mail válido, como nome@dominio.com.");
+        assertThat(pagina.locator("input[type=password]")).hasCount(1);
+        semRolagemHorizontal();
+        print("05-usuario-recusado");
+
+        testid("usuario-form-nome").fill("Pessoa");
+        testid("usuario-form-senha").fill("senha-nova-123");
+        pagina.waitForNavigation(() -> testid("usuario-form-salvar").click());
+        assertThat(testid("usuario-form-nome-erro")).containsText("Informe o nome completo");
+    }
+
+    @Test
     void administradorCadastraUsuarioPelaTelaEOUsuarioNovoEntra() {
         entrarComo(PerfilUsuario.ADMINISTRADOR);
         String login = "e2e-novo-" + java.util.UUID.randomUUID().toString().substring(0, 6) + "@exemplo.com";

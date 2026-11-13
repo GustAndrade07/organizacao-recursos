@@ -30,6 +30,15 @@ class UsuariosDaTelaTest {
     }
 
     @Test
+    void loginAntigoQueNaoEEmailNaoEhProcurado() {
+        assertThatThrownBy(() -> usuarios.loadUserByUsername("admin"))
+                .isInstanceOf(UsernameNotFoundException.class)
+                .hasMessage("E-mail ou senha incorretos.");
+
+        org.mockito.Mockito.verify(repositorio, org.mockito.Mockito.never()).findByLogin(org.mockito.ArgumentMatchers.any());
+    }
+
+    @Test
     void emailInexistenteDaAMesmaMensagemDeSenhaErrada() {
         when(repositorio.findByLogin("ninguem@exemplo.com")).thenReturn(Optional.empty());
 

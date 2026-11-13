@@ -98,6 +98,17 @@ class UsuarioRequestTest {
     }
 
     @Test
+    void loginRequestRecusaValorEnormeAntesDeChegarAoContadorDeTentativas() {
+        var longo = validador.validate(new LoginRequest("a".repeat(255), "qualquer"));
+        var senhaEnorme = validador.validate(new LoginRequest("ana@exemplo.com", "s".repeat(1025)));
+        var noLimite = validador.validate(new LoginRequest("a".repeat(254), "s".repeat(1024)));
+
+        assertThat(longo).extracting(v -> v.getPropertyPath().toString()).containsExactly("login");
+        assertThat(senhaEnorme).extracting(v -> v.getPropertyPath().toString()).containsExactly("senha");
+        assertThat(noLimite).isEmpty();
+    }
+
+    @Test
     void loginRequestSoExigePreenchimentoEFormatoRuimNaoViraErroDeValidacao() {
         var vazio = validador.validate(new LoginRequest("  ", ""));
         var semArroba = validador.validate(new LoginRequest("ana", "qualquer"));

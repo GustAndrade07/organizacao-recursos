@@ -1,6 +1,7 @@
 package br.com.senac.recursos.banco;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -64,15 +65,10 @@ class MigracaoLoginEmailBancoTest extends BancoIntegracaoTest {
             validada.next();
             assertThat(validada.getBoolean(1)).as("CHECK criado NOT VALID: só vale para gravações novas").isFalse();
 
-            SQLException recusa = null;
-            try {
-                comando.execute("insert into usuario (nome, login, senha_hash, perfil) values "
-                        + "('Novo Usuario', 'sem-arroba', 'hash', 'SOLICITANTE')");
-            } catch (SQLException erro) {
-                recusa = erro;
-            }
-            assertThat(recusa == null).as("gravação nova sem @ é recusada").isFalse();
-            assertThat(recusa.getSQLState()).isEqualTo("23514");
+            assertThatThrownBy(() -> comando.execute("insert into usuario (nome, login, senha_hash, perfil) values "
+                    + "('Novo Usuario', 'sem-arroba', 'hash', 'SOLICITANTE')"))
+                    .as("gravação nova sem @ é recusada")
+                    .isInstanceOfSatisfying(SQLException.class, erro -> assertThat(erro.getSQLState()).isEqualTo("23514"));
 
             comando.execute("insert into usuario (nome, login, senha_hash, perfil) values "
                     + "('Novo Usuario', 'novo@exemplo.com', 'hash', 'SOLICITANTE')");

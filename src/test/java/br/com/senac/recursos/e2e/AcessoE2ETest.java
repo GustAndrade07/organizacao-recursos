@@ -28,7 +28,7 @@ class AcessoE2ETest extends E2ETeste {
 
         abrir("/relatorios/utilizacao");
         pagina.waitForURL("**/login?destino=**");
-        testid("login-usuario").fill("e2e-responsavel");
+        testid("login-usuario").fill("  E2E-Responsavel@Exemplo.com ");
         testid("login-senha").fill(SENHA);
         pagina.waitForNavigation(() -> testid("login-entrar").click());
         pagina.waitForURL("**/relatorios/utilizacao");
@@ -44,13 +44,13 @@ class AcessoE2ETest extends E2ETeste {
         contexto.clearCookies();
 
         abrir("/login");
-        testid("login-usuario").fill("e2e-solicitante");
+        testid("login-usuario").fill("e2e-solicitante@exemplo.com");
         testid("login-senha").fill("senha-errada");
         pagina.waitForNavigation(() -> testid("login-entrar").click());
         pagina.waitForURL("**/login?erro");
 
         assertThat(testid("login-erro")).isVisible();
-        assertThat(testid("login-usuario")).hasValue("e2e-solicitante");
+        assertThat(testid("login-usuario")).hasValue("e2e-solicitante@exemplo.com");
         assertThat(testid("login-senha")).hasValue("");
     }
 
@@ -98,7 +98,7 @@ class AcessoE2ETest extends E2ETeste {
     void entrarFicaDesabilitadoEmEntrandoDuranteOEnvioEEnviaUmaVezSo() {
         var posts = segurarPosts("**/login");
         abrir("/login");
-        testid("login-usuario").fill("ana.lima");
+        testid("login-usuario").fill("ana.lima@exemplo.com");
         testid("login-senha").fill("segredo-de-teste");
 
         pagina.waitForRequest(r -> "POST".equals(r.method()), () -> testid("login-entrar").click());
@@ -111,7 +111,7 @@ class AcessoE2ETest extends E2ETeste {
         entrar.click(new Locator.ClickOptions().setForce(true));
         assertThat(enviosDeFormulario()).isEqualTo(1);
         assertThat(posts).hasSize(1);
-        assertThat(posts.get(0).postData()).contains("login=ana.lima").contains("senha=");
+        assertThat(posts.get(0).postData()).contains("login=ana.lima%40exemplo.com").contains("senha=");
     }
 
     @Test
