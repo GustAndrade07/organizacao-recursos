@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<!--/*
+  Tela 19 do inventário (prefixos "politica-" e "rodape-politicas-"). Página pública, sem modelo.
+  O texto é rascunho técnico: cada dado que o repositório não tem é um elemento com data-pendente (o aviso de rascunho
+  some quando a última pendência sair). O texto vem do Anexo A da Spec do vault (Spec - Políticas do site).
+  A data de atualização é literal, nunca do relógio (regra 14 do AGENTS.md).
+*/-->
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: pagina(titulo='Termos de uso', conteudo=~{::#conteudo-pagina})}">
+<head>
+    <title>Termos de uso</title>
+</head>
+<body>
+<div id="conteudo-pagina">
+    <article class="documento" data-testid="politica-termos">
+      <div class="documento__cabecalho">
+        <h1 data-testid="politica-titulo">Termos de uso</h1>
+        <p class="documento__atualizacao" data-testid="politica-atualizacao">Última atualização: 13/11/2026</p>
+      </div>
+      <p class="alerta alerta--aviso" data-testid="politica-rascunho">Rascunho técnico, ainda não revisado por quem responde juridicamente pelo sistema. Não é parecer jurídico.</p>
+      <p class="documento__resumo">Estes termos explicam as regras para usar o Organização de Recursos. Ao entrar no sistema, você concorda com elas.</p>
+      <nav class="documento__indice" aria-label="Nesta página">
+        <p class="documento__indice-titulo">Nesta página</p>
+        <ul>
+          <li><a href="#o-que-o-sistema-oferece">O que o sistema oferece?</a></li>
+          <li><a href="#quem-pode-usar">Quem pode usar?</a></li>
+          <li><a href="#como-devo-cuidar-da-minha-conta">Como devo cuidar da minha conta?</a></li>
+          <li><a href="#para-que-posso-usar-o-sistema">Para que posso usar o sistema?</a></li>
+          <li><a href="#o-que-nao-posso-fazer">O que não posso fazer?</a></li>
+          <li><a href="#o-que-fica-registrado">O que fica registrado?</a></li>
+          <li><a href="#uma-reserva-pode-ser-rejeitada-ou-cancelada">Uma reserva pode ser rejeitada ou cancelada?</a></li>
+          <li><a href="#o-site-tem-garantia-de-funcionar-sempre">O site tem garantia de funcionar sempre?</a></li>
+          <li><a href="#o-texto-pode-mudar">O texto pode mudar?</a></li>
+          <li><a href="#qual-lei-e-qual-foro-valem">Qual lei e qual foro valem?</a></li>
+        </ul>
+      </nav>
+      <section class="documento__secao" aria-labelledby="o-que-o-sistema-oferece">
+        <h2 id="o-que-o-sistema-oferece">O que o sistema oferece?</h2>
+        <p>O Organização de Recursos permite reservar salas, professores e materiais sem conflito de horário. Ele é um trabalho acadêmico (Senac, Qualidade de Software 2026.2).</p>
+        <p>Quem responde pelo sistema é <span data-pendente>a definir (nome de quem responde pelo sistema)</span>. Para falar com a equipe, escreva para <span data-pendente>a definir (e-mail de contato)</span>.</p>
+      </section>
+      <section class="documento__secao" aria-labelledby="quem-pode-usar">
+        <h2 id="quem-pode-usar">Quem pode usar?</h2>
+        <p>Pessoas que recebem uma conta, com um destes perfis: Solicitante, Responsável ou Administrador. Cada perfil só faz o que as suas permissões deixam.</p>
+      </section>
+      <section class="documento__secao" aria-labelledby="como-devo-cuidar-da-minha-conta">
+        <h2 id="como-devo-cuidar-da-minha-conta">Como devo cuidar da minha conta?</h2>
+        <ul>
+          <li>A conta é pessoal.</li>
+          <li>Não divida sua senha com ninguém.</li>
+          <li>Se achar que alguém usou sua conta, avise <span data-pendente>a definir (e-mail de contato)</span>.</li>
+        </ul>
+        <p>O que for feito com a sua conta é registrado em seu nome.</p>
+      </section>
+      <section class="documento__secao" aria-labelledby="para-que-posso-usar-o-sistema">
+        <h2 id="para-que-posso-usar-o-sistema">Para que posso usar o sistema?</h2>
+        <p>Só para reservar recursos da instituição.</p>
+      </section>
+      <section class="documento__secao" aria-labelledby="o-que-nao-posso-fazer">
+        <h2 id="o-que-nao-posso-fazer">O que não posso fazer?</h2>
+        <ul>
+          <li>Tentar burlar o bloqueio de conflito de horário.</li>
+          <li>Tentar burlar as permissões do seu perfil.</li>
+          <li>Tentar entrar com a conta de outra pessoa.</li>
+        </ul>
+      </section>
+      <section class="documento__secao" aria-labelledby="o-que-fica-registrado">
+        <h2 id="o-que-fica-registrado">O que fica registrado?</h2>
+        <p>As reservas e as mudanças nelas ficam no histórico. O histórico mostra quem mudou, quando mudou e o motivo informado. Para saber como tratamos esses dados, leia a Política de Privacidade.</p>
+      </section>
+      <section class="documento__secao" aria-labelledby="uma-reserva-pode-ser-rejeitada-ou-cancelada">
+        <h2 id="uma-reserva-pode-ser-rejeitada-ou-cancelada">Uma reserva pode ser rejeitada ou cancelada?</h2>
+        <p>Pode. Isso acontece conforme as regras do perfil Responsável. Quando uma reserva muda de estado, a mudança entra no histórico.</p>
+      </section>
+      <section class="documento__secao" aria-labelledby="o-site-tem-garantia-de-funcionar-sempre">
+        <h2 id="o-site-tem-garantia-de-funcionar-sempre">O site tem garantia de funcionar sempre?</h2>
+        <p>Não. O sistema é um trabalho acadêmico e pode ficar fora do ar. Não há garantia de disponibilidade.</p>
+      </section>
+      <section class="documento__secao" aria-labelledby="o-texto-pode-mudar">
+        <h2 id="o-texto-pode-mudar">O texto pode mudar?</h2>
+        <p>Pode. As mudanças valem a partir da data de atualização, que aparece no topo desta página.</p>
+      </section>
+      <section class="documento__secao" aria-labelledby="qual-lei-e-qual-foro-valem">
+        <h2 id="qual-lei-e-qual-foro-valem">Qual lei e qual foro valem?</h2>
+        <p>O foro e a lei aplicável são: <span data-pendente>a definir (foro e lei aplicável)</span>.</p>
+      </section>
+    </article>
+</div>
+</body>
+</html>

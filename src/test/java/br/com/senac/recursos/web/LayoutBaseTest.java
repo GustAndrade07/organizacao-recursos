@@ -172,6 +172,37 @@ class LayoutBaseTest {
         assertThat(doc.select("script[src='/js/envio-unico.js'][defer]")).hasSize(1);
     }
 
+    /** CA-4 e CA-14: rodapé de página em toda tela, com a linha de direitos (ano do relógio fixo dos recortes: 2026). */
+    @Test
+    void rodapeComDireitosELinksDasPoliticasApareceParaVisitanteELogados() throws Exception {
+        for (String caminho : List.of("/teste/anonimo", "/teste/solicitante", "/teste/responsavel")) {
+            Document doc = pagina(caminho);
+
+            assertThat(doc.select("footer")).as("rodapé em %s", caminho).hasSize(1);
+            assertThat(doc.selectFirst("footer.rodape-site [data-testid=rodape-direitos]").text())
+                    .isEqualTo("© 2026 Organização de Recursos");
+            assertThat(doc.select("footer nav[aria-label='Políticas do site'] a").eachAttr("href"))
+                    .containsExactly("/privacidade", "/cookies", "/termos");
+            assertThat(doc.select("footer a").eachText())
+                    .containsExactly("Política de privacidade", "Política de cookies", "Termos de uso");
+            assertThat(doc.select("footer a").eachAttr("data-testid"))
+                    .containsExactly("rodape-privacidade", "rodape-cookies", "rodape-termos");
+            // nenhum link é a página atual numa tela que não é política
+            assertThat(doc.select("footer a[aria-current]")).isEmpty();
+        }
+    }
+
+    @Test
+    void rodapeFicaDepoisDoMainEForaDoMenuQueTemOSeuProprioRodape() throws Exception {
+        Document doc = pagina("/teste/solicitante");
+
+        assertThat(doc.body().children().stream().map(e -> e.tagName()).filter(t -> !t.equals("script")).toList())
+                .containsExactly("a", "header", "main", "footer");
+        assertThat(doc.select("footer .menu__rodape")).isEmpty();
+        assertThat(doc.select("nav#menu-painel .menu__rodape [data-testid=menu-sair]")).hasSize(1);
+        assertThat(doc.select("nav[aria-label]").eachAttr("aria-label")).containsExactly("Principal", "Políticas do site");
+    }
+
     @Test
     void scriptDeEnvioUnicoExisteENuncaCancelaOEnvio() throws IOException {
         String js = new String(new ClassPathResource("static/js/envio-unico.js").getInputStream().readAllBytes(), StandardCharsets.UTF_8);

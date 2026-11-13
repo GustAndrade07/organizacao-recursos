@@ -2,7 +2,7 @@
 
 > **Fonte única.** `MatrizAutorizacaoTest` lê as duas tabelas abaixo e confere cada célula com token de cada perfil (ou sem token). O mesmo teste falha se existir rota no código (API em `br.com.senac.recursos.controller` ou tela em `br.com.senac.recursos.web`) que não esteja aqui, ou linha aqui que não exista no código (regra 13 do `AGENTS.md`). Para mudar uma permissão: mude a linha, mude `SegurancaConfig` (ou a regra de posse no serviço) e rode o teste. **Nenhuma célula é apagada para o teste passar** (Etapa 5 do plano): célula vermelha vira `docs/defeitos/DEF-xxx.md` antes da correção.
 >
-> Última atualização: 13/11/2026 (seção nova "Rotas da documentação", RF-14). Antes: 12/11/2026 (telas ligadas aos services, D12 opção (a), ADR-0009). Antes: 11/11/2026 (PR #44, API sob `/api/**` ao lado das telas, ADR-0008).
+> Última atualização: 13/11/2026 (3 linhas públicas das políticas do site; antes, seção nova "Rotas da documentação", RF-14). Antes: 12/11/2026 (telas ligadas aos services, D12 opção (a), ADR-0009). Antes: 11/11/2026 (PR #44, API sob `/api/**` ao lado das telas, ADR-0008).
 
 ## Legenda
 
@@ -63,6 +63,9 @@ Decisão **D12, opção (a)** (12/11/2026, ADR-0009): formulário em `/login` co
 |---|---|---|---|---|---|---|
 | GET | / | login | ok | ok | ok | RF-01 (leva à primeira tela do menu do perfil) |
 | GET | /login | ok | ok | ok | ok | RF-01, tela 1 |
+| GET | /privacidade | ok | ok | ok | ok | políticas do site (LGPD, transparência), tela 17; pública |
+| GET | /cookies | ok | ok | ok | ok | políticas do site, tela 18; pública |
+| GET | /termos | ok | ok | ok | ok | políticas do site, tela 19; pública |
 | GET | /recursos/disponiveis | login | ok | ok | ok | RF-03 (como `GET /api/recursos/disponiveis`) |
 | GET | /reservas/nova | login | ok | ok | ok | RF-04 |
 | POST | /reservas | login | ok | ok | ok | RF-04 (como `POST /api/reservas`) |
@@ -91,6 +94,8 @@ Decisão **D12, opção (a)** (12/11/2026, ADR-0009): formulário em `/login` co
 | POST | /admin/usuarios | login | 403 | 403 | ok | RF-01, tela 16 (como `POST /api/usuarios`) |
 
 URL de tela fora desta tabela: **negada** (`denyAll`, regra 13 do `AGENTS.md`): sem sessão leva ao login, com sessão 403. Esquecer de cadastrar uma rota fecha o acesso em vez de abrir. A página 404 aparece para recurso ou reserva que não existe numa rota da tabela.
+
+As três páginas de política (`/privacidade`, `/cookies`, `/termos`) são **públicas de propósito**: precisam abrir sem sessão, até no `/login`. A regra é um `permitAll` de três `GET` de caminho exato em `SegurancaDasTelasConfig`; outra grafia (`/privacidade/`, `.html`, maiúscula) e outro verbo continuam negados. A célula `ok` desta tabela só prova "diferente de 401 e 403" (um 302 para o login também passa), então quem prova o **200 sem sessão e sem cookie** é `PoliticasPublicasIntegracaoTest`.
 
 ## Fora da matriz (não são rotas de negócio)
 - `POST /login` e `POST /logout`: atendidos pelo filtro do Spring Security, não por um controller (o login é aberto; o logout encerra a sessão e volta a `/login`).

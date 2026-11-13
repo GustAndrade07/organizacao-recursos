@@ -59,6 +59,9 @@ public class SegurancaDasTelasConfig {
                         .requestMatchers("/error", "/error/**", "/css/**", "/js/**", "/img/**", "/favicon.ico",
                                 "/actuator/health").permitAll()
                         .requestMatchers(HttpMethod.GET, "/login").permitAll()
+                        // Políticas do site (tem de abrir sem sessão, até no login): três GET de caminho exato, sem
+                        // curinga. Outra grafia (barra final, .html, maiúscula) e outro verbo caem no denyAll abaixo.
+                        .requestMatchers(HttpMethod.GET, "/privacidade", "/cookies", "/termos").permitAll()
 
                         // Documentação da API (RF-14): rotas da biblioteca springdoc, não do pacote controller.
                         // Exigem sessão como qualquer tela; a permissão está na seção "Rotas da documentação" de
