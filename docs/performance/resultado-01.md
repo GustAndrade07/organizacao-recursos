@@ -75,9 +75,11 @@ docker compose up -d
 ./mvnw -B verify
 ```
 ```bash
-ADMIN_LOGIN=carga.admin ADMIN_SENHA=<senha-so-desta-rodada> java -jar target/organizacao-recursos-0.0.1-SNAPSHOT.jar
+ADMIN_LOGIN=carga.admin@exemplo.com ADMIN_SENHA=<senha-so-desta-rodada> java -jar target/organizacao-recursos-0.0.1-SNAPSHOT.jar
 ```
 ```bash
-jmeter -n -t perf/reservas.jmx -Jadmin_login=carga.admin -Jadmin_senha=<a-mesma> -l perf/resultados/rodada-01.jtl -e -o perf/relatorio-01
+jmeter -n -t perf/reservas.jmx -Jadmin_login=carga.admin@exemplo.com -Jadmin_senha=<a-mesma> -l perf/resultados/rodada-01.jtl -e -o perf/relatorio-01
 ```
 Para a rodada 02, acrescentar `-Jrepeticoes=60` e trocar `01` por `02` nos caminhos.
+
+Para repetir, use o `perf/usuarios.csv` novo (logins em formato de e-mail). As rodadas 01 e 02 foram feitas antes da troca do login para e-mail (13/11/2026), com `carga.admin` e `carga.usuarioNN`; os números acima valem para aquela medição e continuam como foram medidos.

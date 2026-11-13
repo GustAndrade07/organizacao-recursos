@@ -74,14 +74,14 @@ O Spring escolhe o template pelo status: `templates/error/401.html`, `403.html`,
 | O quê | Valor |
 |---|---|
 | Envio | `POST /login` com os campos `login` e `senha` (e `destino`, se houver) e o `_csrf` |
-| Falha | Volta a `/login?erro` (repetindo o `destino` na URL) e a tela mostra "Login ou senha incorretos", sem dizer qual dos dois errou. O login digitado volta por **atributo flash** (`login`), nunca na URL; a senha nunca volta |
+| Falha | Volta a `/login?erro` (repetindo o `destino` na URL) e a tela mostra "E-mail ou senha incorretos", sem dizer qual dos dois errou. O login digitado volta por **atributo flash** (`login`), nunca na URL; a senha nunca volta |
 | Sessão expirada | Quem abre uma tela com o cookie de sessão vencido vai para `/login?expirou` (e `&destino=` no `GET`); a tela mostra "Sua sessão expirou. Entre novamente." Se vierem `erro` e `expirou` juntos, só o aviso de credencial aparece |
 | Sem sessão | Qualquer tela leva a `/login?destino=<página pedida>` (só no `GET`, só se o destino passar em `CaminhoDoSite`) |
 | Sucesso | Redireciona para o `destino` **revalidado** com `CaminhoDoSite` (o campo oculto é editável); sem destino válido, `/`, que leva à primeira tela do menu do perfil |
 | Sair | `POST /logout` (botão "Sair" do menu) encerra a sessão, apaga o cookie e volta a `/login` |
 | Limite de tentativas | 5 falhas do mesmo login em 15 minutos bloqueiam esse login por 15 minutos, desde a 5ª falha (`recursos.seguranca.login.tentativas` e `recursos.seguranca.login.bloqueio`). Durante o bloqueio, até a senha certa volta a `/login?erro`, com a **mesma** tela e o mesmo aviso de uma senha errada: a tela não diz que bloqueou nem se o login existe. Login certo zera o contador, e login inexistente também conta. Tentativa no bloqueio não estende o bloqueio. O contador é o **mesmo** do `POST /api/auth/login`: falhas na API também bloqueiam a tela, e vice-versa. Ele fica na memória (uma instância só). E2E em 375 px: `LimiteDeTentativasE2ETest`. Ver ADR-0009, ressalva 1 |
 
-O campo é **Login** (`type=text`, `autocomplete=username`), não e-mail: o cadastro aceita `[a-z0-9._-]` (`UsuarioRequest`), e um `type=email` recusava esses logins no navegador.
+O campo se chama `login` no formulário e no JSON, mas o valor é o **e-mail** (DEF-010): rótulo **E-mail**, `type=email`, `autocomplete=username`, minúsculas, até 254 caracteres, formato `nome@dominio.com`. Contas antigas sem `@` não entram; o banco local se recria com `docker compose down -v` ou o Administrador recadastra.
 
 Regra de `CaminhoDoSite` (`br.com.senac.recursos.web`, usada no login e nas páginas de erro): começa com `/`; o segundo caractere não é `/` nem `\`; não tem `\` em posição nenhuma; não tem caractere de controle (TAB, LF, CR, NUL...), espaço (inclusive Unicode) nem caractere invisível; não tem `%2f`, `%5c` nem `%25` (sem diferenciar maiúsculas); no máximo 2000 caracteres; é uma URI válida, sem esquema nem autoridade. Isso fecha `/<TAB>/evil.com` (o navegador remove TAB, LF e CR e lê `//evil.com`) e `/\evil.com`. Um valor que não passa não vai ao formulário (login) nem vira link (páginas de erro, que caem em `/`). Os templates chamam a regra por `${caminhoDoSite.valido(x)}`, atributo que um `@ControllerAdvice` (`AtributosDasTelas`) põe no modelo de todas as telas, inclusive `/error`.
 
@@ -356,7 +356,7 @@ O E2E em 375 px prova o POST único com clique duplo nas telas 8 e 10 (botão de
 | `perfis` | `valor` (`SOLICITANTE`, `RESPONSAVEL`, `ADMINISTRADOR`) e `rotulo` | — |
 | `erros` | mapa de `nome`, `login`, `senha` ou `perfil` para a mensagem, na ordem do formulário | Sem erros |
 
-- As regras dos campos são as do `UsuarioRequest` da API, com as mesmas mensagens (nome até 120; login `[a-z0-9._-]{3,60}`; senha de 8 a 72; perfil obrigatório). Login repetido: "Já existe um usuário com este login." no campo.
+- As regras dos campos são as do `UsuarioRequest` da API, com as mesmas mensagens (nome completo, com pelo menos duas palavras só com letras, até 120; login = e-mail em minúsculas, até 254 caracteres, formato `nome@dominio.com`; senha de 8 a 72; perfil obrigatório, escolhido pelo Administrador). E-mail repetido: "Já existe um usuário com este e-mail." no campo.
 - A senha é `type=password` com `autocomplete="new-password"` e só é guardada como hash BCrypt pelo service.
 - Não há editar nem desativar usuário: o service ainda não tem essas operações.
 - O menu do Administrador ganhou o item "Usuários".
