@@ -1,11 +1,11 @@
 package br.com.senac.recursos.service;
 
+import br.com.senac.recursos.validation.Emails;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -84,7 +84,10 @@ public class TentativasDeLogin {
     }
 
     private static String chave(String login) {
-        return login == null ? "" : login.trim().toLowerCase(Locale.ROOT);
+        String normalizado = login == null ? "" : Emails.normalizar(login);
+        // Passa de 254 caracteres nenhum e-mail é válido: todos esses textos dividem um balde, para um valor enorme
+        // não virar chave enorme na memória.
+        return normalizado.length() > Emails.TAMANHO_MAXIMO ? normalizado.substring(0, Emails.TAMANHO_MAXIMO) : normalizado;
     }
 
     /** Falhas dentro da janela, ou o fim do bloqueio. */

@@ -26,7 +26,7 @@ abstract class BancoComDadosTest extends BancoIntegracaoTest {
         Long id = jdbc.queryForObject(
                 "insert into usuario (nome, login, senha_hash, perfil) values (?, ?, 'hash-de-teste', 'SOLICITANTE') "
                         + "returning id",
-                Long.class, "Usuario " + login, login);
+                Long.class, "Usuario " + login, login + "@exemplo.com");
         return id;
     }
 

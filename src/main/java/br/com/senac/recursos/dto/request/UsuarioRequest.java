@@ -1,20 +1,30 @@
 package br.com.senac.recursos.dto.request;
 
 import br.com.senac.recursos.enums.PerfilUsuario;
+import br.com.senac.recursos.validation.EmailDeLogin;
+import br.com.senac.recursos.validation.Emails;
+import br.com.senac.recursos.validation.NomeCompleto;
+import br.com.senac.recursos.validation.SemEmoji;
+import br.com.senac.recursos.validation.Textos;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
-/** Cadastro de usuário pelo Administrador. O limite de 72 caracteres da senha é o do BCrypt. */
+/**
+ * Cadastro de usuário pelo Administrador (DEF-010): nome completo, e-mail (que é o login; o campo continua se
+ * chamando {@code login}) e senha, mais o perfil. Sem campo de repetir a senha. O pedido normaliza o que recebe: o
+ * e-mail fica em minúsculas e sem espaços nas pontas, o nome sem espaços repetidos; assim a API e a tela têm o mesmo
+ * comportamento. O limite de 72 caracteres da senha é o do BCrypt.
+ */
 public record UsuarioRequest(
-        @NotBlank(message = "Informe o nome.")
-        @Size(max = 120, message = "O nome pode ter no máximo 120 caracteres.")
+        @NotBlank(message = "Informe o nome completo.")
+        @SemEmoji
+        @NomeCompleto
         String nome,
 
-        @NotBlank(message = "Informe o login.")
-        @Pattern(regexp = "[a-z0-9._-]{3,60}",
-                message = "O login deve ter de 3 a 60 caracteres: letras minúsculas, números, ponto, hífen ou sublinhado.")
+        @NotBlank(message = "Informe o e-mail.")
+        @SemEmoji
+        @EmailDeLogin
         String login,
 
         @NotBlank(message = "Informe a senha.")
@@ -23,6 +33,11 @@ public record UsuarioRequest(
 
         @NotNull(message = "Informe o perfil.")
         PerfilUsuario perfil) {
+
+    public UsuarioRequest {
+        nome = Textos.normalizarNome(nome);
+        login = Emails.normalizar(login);
+    }
 
     /** A senha nunca aparece em log nem em mensagem de erro. */
     @Override
