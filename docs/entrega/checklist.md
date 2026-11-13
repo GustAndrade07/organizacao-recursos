@@ -48,6 +48,18 @@
 3. Falha de autorização
 4. Possibilidade de reserva dupla
 5. **Nenhum encontrado na rodada de 13/11/2026** (clone limpo pela IA, commit `9acbbcd`): nenhum dos quatro limitadores apareceu — a aplicação executa, o `verify` ficou verde, a matriz de autorização é testada e a sobreposição respondeu 409 com a reserva única no banco.
+6. **Rodada 2 (Windows, `bf2584a`, máquina do Pedro):** "aplicação não executa" **seguindo só o README** numa máquina com PostgreSQL nativo na porta 5432. É lacuna do README, não do código (com outra porta, sobe e passa). Ver a seção "Segunda rodada" abaixo.
+
+## Segunda rodada — Windows, máquina do Pedro, 13/11/2026 (feita pela IA a pedido do Pedro)
+
+**O que foi feito.** Clone novo de `bf2584a` numa pasta vazia do Windows 11 (PowerShell 5.1, JDK 21.0.13, Docker 29.9.3), com cache do Maven vazio, seguindo só o README e a forma `$env:` dele. Passo a passo e erros na seção 4.2 do [roteiro](roteiro-clone-limpo.md).
+
+**Resultado, em uma linha:** seguindo só o README, **a aplicação não subiu nesta máquina**: um PostgreSQL 18 nativo do Windows ocupa a porta 5432 e a aplicação falou com ele, não com o container (`autenticação do tipo senha falhou para o usuário "recursos"`). Com o banco do projeto na porta 5433 e `DB_URL` (contorno fora do README), tudo o mais passou: `UP`, 201 e 409 pela API, a reserva da API aparece nas telas e a da tela aparece na API, 409 pela tela, cancelamento visto nas duas pontas, Swagger só com sessão; `verify`: @@@.
+
+| Bloqueador (rodada 2) | Correção | Dono |
+|---|---|---|
+| README não diz que a porta 5432 precisa estar livre; com PostgreSQL instalado, a aplicação não sobe | Uma linha em "Pré-requisitos" e o exemplo de `DB_URL` com outra porta, para PowerShell | Gustavo (README), em PR separado |
+| A rodada foi da IA, não do Pedro com as próprias mãos | O Pedro repete os passos 3 a 5 e assina aqui: "Feito por Pedro Henrique em __/__/2026, commit ____, resultado ____" | Pedro |
 
 ## Rodada de clone limpo — 13/11/2026 (feita pela IA, não por um integrante)
 

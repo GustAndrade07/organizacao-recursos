@@ -80,6 +80,55 @@ Rodada de 13/11/2026 (IA, container novo; horas em UTC):
 2. Pendência não bloqueante: o README não dizia como entrar nas telas (corrigido neste PR).
 3. Pendência de processo, **não técnica**: a rodada foi feita por IA, não por um integrante. Enquanto o grupo não decidir se isso vale, a caixa "clone limpo por quem não escreveu o README" continua aberta.
 
+### 4.2 Segunda rodada — Windows 11, máquina do Pedro, 13/11/2026 (feita pela IA a pedido do Pedro)
+
+**Quem fez:** a IA (Claude Code), na sessão e na máquina do Pedro, a pedido dele. **Não foi o Pedro seguindo o README com as próprias mãos**; a mesma ressalva da rodada 1 vale aqui, e o grupo decide se a conta. O que esta rodada acrescenta: é **Windows**, com a forma `$env:` do README (PR #63), no commit de agora.
+
+| Dado | Valor |
+|---|---|
+| Data e hora de início | 13/11/2026, 18:12 (Brasília) |
+| Sistema operacional | Windows 11 Pro 10.0.26200, PowerShell 5.1.26100 |
+| Java | OpenJDK 21.0.13 (Temurin) |
+| Docker | Docker Desktop, Engine 29.9.3 |
+| Commit testado | `bf2584a` (`main`, merge do PR #66) |
+| Pasta | nova e vazia, fora de qualquer outro clone |
+| Cache do Maven | **vazio**: `MAVEN_USER_HOME` e `-Dmaven.repo.local` apontando para uma pasta nova, para não reaproveitar o `~/.m2` da máquina (o README não pede isso; foi só para simular máquina limpa) |
+
+| # | Hora | Funcionou? | O que apareceu |
+|---|---|---|---|
+| 1 | 18:12 | sim | `openjdk version "21.0.13"`; Docker respondeu `29.9.3`; `git version 2.54.0.windows.1` |
+| 2 | 18:12 | sim | `Cloning into 'organizacao-recursos'...`; `git rev-parse --short HEAD` = `bf2584a` |
+| 3 | 18:12 | sim | `Container organizacao-recursos-db-1 Started`; `docker compose ps`: `postgres:16`, `0.0.0.0:5432->5432/tcp` |
+| 4 | 18:13 | **não** | `$env:ADMIN_LOGIN='admin'; $env:ADMIN_SENHA='<senha>'; .\mvnw.cmd spring-boot:run` (forma do README) baixou tudo e parou no Flyway: `org.postgresql.util.PSQLException: FATAL: autenticação do tipo senha falhou para o usuário "recursos"` e `BUILD FAILURE` (46,8 s). **Causa:** esta máquina tem um **PostgreSQL 18 nativo do Windows** (serviço `postgresql-x64-18`, início automático) escutando em `0.0.0.0:5432` e `[::]:5432`. O `docker compose` publicou a porta sem erro, mas a aplicação, em `localhost:5432`, falou com o PostgreSQL nativo, não com o container (o log do container não mostra nenhuma tentativa de login; a mensagem do erro está em português, a língua do PostgreSQL instalado, e não em inglês, a do container) |
+| 4b | 18:14 | sim, **com contorno fora do README** | Para seguir os outros passos sem mexer no serviço do Windows: `docker compose down`; o mesmo `postgres:16` com o mesmo banco, usuário e senha do `docker-compose.yml`, publicado na **5433**; e `$env:DB_URL='jdbc:postgresql://localhost:5433/recursos'` (variável que o `application.yml` já aceita). Resultado: `Successfully applied 1 migration ... now at version v1`, `Started RecursosApplication in 7.601 seconds`, `Administrador inicial 'admin' criado.` |
+| 5 | 18:15 | sim | `http://localhost:8080/actuator/health` respondeu `{"status":"UP"}` |
+| 6 | @@HORA6@@ | @@OK6@@ | @@VERIFY@@ |
+| 7 | @@HORA7@@ | @@OK7@@ | @@COBERTURA@@ |
+
+**Passos extras (aplicação de ponta a ponta, API e telas no mesmo banco):**
+
+| O que | Resultado |
+|---|---|
+| `POST /api/auth/login` com `ADMIN_LOGIN`/`ADMIN_SENHA` (senha gerada na hora, fora do repositório) | 200 com token |
+| `POST /api/recursos` (sala) | 201 |
+| `POST /api/reservas` 01/12/2026 10:00–12:00 (Brasília) | **201**, `APROVADA` |
+| `POST /api/reservas` 11:00–13:00 (sobrepõe) | **409** `urn:recursos:problema:conflito-de-horario` |
+| Login pelo formulário `/login` (com CSRF) | 302 para `/` |
+| `/reservas/minhas` e `/reservas/1` | 200; a reserva **criada pela API** aparece na tela, como Aprovada |
+| `POST /reservas` pela tela, 02/12/2026 09:00–10:00 | gravada; `GET /api/reservas` passa a listar a reserva da tela (`2026-12-02T12:00:00Z`, Aprovada) |
+| `POST /reservas` pela tela, 09:30–10:30 (sobrepõe a da tela) | **409** |
+| `POST /api/reservas/1/cancelamento` | 200, `CANCELADA`; a tela `/reservas/1` passa a mostrar Cancelada |
+| `/swagger-ui/index.html` | 200 com sessão; sem sessão, 302 para `/login?destino=...` |
+| Banco, contado no fim (`psql`) | 2 reservas (`1:CANCELADA`, `3:APROVADA`), 2 tentativas recusadas (uma da API, uma da tela), 3 registros de auditoria |
+
+**O que faltou no README (rodada 2):**
+- **A porta 5432 precisa estar livre**, e o README não diz isso. Quem já tem PostgreSQL instalado no Windows (comum em quem fez outras matérias de banco) segue o README e a aplicação **não sobe**, com um erro de senha que não aponta para a causa. Sugestão para o PR de correção do Gustavo: uma linha em "Pré-requisitos" ("a porta 5432 precisa estar livre; se houver PostgreSQL instalado, pare o serviço ou suba o container em outra porta e defina `DB_URL`") e o exemplo de `DB_URL` para PowerShell.
+- A forma `$env:` do README **funcionou** (as variáveis chegaram à aplicação e o Administrador foi criado). A forma do `cmd` **não foi testada**.
+
+**Bloqueadores da rodada 2, em ordem:**
+1. **Aplicação não executa seguindo só o README nesta máquina**, por causa da porta 5432 ocupada pelo PostgreSQL nativo. É bloqueador do README em máquinas assim, não defeito do código: com o banco do projeto em outra porta, a aplicação sobe e tudo o mais passa. Correção: README (Gustavo), em PR separado.
+2. Pendência de processo: a rodada foi feita pela IA na máquina do Pedro. Para valer como a conferência humana da Aula 14, o Pedro repete os passos 3 a 5 ele mesmo (com a correção do README ou parando o serviço `postgresql-x64-18`) e assina a linha no checklist.
+
 ## 5. Depois do clone
 
 1. Entregue este arquivo preenchido ao Gustavo, em PR seu (sua autoria) ou colado no grupo.
