@@ -70,7 +70,7 @@ Fonte: PRs mergeados na `main` até 13/11/2026, 11:29 (lista do GitHub; `git log
 - O uso de IA pelos outros integrantes fica na declaração de cada um.
 
 **Declaração de cada integrante** (o checklist da entrega pede; cada um escreve a sua, com as próprias palavras):
-- **Gustavo:** _a escrever pelo Gustavo._
+- **Gustavo:** Fui responsável pelo banco de dados, pela CI, pelo SonarCloud, pela arquitetura e pelos ADRs, pelo README e pela tag. Escrevi a migração V1 com a constraint `EXCLUDE` contra reserva dupla e a trava por recurso (D7), com os testes de banco em TDD. Também fiz a CI com o gate do JaCoCo e o SonarCloud, o CI vermelho proposital, a checagem de migração imutável, os ADRs 0001 a 0007, a avaliação arquitetural (ciclo 01) e o tratamento dos riscos de dependência. Usei o Claude Code em boa parte do trabalho: para pesquisar CVEs e versões, rascunhar documentos e ADRs, rodar o `verify` e medir cobertura. Revisei cada diff antes do commit e decidi cada ponto. Os números que citei vêm de testes, runs do CI ou do SonarCloud, e o que não foi medido está escrito como "não medido". Concordo com a decisão de liberar com ressalvas, desde que o clone limpo humano passe. (13/11/2026)
 - **Pedro:** _a escrever pelo Pedro._
 - **Leandro:** _a escrever pelo Leandro._
 

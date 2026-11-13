@@ -1,0 +1,3 @@
+- README: forma do PowerShell e do cmd para `ADMIN_LOGIN`/`ADMIN_SENHA` (a do bash não funciona no Windows), nota do cookie `Secure` (só com HTTPS e `SESSAO_COOKIE_SEGURO=true`) e Stack com Cucumber, springdoc e JMeter; WireMock segue ausente (RF-11).
+- Riscos de dependências: springdoc 2.8.17, Cucumber 7.23.0, `junit-platform-suite`, Playwright 1.63.0 e o override do `commons-lang3` 3.22.0 (CVE-2025-48924) registrados, com escopo, motivo e consulta à OSV/NVD; CVE-2026-59276 conferido no advisory oficial do Spring: não atinge o projeto.
+- Ciclo ATAM 01: medidas do JaCoCo e do SonarCloud na `main` `bc40183` (1138 testes, 95,85% de linhas e 81,31% de branches no JaCoCo; Quality Gate OK) e RK9 reconferido.
