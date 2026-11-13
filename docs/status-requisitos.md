@@ -9,6 +9,8 @@
 - `./mvnw -B verify` local com **1116 testes, 0 falhas, 0 erros, 0 ignorados**;
 - carga do PR #56.
 
+Depois da recontagem, 12/11/2026 (Pedro, PR #58): RF-06 ganha o vermelho sem a proteção no nível da API (mutação M1); D10 e D11 decididas ("fica como está no código"). Ver `docs/status/2026-11-12-docs-d10-d11-adr0008-concorrencia-api.md`.
+
 A lista completa de testes por requisito está na [RTM](rtm.md). Aqui fica a situação, com os testes principais.
 
 **Histórico:**
@@ -23,9 +25,9 @@ A lista completa de testes por requisito está na [RTM](rtm.md). Aqui fica a sit
 | RF-03 Pesquisa | parcial | `RecursoApiControllerTest.disponiveisExcluiReservaQueOcupaEManutencaoMasNaoACancelada`, `TelasComBancoTest.buscaMostraSoOQueEstaLivreNoHorario`. Falta localização e competência (V2) | Busca sem dois dos filtros do PRD | Pedro |
 | RF-04 Criar, alterar e cancelar reservas | feito | `ReservaApiControllerTest` (`Criar`, `Alterar`, `Cancelar`), `TelasComBancoTest.alterarTrocaOPeriodoNoBancoECancelarLiberaOHorario`, `ReservaE2ETest`. Regra de quando alterar e cancelar: proposta D9 testada, decisão pendente | | Pedro |
 | RF-05 Sobreposição de horário (inclusive professor) | feito | `SobreposicaoBancoTest`; `ReservaApiControllerTest.Sobreposicao.agendaDoProfessorTambemEhProtegidaMesmoEmOutraSala`; `ReservaE2ETest.conflitoRealDeHorarioExplicaOMotivoComFocoEOfereceVoltarABusca` | Duas turmas na mesma sala | Pedro |
-| RF-06 Reserva dupla em pedidos simultâneos | feito | `ConcorrenciaReservaBancoTest`; `ConcorrenciaReservaApiTest` (20 pedidos HTTP → 1 × 201 e 19 × 409, sala e professor, 5 rodadas); carga do RNF-03. Sem mutação à mão no nível da API | Reserva dupla zera a nota | Gustavo / Pedro |
-| RF-07 Aprovação de recurso restrito | feito | `ReservaApiControllerTest.Aprovacao`, `TelasComBancoTest.recursoRestritoEsperaAprovacaoEOResponsavelAprovaNaFila`. Estado inicial sem restrito = APROVADA é proposta (D10) | | Pedro |
-| RF-08 Bloqueio por manutenção | feito | `ReservaApiControllerTest.Manutencao.fronteirasDaManutencaoDe10a12`, `RecursoApiControllerTest.manutencaoECadastradaEListadaComPeriodoInvalidoRecusado`. Efeito sobre reservas existentes: D11 pendente; corrida da D13 aceita (ADR-0008) | | Pedro |
+| RF-06 Reserva dupla em pedidos simultâneos | feito | `ConcorrenciaReservaBancoTest`; `ConcorrenciaReservaApiTest` (20 pedidos HTTP → 1 × 201 e 19 × 409, sala e professor, 5 rodadas); carga do RNF-03. Vermelho sem a proteção nos dois níveis: mutação M1 de `docs/testes/mutacao-manual.md` (API: 10 de 10 vermelhos em 12/11/2026, só local) | Reserva dupla zera a nota | Gustavo / Pedro |
+| RF-07 Aprovação de recurso restrito | feito | `ReservaApiControllerTest.Aprovacao`, `TelasComBancoTest.recursoRestritoEsperaAprovacaoEOResponsavelAprovaNaFila`. Estado inicial sem restrito = APROVADA (D10, decidida em 12/11/2026): `ReservaApiControllerTest.Criar.salaComProfessorSemRestritoNasceAprovadaComAuditoria`. Sem teste para o Responsável rejeitar a própria reserva (D10 (c)) | | Pedro |
+| RF-08 Bloqueio por manutenção | feito | `ReservaApiControllerTest.Manutencao.fronteirasDaManutencaoDe10a12`, `RecursoApiControllerTest.manutencaoECadastradaEListadaComPeriodoInvalidoRecusado`. Efeito sobre reservas existentes (D11, decidida em 12/11/2026: continuam como estão): `TelasComBancoTest.bloqueioComReservaNoPeriodoPedeConfirmacaoAntesDeGravar`, sem teste da mesma regra na API; corrida da D13 aceita (ADR-0008) | | Pedro |
 | RF-09 Retirada e devolução | feito | `ReservaApiControllerTest.CicloDeUso.retiradaEDevolucaoLevamAteConcluidaComAuditoriaDeCadaPasso`, `TelasComBancoTest.retiradaEDevolucaoMudamOEstadoEOHistoricoMostraCadaPasso` | | Pedro |
 | RF-10 Histórico auditável | feito | `AuditoriaBancoTest`, `AuditoriaServiceTest`, `ReservaApiControllerTest.Aprovacao.responsavelAprovaRestritoEHistoricoGuardaQuemEQuando`, `HistoricoPaginaTest` | | Gustavo / Pedro |
 | RF-11 Notificação externa | ausente | Sem código, sem WireMock | Requisito do PRD sem entrega | Pedro |
@@ -49,7 +51,7 @@ Em ordem de prioridade, primeiro o que bloqueia a tag `v1.0.0-rc1` (entrega em 1
 | 3 | Números no commit da tag: refazer a seção 4 do relatório e o run da RTM no commit que receber a tag | Sim | Leandro (com o Gustavo, que faz a tag) | Números de `6ce4478` neste PR |
 | 4 | Merge do PR #56 (carga JMeter, lacuna 1) | Sim | Pedro (revisão) | Aberto, aguardando revisão |
 | 5 | D4: perguntar ao professor se "0 vulnerabilidades críticas" vale pelo CVSS das dependências ou pelo Quality Gate | Não, mas muda a decisão de qualidade | Gustavo | Pergunta pessoalmente na Aula 14 (13/11) |
-| 6 | Decisões pendentes D8 (relatório), D9 (alterar e cancelar), D10 (estado inicial e limites de perfil) e D11 (manutenção sobre reservas existentes) | Não: o código segue a proposta, testada | Grupo (Pedro propõe) | Pendentes desde 11/11; se não forem decididas, entram como premissa na decisão de qualidade |
+| 6 | Decisões pendentes D8 (relatório) e D9 (alterar e cancelar). D10 (estado inicial e limites de perfil) e D11 (manutenção sobre reservas existentes) decididas em 12/11/2026 no PR #58: "fica como está no código" | Não: o código segue a proposta, testada | Grupo (Pedro propõe) | Pendentes desde 11/11; se não forem decididas, entram como premissa na decisão de qualidade |
 | 7 | BDD executável com Cucumber e `docs/testes/evidencia-tdd.md` (lacuna 4) | Não, mas pesa em "qualidade dos testes" | Pedro | Não começado |
 | 8 | Mutação manual das regras do serviço (aprovação, manutenção, autorização) em `docs/testes/mutacao-manual.md` (lacuna 6) | Não | Pedro | "pendente (Pedro)" no roteiro |
 | 9 | `docs/testes/plano-tdd.md` (lacuna 7) e OpenAPI do RF-14 (lacuna 8) | Não | Pedro | Não começados |
