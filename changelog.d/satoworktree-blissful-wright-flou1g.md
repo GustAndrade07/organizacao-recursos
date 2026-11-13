@@ -1,0 +1,1 @@
+- Decisão de qualidade, relatório de qualidade, checklist da entrega e plano atualizados depois dos PRs #59 a #62 (RF-14, BDD e mutação do serviço feitos; clone limpo da IA registrado; contagem de PRs corrigida). Só documentação.

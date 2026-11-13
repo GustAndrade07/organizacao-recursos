@@ -9,7 +9,7 @@
 | # | O que fazer | Como conferir que deu certo |
 |---|---|---|
 | 1 | `docker compose up -d` | `docker compose ps` mostra o serviço de pé |
-| 2 | Subir a aplicação com o administrador inicial: `ADMIN_LOGIN=admin ADMIN_SENHA='<senha escolhida na hora>' ./mvnw spring-boot:run` | log com `Started RecursosApplication` |
+| 2 | Subir a aplicação com o administrador inicial. **Linux, macOS e Git Bash:** `ADMIN_LOGIN=admin ADMIN_SENHA='<senha escolhida na hora>' ./mvnw spring-boot:run`. **PowerShell** (a sintaxe `VAR=valor comando` não existe nele): `$env:ADMIN_LOGIN='admin'; $env:ADMIN_SENHA='<senha escolhida na hora>'; .\mvnw.cmd spring-boot:run` (**não conferido** no Windows) | log com `Started RecursosApplication` |
 | 3 | Abrir http://localhost:8080/actuator/health | responde `{"status":"UP"}` |
 | 4 | Carregar a massa de demonstração (seção 1) | o script imprime os ids criados |
 | 5 | Abrir as abas já logadas: `/login` (Solicitante), `/aprovacoes` (Responsável), `/admin/recursos` (Administrador) | três janelas prontas; **nada de digitar senha na frente da banca** |
@@ -21,7 +21,7 @@
 
 A massa é criada **pela própria API**, com o token do administrador inicial — nada de `insert` solto no banco, para a demonstração usar os mesmos caminhos que o usuário usa.
 
-Salve como `demo.sh` fora do repositório (ele pede a senha e não a escreve em arquivo):
+Salve como `demo.sh` fora do repositório (ele pede a senha e não a escreve em arquivo). É um script de bash: no Windows, rode no Git Bash ou no WSL (**não conferido** nesta máquina; o roteiro foi rodado só em Linux):
 
 ```bash
 #!/usr/bin/env bash
@@ -92,5 +92,5 @@ echo 'Massa criada. Nenhuma reserva foi criada de propósito: as reservas nascem
 ## 4. O que ainda é humano
 
 - **Ensaiar cronometrado** no notebook que será usado, pelo menos uma vez, e preencher a tabela de tempos em [`ensaio.md`](ensaio.md).
-- Decidir quem fala cada parte (a sugestão acima segue as áreas, invertendo quem apresenta o quê).
+- Decidir quem fala cada parte. A sugestão da tabela da seção 2 **segue as áreas**: cada um apresenta o que escreveu (Gustavo: arquitetura, testes e CI; Leandro: problema, RTM, relatório e limitações), e só a demonstração é conduzida por quem não escreveu as telas (Pedro). Quem **inverte** a autoria é a prova oral (as perguntas de [`perguntas.md`](perguntas.md)). Se o grupo quiser inverter também a apresentação, é uma decisão dele; nada aqui foi decidido.
 - Conferir, no dia, que o Docker e o JDK 21 estão na máquina da apresentação.
