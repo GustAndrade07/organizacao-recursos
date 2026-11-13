@@ -50,7 +50,7 @@ Em ordem de prioridade, primeiro o que bloqueia a tag `v1.0.0-rc1` (entrega em 1
 
 | # | Pendência | Bloqueia a tag? | Quem pega | Situação em 12/11/2026, noite |
 |---|---|---|---|---|
-| 1 | Clone limpo seguindo só o README e `docs/entrega/checklist.md` (lacuna 11). É o único limitador sem prova: "aplicação executa" | Sim | Leandro ou Pedro (quem não escreveu o README) | Roteiro em `docs/entrega/roteiro-clone-limpo.md`. Rodada feita **pela IA** em 13/11/2026 (PR #60, `9acbbcd`): verde. **Falta a rodada humana** (Pedro) |
+| 1 | Clone limpo seguindo só o README e `docs/entrega/checklist.md` (lacuna 11). É o único limitador sem prova: "aplicação executa" | Sim | Leandro ou Pedro (quem não escreveu o README) | Roteiro em `docs/entrega/roteiro-clone-limpo.md`. Rodada feita **pela IA** em 13/11/2026 (PR #60, `9acbbcd`): verde. **Falta a rodada humana** (Pedro). Rodada 2 (IA na máquina Windows do Pedro, `bf2584a`, branch `docs/clone-limpo-windows-1311`): **não sobe seguindo só o README** quando há PostgreSQL nativo na porta 5432; com outra porta, tudo passa |
 | 2 | `docs/decisao-qualidade.md` (lacuna 2): decisão, critérios com evidência, riscos aceitos e quem fez o quê | Sim | Leandro | Mergeada no PR #59 e atualizada em 13/11/2026; faltam as declarações dos integrantes e a conferência no commit da tag |
 | 3 | Números no commit da tag: refazer a seção 4 do relatório e o run da RTM no commit que receber a tag | Sim | Leandro (com o Gustavo, que faz a tag) | Números de `6ce4478` neste PR |
 | 4 | Merge do PR #56 (carga JMeter, lacuna 1) | Sim | Pedro (revisão) | Mergeado em 13/11/2026 |

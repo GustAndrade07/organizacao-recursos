@@ -1,0 +1,1 @@
+- Clone limpo no Windows (rodada 2, `bf2584a`): a forma `$env:` do README funciona; achado o bloqueador da porta 5432 ocupada por PostgreSQL nativo, registrado no roteiro e no checklist.
