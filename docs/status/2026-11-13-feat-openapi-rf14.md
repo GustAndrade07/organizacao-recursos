@@ -33,3 +33,6 @@ As rotas do Swagger **exigem login**. Não é um ponto da seção 9 do plano (ne
 - Run do CI e efeito do springdoc no tempo do build no CI.
 - Se o SonarCloud aponta algo na dependência nova (`docs/seguranca/riscos-dependencias.md` é do Gustavo).
 - `docs/status-requisitos.md` e `docs/rtm.md`: atualizados depois do merge do PR #57 na `main`; RF-14 passa a `feito`, citando `OpenApiDocumentacaoTest`.
+
+## Risco de dependência acusado no PR (13/11/2026, depois do primeiro run)
+O SonarCloud do PR #61 passou no Quality Gate, mas acusou **1 novo risco de dependência**. O painel exige login e não foi aberto; comparando a árvore de dependências da `main` com a deste PR (33 artefatos novos), o único com CVE conhecido é o **`commons-lang3` 3.17.0**, que entra pelo springdoc (`swagger-core-jakarta`) e tem o CVE-2025-48924, corrigido na 3.18.0. Seguindo a regra 5 do `AGENTS.md` (correção na mesma linha → subir por propriedade), o `pom.xml` passou a fixar `commons-lang3.version` em 3.22.0. **Não conferido:** se o risco do painel era mesmo esse; a próxima análise do Sonar no PR diz se zerou.
