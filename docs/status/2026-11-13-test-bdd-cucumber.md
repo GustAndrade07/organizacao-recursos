@@ -2,6 +2,8 @@
 
 **Quem:** feito pelo Leandro (com IA) na área do Pedro (back-end e testes), com o OK do Leandro; **Pedro revisa**. Mesmo combinado do PR #52.
 
+> Este arquivo de status é de uma das partes do PR `test/qualidade-testes-e-openapi-1311`, que junta cinco assuntos da área do Pedro num PR só (combinado com o Leandro em 13/11/2026, para não serem cinco revisões no dia da entrega). O `verify` da ponta do PR tem **1138 testes, 0 falhas, 0 erros, 0 ignorados**.
+
 **Lacuna fechada:** a 4 da tabela "Lacunas para a entrega" (BDD executável e evidência de TDD).
 
 ## O que mudou
