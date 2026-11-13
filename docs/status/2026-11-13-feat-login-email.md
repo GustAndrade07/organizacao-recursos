@@ -27,11 +27,18 @@
 ## Pergunta em aberto
 - **D15, auto-cadastro:** "quem já tem conta só entra" sugere cadastro público. Hoje só o Administrador cadastra; abrir cadastro público muda o modelo de permissões (falha de autorização é limitador de nota) e exige perfil fixo, limite de abuso e confirmação do e-mail. **Não implementado.**
 
-## Verificado (resumo)
-Ver a seção "Verificado" do PR (números e comandos; rodados em 13/11/2026 com JDK 21 e PostgreSQL 16 portáteis, **sem Docker**). Resumo no fim deste arquivo, preenchido depois da última rodada.
+## Verificado (13/11/2026, JDK 21 e PostgreSQL 16 portáteis, **sem Docker**)
+Os testes que sobem Testcontainers (`ApiIntegracaoTest`, `BancoIntegracaoTest`, Cucumber) rodaram contra o PostgreSQL 16 local trocando só o contêiner (um arquivo local, fora do git); o resto é o código do PR.
+- **Vermelho, depois verde (regra 11):** `bd09e77` 161 testes sem banco, 78 falhas e 3 erros; 343 testes com banco, 41 falhas. `1e60787` (revisão de segurança) 65 testes, 4 falhas. O `feat(green)` zera as falhas.
+- **Suíte inteira, exceto os E2E e 3 classes com contêiner próprio:** 1209 testes, **0 falhas**. 364 erros eram `FATAL: too many clients already` do PostgreSQL portátil (100 conexões, vários contextos Spring com pool de 30); as 12 classes afetadas rodaram de novo em 3 lotes: 26, 226 e 68 testes, **0 falhas, 0 erros, 0 ignorados** (inclui `MatrizAutorizacaoTest`, 222 casos, e `TelasComBancoTest`).
+- **Depois do endurecimento da revisão de segurança:** 16 classes tocadas pelo PR (validação, requests, serviços, telas, API, banco, V2, administrador inicial): **261 testes, 0 falhas, 0 erros, 0 ignorados**.
+- **No navegador (Chromium do Playwright, aplicação local contra um banco novo, 390 px e 1280 px):** login com `  ADMIN@Exemplo.com ` entra; cadastro com nome "Bia 😀" e e-mail `bia@exemplo` volta com "Não use emojis neste campo." e "Informe um e-mail válido, como nome@dominio.com."; cadastro de "  Bia   Campos " / `BIA.Campos@Exemplo.com` volta à lista com a confirmação; repetido com outra caixa dá "Já existe um usuário com este e-mail."; a Bia entra com `bia.campos@EXEMPLO.com`; e-mail inexistente e senha errada dão o mesmo `/login?erro` e o mesmo texto; um só campo de senha.
+- **No banco (psql):** `senha_hash` BCrypt (`$2a$`, 60 caracteres), logins em minúsculas, V1 e V2 aplicadas com sucesso, `usuario_login_e_email` com `convalidated = f` (`NOT VALID`), `INSERT` de e-mail em maiúsculas recusado pelo `CHECK`.
+- **Na API (curl):** login antigo sem `@` dá 401; e-mail com 300 caracteres dá 400.
+- **Não medido:** tempo de resposta do login entre os casos (e-mail inexistente × senha errada).
 
 ## Não verificado
-- `./mvnw -B verify` completo (precisa de Docker: os testes que sobem o Testcontainers diretamente, `AplicacaoSmokeTest`, `LimiteDeTentativasDoLoginIntegracaoTest`, `PaginaNaoEncontradaIntegracaoTest`, e os E2E `*E2ETest`, só rodam no CI). Cobertura do JaCoCo e Quality Gate do SonarCloud também só no CI.
+- `./mvnw -B verify` completo: precisa de Docker. **Só o CI roda:** os E2E `*E2ETest` (incluindo os dois testes de cadastro/entrada que mexi e o novo `cadastroRecusaEmoji...`), `AplicacaoSmokeTest`, `LimiteDeTentativasDoLoginIntegracaoTest`, `PaginaNaoEncontradaIntegracaoTest`, o gate de cobertura do JaCoCo e o Quality Gate do SonarCloud.
 - Specs do Notion (Banco de Dados, Back-end, Front-end e principal): **não atualizadas neste PR**; o texto de cada uma está abaixo, para colar no prazo de 24 h (regra 7 do `AGENTS.md`).
 - Aprovação do grupo para D14 e D15.
 
