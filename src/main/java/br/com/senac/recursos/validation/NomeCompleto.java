@@ -18,7 +18,7 @@ import static java.lang.annotation.ElementType.RECORD_COMPONENT;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface NomeCompleto {
 
-    String message() default "Informe o nome completo, com nome e sobrenome (só letras, espaço, apóstrofo, hífen e ponto).";
+    String message() default "Informe o nome completo, com nome e sobrenome (só letras, espaço, apóstrofo, hífen e ponto, até 120 caracteres).";
 
     Class<?>[] groups() default {};
 

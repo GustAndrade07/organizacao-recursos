@@ -3,7 +3,7 @@
   Tela 1 do inventário (prefixo "login-"), RF-01. Atributos de modelo (docs/frontend/README.md):
     falhou   : true quando veio /login?erro (credenciais inválidas)
     expirou  : true quando veio /login?expirou (sessão expirada); o aviso de credencial prevalece sobre ele
-    login    : login digitado, devolvido por atributo flash depois de uma falha (a senha nunca volta)
+    login    : e-mail digitado (o login é o e-mail, DEF-010), devolvido por atributo flash depois de uma falha (a senha nunca volta)
     destino  : para onde voltar depois de entrar; o controller só passa o valor se for caminho deste site (CaminhoDoSite)
 */-->
 <html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"
@@ -16,11 +16,11 @@
     <section class="cartao cartao--estreito">
         <header class="cartao__cabecalho">
             <h1 class="cartao__titulo" data-testid="login-titulo">Entrar</h1>
-            <p class="cartao__descricao" data-testid="login-descricao">Use seu login e senha para acessar o sistema de reservas.</p>
+            <p class="cartao__descricao" data-testid="login-descricao">Use seu e-mail e senha para acessar o sistema de reservas.</p>
         </header>
 
         <p class="alerta alerta--perigo" role="alert" tabindex="-1" data-testid="login-erro" th:if="${falhou}">
-            Login ou senha incorretos. Confira os dados e tente novamente.
+            E-mail ou senha incorretos. Confira os dados e tente novamente.
         </p>
 
         <p class="alerta alerta--aviso" role="alert" tabindex="-1" data-testid="login-sessao-expirada"
@@ -33,9 +33,9 @@
             <input type="hidden" name="destino" th:value="${destino}" data-testid="login-destino"
                    th:if="${destino != null}">
             <div class="campo">
-                <label class="campo__rotulo" for="login">Login</label>
-                <input class="campo__entrada" id="login" name="login" type="text" data-testid="login-usuario"
-                       autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="seu.login"
+                <label class="campo__rotulo" for="login">E-mail</label>
+                <input class="campo__entrada" id="login" name="login" type="email" inputmode="email" data-testid="login-usuario"
+                       autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="nome@exemplo.com"
                        th:value="${login}" required>
             </div>
             <div class="campo">

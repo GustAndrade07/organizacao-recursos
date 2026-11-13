@@ -8,8 +8,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * No start, garante o primeiro Administrador a partir de {@code ADMIN_LOGIN} e {@code ADMIN_SENHA}. Sem as duas
- * variáveis não faz nada. Nunca grava nem imprime a senha.
+ * No start, garante o primeiro Administrador a partir de {@code ADMIN_LOGIN} (um e-mail, DEF-010) e
+ * {@code ADMIN_SENHA}. Sem as duas variáveis não faz nada; com um {@code ADMIN_LOGIN} que não é e-mail a subida
+ * falha com mensagem clara. Nunca grava nem imprime a senha, nem o e-mail no log.
  */
 @Configuration(proxyBeanMethods = false)
 public class AdministradorInicialConfig {
@@ -26,7 +27,7 @@ public class AdministradorInicialConfig {
                     ? "Administrador"
                     : propriedades.nome();
             if (usuarios.garantirAdministrador(nome, propriedades.login(), propriedades.senha())) {
-                LOG.info("Administrador inicial '{}' criado.", propriedades.login());
+                LOG.info("Administrador inicial criado.");
             }
         };
     }
