@@ -13,7 +13,7 @@ import org.springframework.test.context.TestPropertySource;
 
 /** O primeiro Administrador nasce das variáveis de ambiente, uma vez só, e consegue entrar. */
 @TestPropertySource(properties = {
-    "recursos.administrador-inicial.login=chefe",
+    "recursos.administrador-inicial.login=Chefe@Exemplo.com",
     "recursos.administrador-inicial.senha=senha-do-chefe-123",
     "recursos.administrador-inicial.nome="
 })
@@ -27,9 +27,9 @@ class AdministradorInicialTest extends ApiIntegracaoTest {
         administradorInicial.run(new DefaultApplicationArguments());
         administradorInicial.run(new DefaultApplicationArguments());
 
-        assertThat(contar("select count(*) from usuario where login = 'chefe' and perfil = 'ADMINISTRADOR' "
+        assertThat(contar("select count(*) from usuario where login = 'chefe@exemplo.com' and perfil = 'ADMINISTRADOR' "
                 + "and nome = 'Administrador'")).isOne();
-        enviar(null, "/api/auth/login", "{\"login\":\"chefe\",\"senha\":\"senha-do-chefe-123\"}")
+        enviar(null, "/api/auth/login", "{\"login\":\"chefe@exemplo.com\",\"senha\":\"senha-do-chefe-123\"}")
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.token").isNotEmpty());
     }

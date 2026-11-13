@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <!--/*
   Tela 16 do inventário, cadastro (prefixo "usuario-form-"), RF-01, só do Administrador. Atributos de modelo:
-    usuario : nome, login, perfil (o que foi digitado; a senha nunca volta)
+    usuario : nome, login (o e-mail, DEF-010), perfil (o que foi digitado; a senha nunca volta)
     perfis  : lista de valor (SOLICITANTE, RESPONSAVEL, ADMINISTRADOR) e rotulo
     erros   : mapa campo (nome, login, senha, perfil) para mensagem, na ordem do formulário   (back-end; opcional)
 */-->
@@ -23,8 +23,8 @@
             <p class="alerta__texto" th:text="${total == 1} ? 'Corrija o campo destacado:' : 'Corrija os ' + ${total} + ' campos destacados:'">Corrija os 2 campos destacados:</p>
             <ul class="alerta__lista">
                 <li th:each="erro : ${erros}" th:switch="${erro.key}">
-                    <a th:case="'nome'" href="#usuario-form-nome">Nome</a>
-                    <a th:case="'login'" href="#usuario-form-login">Login</a>
+                    <a th:case="'nome'" href="#usuario-form-nome">Nome completo</a>
+                    <a th:case="'login'" href="#usuario-form-login">E-mail</a>
                     <a th:case="'senha'" href="#usuario-form-senha">Senha</a>
                     <a th:case="'perfil'" href="#usuario-form-perfil">Perfil</a>
                     <span th:case="*" th:text="${erro.value}">Erro sem campo</span>
@@ -34,8 +34,31 @@
 
         <form class="cartao formulario" method="post" novalidate data-envio-unico data-testid="usuario-form"
               th:action="@{/admin/usuarios}">
-            <div th:replace="~{fragments/campo :: campo('usuario-form', 'nome', 'Nome', 'text', ${usuario.nome}, ${erros?.get('nome')}, null, false, false)}"></div>
-            <div th:replace="~{fragments/campo :: campo('usuario-form', 'login', 'Login', 'text', ${usuario.login}, ${erros?.get('login')}, 'De 3 a 60 caracteres: letras minúsculas, números, ponto, hífen ou sublinhado.', false, false)}"></div>
+            <!--/* Nome e e-mail fora do fragmento: precisam de maxlength, autocomplete="off" e (o e-mail) type="email" */-->
+            <div class="campo" th:with="erroNome=${erros?.get('nome')}">
+                <label class="campo__rotulo" for="usuario-form-nome">Nome completo <span class="campo__obrig">(obrigatório)</span></label>
+                <input class="campo__entrada" id="usuario-form-nome" name="nome" type="text" maxlength="120" autocomplete="off"
+                       required aria-required="true" data-testid="usuario-form-nome" th:value="${usuario.nome}"
+                       th:classappend="${erroNome != null} ? 'campo__entrada--erro'"
+                       th:aria-invalid="${erroNome != null} ? 'true'"
+                       th:aria-describedby="${erroNome != null} ? 'usuario-form-nome-erro usuario-form-nome-ajuda' : 'usuario-form-nome-ajuda'">
+                <p class="campo__ajuda" id="usuario-form-nome-ajuda">Nome e sobrenome, só com letras (acentos, apóstrofo, hífen e ponto valem), até 120 caracteres.</p>
+                <p class="campo__erro" id="usuario-form-nome-erro" data-testid="usuario-form-nome-erro"
+                   th:if="${erroNome != null}" th:text="${erroNome}">Informe o nome completo.</p>
+            </div>
+
+            <div class="campo" th:with="erroLogin=${erros?.get('login')}">
+                <label class="campo__rotulo" for="usuario-form-login">E-mail <span class="campo__obrig">(obrigatório)</span></label>
+                <input class="campo__entrada" id="usuario-form-login" name="login" type="email" inputmode="email" maxlength="254"
+                       autocomplete="off" autocapitalize="none" spellcheck="false" required aria-required="true"
+                       data-testid="usuario-form-login" th:value="${usuario.login}"
+                       th:classappend="${erroLogin != null} ? 'campo__entrada--erro'"
+                       th:aria-invalid="${erroLogin != null} ? 'true'"
+                       th:aria-describedby="${erroLogin != null} ? 'usuario-form-login-erro usuario-form-login-ajuda' : 'usuario-form-login-ajuda'">
+                <p class="campo__ajuda" id="usuario-form-login-ajuda">É o login da pessoa. Guardado em minúsculas, até 254 caracteres, sem espaços e sem emoji.</p>
+                <p class="campo__erro" id="usuario-form-login-erro" data-testid="usuario-form-login-erro"
+                   th:if="${erroLogin != null}" th:text="${erroLogin}">Informe um e-mail válido, como nome@dominio.com.</p>
+            </div>
 
             <!--/* Senha fora do fragmento: precisa de autocomplete="new-password" e nunca leva valor de volta */-->
             <div class="campo" th:with="erroSenha=${erros?.get('senha')}">

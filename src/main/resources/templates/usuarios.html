@@ -37,14 +37,14 @@
             <thead>
             <tr>
                 <th scope="col">Nome</th>
-                <th scope="col">Login</th>
+                <th scope="col">E-mail</th>
                 <th scope="col">Perfil</th>
             </tr>
             </thead>
             <tbody>
             <tr th:each="usuario : ${usuarios}" th:attr="data-testid='usuarios-linha-' + ${usuario.id}">
                 <th scope="row" class="tabela__nome" th:text="${usuario.nome}">Ana Lima</th>
-                <td data-rotulo="Login" th:text="${usuario.login}">ana.lima</td>
+                <td data-rotulo="E-mail" th:text="${usuario.login}">ana.lima@exemplo.com</td>
                 <td data-rotulo="Perfil" th:text="${usuario.perfil}" th:attr="data-testid='usuarios-perfil-' + ${usuario.id}">Solicitante</td>
             </tr>
             </tbody>

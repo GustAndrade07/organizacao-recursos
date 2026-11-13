@@ -116,8 +116,13 @@ public abstract class ApiIntegracaoTest {
 
     // ---------------------------------------------------------------- dados
 
-    protected Usuario usuario(String login, PerfilUsuario perfil) {
-        return usuarios.save(new Usuario("Usuário " + login, login, codificadorDeSenha.encode(SENHA), perfil));
+    /** O login é um e-mail (DEF-010): os testes dão só o apelido e o e-mail é {@code apelido@exemplo.com}. */
+    protected static String email(String apelido) {
+        return apelido + "@exemplo.com";
+    }
+
+    protected Usuario usuario(String apelido, PerfilUsuario perfil) {
+        return usuarios.save(new Usuario("Usuário " + apelido, email(apelido), codificadorDeSenha.encode(SENHA), perfil));
     }
 
     protected String token(Usuario usuario) {

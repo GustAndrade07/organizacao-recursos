@@ -57,21 +57,21 @@
         <h2 id="quais-dados-coletamos">Quais dados coletamos?</h2>
         <p>Guardamos estes dados no banco de dados (PostgreSQL):</p>
         <ul>
-          <li><strong>Seu usuário:</strong> nome, login e perfil (Solicitante, Responsável ou Administrador). A senha é guardada só como hash, que é um código embaralhado. Ninguém consegue ler a senha original.</li>
+          <li><strong>Seu usuário:</strong> nome, e-mail (que é o seu login) e perfil (Solicitante, Responsável ou Administrador). A senha é guardada só como hash, que é um código embaralhado. Ninguém consegue ler a senha original.</li>
           <li><strong>Suas reservas:</strong> quem pediu, o estado da reserva, a data em que foi criada, o recurso e o período.</li>
           <li><strong>O histórico de cada reserva:</strong> quem mudou o estado, quando mudou, o estado anterior, o estado novo e o motivo. O motivo é um texto livre, de até 500 caracteres, que a pessoa digita. Não escreva nele nada que não precise estar lá.</li>
           <li><strong>Tentativas de reserva recusadas por conflito de horário:</strong> quem tentou, qual recurso, qual período e quando.</li>
           <li><strong>Recursos:</strong> salas, materiais e professores. O professor aparece como um recurso que se pode reservar, com nome. Ele pode não ser usuário do sistema.</li>
         </ul>
-        <p>O login passará a ser um endereço de e-mail. Esse ponto ainda está em alinhamento. Se for um e-mail, ele é dado pessoal, porque identifica você.</p>
+        <p>O seu login é o seu endereço de e-mail. Ele é dado pessoal, porque identifica você. Guardamos o e-mail em letras minúsculas. Contas antigas, criadas com um nome de usuário sem "@", não conseguem mais entrar: o Administrador precisa cadastrar a pessoa de novo.</p>
       </section>
       <section class="documento__secao" aria-labelledby="que-dados-ficam-so-na-memoria-do-servidor">
         <h2 id="que-dados-ficam-so-na-memoria-do-servidor">Que dados ficam só na memória do servidor?</h2>
-        <p>O sistema conta os erros de senha de cada login. Com 5 erros do mesmo login em 15 minutos, esse login fica bloqueado por 15 minutos. Esse contador fica só na memória do servidor. O texto digitado no campo de login fica nele até o servidor reiniciar (ou até a lista ficar grande e ser limpa). Não prometemos que suma em 15 minutos.</p>
+        <p>O sistema conta os erros de senha de cada login. Com 5 erros do mesmo login em 15 minutos, esse login fica bloqueado por 15 minutos. Esse contador fica só na memória do servidor. O texto digitado no campo de e-mail fica nele até o servidor reiniciar (ou até a lista ficar grande e ser limpa). Não prometemos que suma em 15 minutos.</p>
       </section>
       <section class="documento__secao" aria-labelledby="o-que-o-registro-tecnico-log-guarda">
         <h2 id="o-que-o-registro-tecnico-log-guarda">O que o registro técnico (log) guarda?</h2>
-        <p>O registro técnico da aplicação não grava senha nem endereço IP. Ele registra erros inesperados. Quando o administrador inicial é criado, ele registra o login desse administrador.</p>
+        <p>O registro técnico da aplicação não grava senha nem endereço IP. Ele registra erros inesperados. Quando o administrador inicial é criado, o registro diz só que ele foi criado, sem o e-mail. Um erro do banco (por exemplo, dois cadastros do mesmo e-mail ao mesmo tempo) pode citar o e-mail no registro; isso não foi medido.</p>
         <p>Ainda não sabemos o que a hospedagem do site registra. Por isso, esta página não afirma nada sobre isso.</p>
       </section>
       <section class="documento__secao" aria-labelledby="quem-dentro-do-sistema-pode-ver-seus-dados">

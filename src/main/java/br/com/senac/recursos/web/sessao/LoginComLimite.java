@@ -21,7 +21,7 @@ import org.springframework.security.core.AuthenticationException;
  */
 public class LoginComLimite implements AuthenticationProvider {
 
-    private static final String MENSAGEM = "Login ou senha incorretos.";
+    private static final String MENSAGEM = "E-mail ou senha incorretos.";
 
     private final AuthenticationProvider senhas;
     private final TentativasDeLogin tentativas;
