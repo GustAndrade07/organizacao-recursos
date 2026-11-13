@@ -199,9 +199,29 @@ Nenhuma mutação sobrou — nem em `src/main`, nem em `src/test`.
 
 - O serviço de notificação (RF-11) **não existe**, então não há o que mutar.
 - A janela da RN-04 ("consulta e depois grava", D13): o risco foi aceito e **não** tem teste, então uma mutação ali não teria o que ficar vermelho. Está dito no ADR-0008.
-- Mutações de condição de borda dentro das consultas do relatório (M4 e M5 do banco já cobrem parte; o serviço do relatório não foi mutado — **não medido**).
+- Mutações de condição de borda dentro das consultas do relatório (M4 e M5 do banco cobrem parte; o serviço do relatório foi mutado em 13/11/2026, MR1 a MR5, na seção própria acima).
+
+## Mutações do serviço do relatório (RF-12)
+
+> Feitas em **13/11/2026** pelo Pedro (com IA). Fecham a lacuna "o serviço do relatório não foi mutado".
+
+**Como foi medido:** Windows 11, JDK 21.0.13, Docker 29.9.3, PostgreSQL 16 em Testcontainers; **só nesta máquina**. Base: `main` `00b521b` mais `RelatorioInstantaneoTest`. Cada mutação sozinha, com `./mvnw -B -q clean test` sobre as 7 classes que exercitam o relatório (`RelatorioUtilizacaoBancoTest`, `RelatorioApiControllerTest`, `RelatorioInstantaneoTest`, `RelatorioPaginaTest`, `TelasComBancoTest`, `MatrizAutorizacaoTest`, `OpenApiDocumentacaoTest`; **281 testes**, linha de base 0 falhas), e `git checkout -- src/main` depois. Não é a suíte inteira: a primeira tentativa com a suíte inteira foi descartada, porque a máquina suspendeu a rede no meio (`ERR_NETWORK_IO_SUSPENDED` em dois E2E) e um Maven parado continuou compilando no mesmo `target`.
+
+| Mutação | Quebra | Vermelhos (de 281) |
+|---|---|---|
+| MR1 | `RelatorioService`: início e fim da janela trocados na resposta | **1**: `RelatorioApiControllerTest.valoresCalculadosAMaoComBordaCanceladaEConflito` |
+| MR2 | `RelatorioService`: conflitos evitados fixos em 0 | **1**: o mesmo |
+| MR3 | `RelatorioService`: carga por professor sempre vazia | **2**: o mesmo e `RelatorioInstantaneoTest` |
+| MR4 | `RelatorioService`: sem `REPEATABLE READ` (as três partes deixam de ler o mesmo instantâneo) | **1**: `RelatorioInstantaneoTest.reservaGravadaNoMeioDoRelatorioNaoEntraEmSoUmaDasPartes`. **Sem esse teste: 0 de 280** |
+| MR5 | `RelatorioRepository`: horas por recurso truncadas para inteiro (1,5 h vira 1 h) | **2**: `RelatorioApiControllerTest.valoresCalculados...` e `TelasComBancoTest.relatorioContaReservasEHorasNoPeriodoDoFusoDasTelas` |
+
+**Lacuna achada (MR4):** a promessa do Javadoc de `RelatorioService` ("as três partes leem o mesmo instantâneo") não tinha teste. `RelatorioInstantaneoTest` grava e confirma, em outra thread, uma reserva entre a consulta das horas e a da carga por professor, e exige que as duas partes concordem (1 h); sem o isolamento, a carga vê 3 h. Rodado 3 vezes seguidas sem mutação: verde nas 3.
+
+**Ponto frágil:** MR1 e MR2 são pegas por um único teste (`valoresCalculadosAMaoComBordaCanceladaEConflito`).
 
 ## Lacunas encontradas
+
+**Lacuna achada em 13/11/2026 (MR4):** tirar o `REPEATABLE READ` do relatório não deixava nenhum teste vermelho (0 de 280). `RelatorioInstantaneoTest` fecha o buraco (1 vermelho).
 
 **Lacuna achada em 13/11/2026 (MAU1):** apagar a auditoria do cancelamento e do não comparecimento não deixava **nenhum** teste vermelho (0 de 1116). Os 4 testes de `ReservaApiControllerTest.AuditoriaDeCadaTransicao` (PR `test/rn08-auditoria-servico`) fecham o buraco: com eles, a mesma mutação deixa 3 vermelhos.
 
