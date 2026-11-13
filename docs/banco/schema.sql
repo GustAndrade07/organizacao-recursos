@@ -1,12 +1,14 @@
 -- Esquema consolidado do banco (documentação). NÃO é migração: o Flyway só roda src/main/resources/db/migration.
--- Gerado em 07/11/2026 a partir da migração V1__nucleo_da_reserva.sql, num PostgreSQL 16.15 descartável:
+-- Gerado em 13/11/2026 a partir das migrações V1__nucleo_da_reserva.sql e V2__login_e_email.sql, num PostgreSQL 16.15 descartável
+-- (a primeira versão, de 07/11/2026, tinha só a V1):
 --   1. subir um contêiner postgres:16 só para isso (Docker, banco vazio chamado recursos, apagado depois);
---   2. aplicar a V1 com psql -f V1__nucleo_da_reserva.sql;
+--   2. aplicar a V1 e depois a V2 com psql -v ON_ERROR_STOP=1 -f <arquivo>;
 --   3. rodar pg_dump --schema-only --no-owner --no-privileges nesse banco.
 -- Só estrutura: não há dados, usuários, papéis nem credenciais neste arquivo.
 -- (as linhas \restrict e \unrestrict do pg_dump, com token aleatório, foram removidas para o arquivo ser estável)
--- Ao criar a V2, gere de novo. Não edite à mão: a fonte da verdade é a pasta db/migration.
--- Fora da V1 (ficam para a V2): tabela movimentacao_material (RF-09) e colunas de competência e localização de recurso.
+-- Ao criar a V3, gere de novo. Não edite à mão: a fonte da verdade é a pasta db/migration.
+-- Fora da V1 e da V2 (ficam para a V3): tabela movimentacao_material (RF-09) e colunas de competência e localização de recurso.
+-- A V2 (login por e-mail, ADR-0010) só acrescenta o índice usuario_login_minusculo_uq e o CHECK usuario_login_e_email (NOT VALID).
 --
 -- PostgreSQL database dump
 --
@@ -307,6 +309,14 @@ ALTER TABLE ONLY public.tentativa_recusada
 
 
 --
+-- Name: usuario usuario_login_e_email; Type: CHECK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE public.usuario
+    ADD CONSTRAINT usuario_login_e_email CHECK (((login ~ '^[a-z0-9_%+-]+(\.[a-z0-9_%+-]+)*@([a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}$'::text) AND (length(login) <= 254) AND (POSITION(('@'::text) IN (login)) <= 65))) NOT VALID;
+
+
+--
 -- Name: usuario usuario_login_key; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -362,6 +372,13 @@ CREATE INDEX tentativa_recusada_recurso_data_idx ON public.tentativa_recusada US
 --
 
 CREATE INDEX tentativa_recusada_solicitante_idx ON public.tentativa_recusada USING btree (solicitante_id);
+
+
+--
+-- Name: usuario_login_minusculo_uq; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX usuario_login_minusculo_uq ON public.usuario USING btree (lower(login));
 
 
 --

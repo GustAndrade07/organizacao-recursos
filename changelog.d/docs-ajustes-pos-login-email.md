@@ -1,0 +1,3 @@
+- `docs/banco/schema.sql` gerado de novo com a V1 e a V2 (índice único em `lower(login)` e `CHECK usuario_login_e_email` `NOT VALID`).
+- A migração futura de localização, patrimônio, competências e `movimentacao_material` passa a se chamar V3 no plano (Entidades e D13) e no ADR-0009, porque a V2 é a do login por e-mail.
+- ADR-0010 (login por e-mail) aceito; D14 com o OK do Gustavo; plano atualizado com o merge dos PRs #66 e #67.

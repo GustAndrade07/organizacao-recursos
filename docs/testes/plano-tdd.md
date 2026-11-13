@@ -50,7 +50,7 @@ Camadas: **[b]** banco (Testcontainers), **[u]** unidade, **[s]** serviço, **[a
 | Limite: recurso restrito nasce SOLICITADA; sem restrito nasce APROVADA (D10) | [u] `ReservaTest.reservaComUmRecursoRestritoExigeAprovacao`; [a] `Criar.recursoRestritoNasceSolicitada` e `...NasceAprovadaComAuditoria` | coberto |
 | Estado proibido: ninguém aprova a própria reserva, nem o Responsável | [a] `Aprovacao.responsavelNaoAprovaAPropriaReserva`, `solicitanteNaoAprovaAPropriaReserva`; [bdd]⁺ dois cenários; [t] `TelasComBancoTest.responsavelNaoAprovaAPropriaReservaETelaMostraOAviso` | coberto; mutação **MA1**⁺ deixa 4 testes vermelhos |
 | Conflito: rejeitar libera o horário | [a] `Aprovacao.rejeitarLiberaOHorario`; [bdd]⁺ "Rejeição libera o horário" | coberto |
-| **Falta** | o Responsável **rejeitar a própria** reserva (D10 (c) diz que pode) não tem teste próprio | **falta** |
+| Permitido pela D10 (c): o Responsável **rejeita a própria** reserva (a RN-06 só proíbe aprovar) | [a] `Aprovacao.responsavelPodeRejeitarAPropriaReserva` (13/11/2026; histórico com o Responsável como autor) | coberto; sem ele, a mutação MD10c (proibir) passava despercebida |
 
 ## 4. Bloqueio por manutenção (RF-08, RN-04)
 
@@ -61,6 +61,7 @@ Camadas: **[b]** banco (Testcontainers), **[u]** unidade, **[s]** serviço, **[a
 | Inválido: período invertido na manutenção → 400 | [a] `RecursoApiControllerTest.manutencaoECadastradaEListada...` | coberto |
 | Conflito: 409 de **tipo próprio**, sem tentativa recusada gravada | [a] `Manutencao.manutencaoDa409DeTipoProprioSemTentativaESemReserva`; [bdd]⁺ "Recusa por manutenção não é conflito de horário" | coberto; mutações **MM1** e **MM3**⁺ |
 | Estado proibido: alterar reserva para período em manutenção | [a] `Alterar.periodoParaManutencaoDa409` | coberto |
+| Reservas que já existem no período (D11): a manutenção é gravada, a reserva existente continua como estava e só as novas são recusadas | [a] `Manutencao.manutencaoSobreReservaExistenteMantemAReservaEBloqueiaSoAsNovas` (13/11/2026); [t] `TelasComBancoTest.bloqueioComReservaNoPeriodoPedeConfirmacaoAntesDeGravar` | coberto na API e na tela; sem o teste da API, a mutação MD11 (cancelar as afetadas) passava despercebida |
 | **Limite conhecido** | a regra é "consulta e depois grava" (D13, risco aceito): manutenção criada entre a consulta e o commit passa. **Sem teste**, por decisão registrada no ADR-0008 | risco aceito |
 
 ## 5. Transições de estado (RN-05, D3)
@@ -73,6 +74,7 @@ Camadas: **[b]** banco (Testcontainers), **[u]** unidade, **[s]** serviço, **[a
 | Estado proibido no banco: estado fora da máquina, ocupação incoerente | [b] `SobreposicaoBancoTest.estadoForaDaMaquinaDeEstadosERecusadoPeloBanco`, `estadoDaOcupacaoDiferenteDoEstadoDaReservaERecusadoPeloBanco` | coberto |
 | Conflito: não comparecimento libera o horário | [a] `CicloDeUso.naoComparecimentoLiberaOHorario`; [bdd]⁺ | coberto |
 | Inválido: transição em reserva inexistente → 404 | [a] `CicloDeUso.transicaoEmReservaInexistenteDa404` | coberto |
+| Limite da D10 (d): sem limite de horário para retirada, devolução e "não compareceu" (antes do início, durante e depois do fim) | [a] `SemLimiteDeHorarioNoCicloDeUso.retiradaEDevolucaoSaoAceitasEmQualquerHorario` (3 instantes) e `naoComparecimentoEhAceitoEmQualquerHorario` (3 instantes), relógio fixo (13/11/2026) | coberto; a mutação MD10d (limitar) deixa 3 vermelhos |
 
 ## 6. Alterar e cancelar (RF-04, RN-07)
 

@@ -18,7 +18,7 @@
   - **Perdemos:**
     - **Duas formas de autenticação no mesmo sistema** (JWT na API, sessão nas telas): duas cadeias para manter e testar.
     - Sessão no servidor: se um dia houver mais de uma instância, a sessão precisa ser compartilhada (não medido nem previsto para a entrega).
-    - O esquema ainda não guarda localização, patrimônio, competências nem o motivo do bloqueio (V2). As telas mostram "Não informado" e o que for digitado nesses campos **não é gravado**.
+    - O esquema ainda não guarda localização, patrimônio, competências nem o motivo do bloqueio (migração futura, chamada de V2 até 13/11/2026 e agora V3, porque a V2 é a do login por e-mail, ADR-0010). As telas mostram "Não informado" e o que for digitado nesses campos **não é gravado**.
     - A contagem de reservas por linha do relatório é feita na tela (reservas que ocupam horário e cruzam o período, a mesma regra das consultas), porque o service devolve só as horas.
   - **Exige de testes:**
     - Matriz de autorização das telas célula a célula com o usuário de cada perfil na sessão e o CSRF em todo `POST` (`MatrizAutorizacaoTest`, 210 casos com a API).
