@@ -38,7 +38,7 @@
 - [ ] Tag anotada `v1.0.0-rc1` com CI verde **no commit da tag** (se corrigir depois: `rc2`; nunca mover tag já usada)
 - [ ] `CHANGELOG.md` com o que entra na versão (entradas de `changelog.d/` juntadas com `bash .github/scripts/juntar-changelog.sh`, num PR antes da tag)
 - [ ] `docs/evidencias/README.md`: índice com link do CI no commit da tag, JaCoCo (artifact), Quality Gate, `resultado-01.md`, `rtm.md`, `defeitos/` e `relatorio-qualidade.md`; nenhum link quebrado
-- [ ] `docs/decisao-qualidade.md`: liberar / liberar com ressalvas / bloquear; critérios e evidência de cada um; riscos aceitos **com impacto, justificativa e responsável**; declaração de cada integrante
+- [ ] `docs/decisao-qualidade.md`: liberar / liberar com ressalvas / bloquear; critérios e evidência de cada um; riscos aceitos **com impacto, justificativa e responsável**; declaração de cada integrante — escrita em 12/11/2026 (Leandro); faltam as declarações dos três integrantes e a conferência no commit da tag
 - [ ] Formulário de entrega enviado por **um** integrante: nomes completos (até 4) e link do repositório público
 
 ## Bloqueadores (em ordem; os 4 primeiros zeram a nota)
@@ -81,7 +81,7 @@
 | `docs/testes/plano-tdd.md`, `docs/testes/evidencia-tdd.md`, `docs/testes/mutacao-manual.md` | **não existem** |
 | `docs/seguranca/matriz-autorizacao.md` | **não existe** |
 | `perf/reservas.jmx`, `docs/performance/rnf.md`, `docs/performance/resultado-01.md` | **não existem** |
-| `docs/decisao-qualidade.md`, `docs/evidencias/README.md` | **não existem** (o `docs/relatorio-qualidade.md` entrou na versão 1 em 11/11/2026, PR #42) |
+| `docs/decisao-qualidade.md`, `docs/evidencias/README.md` | Os dois existem: o índice desde o PR #46; a decisão em 12/11/2026 (branch `docs/decisao-qualidade`). O `docs/relatorio-qualidade.md` está na versão 2 (PR #57) |
 | `docs/avaliacao-arquitetural/ciclo-01.md`, `docs/banco/schema.sql` | **não existem** (em PRs abertos) |
 | Arquivos `.feature` (BDD), OpenAPI/Swagger | **não existem** |
 | `docs/defeitos/` | só `TEMPLATE.md` (nenhum defeito registrado) |
