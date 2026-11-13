@@ -14,5 +14,11 @@ Os documentos da análise ficam em `docs/performance/`:
 
 ## Como rodar (somente modo CLI, contra a aplicação local, nunca ambiente compartilhado)
 ```bash
-jmeter -n -t perf/reservas.jmx -l perf/resultados/rodada-01.jtl -e -o perf/relatorio-01
+jmeter -n -t perf/reservas.jmx -Jadmin_login=<login> -Jadmin_senha=<senha> -l perf/resultados/rodada-01.jtl -e -o perf/relatorio-01
 ```
+
+- **Preparação** (setUp do plano, fora das métricas): o Administrador cria os 50 usuários do CSV e uma sala nova a cada rodada.
+- **O Administrador** vem por propriedade (`-Jadmin_login`, `-Jadmin_senha`). Na aplicação local, ele é criado no start com `ADMIN_LOGIN` e `ADMIN_SENHA`. Use uma senha só desta rodada, nunca escrita em arquivo do repositório.
+- **Outras propriedades**, com os padrões do cenário de `docs/performance/rnf.md`: `-Jusuarios=50`, `-Jrampa=10`, `-Jrepeticoes=20`, `-Jhost=localhost` e `-Jporta=8080`.
+- **Cada usuário entra uma vez, com a senha certa.** Senha errada esbarra no limite de tentativas do login (5 falhas em 15 min bloqueiam, ADR-0009).
+- **Resultado da primeira medição:** `docs/performance/resultado-01.md` (rodadas 01 e 02, 12/11/2026).
