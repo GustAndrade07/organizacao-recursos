@@ -9,7 +9,7 @@
 | # | O que fazer | Como conferir que deu certo |
 |---|---|---|
 | 1 | `docker compose up -d` | `docker compose ps` mostra o serviço de pé |
-| 2 | Subir a aplicação com o administrador inicial. **Linux, macOS e Git Bash:** `ADMIN_LOGIN=admin ADMIN_SENHA='<senha escolhida na hora>' ./mvnw spring-boot:run`. **PowerShell** (a sintaxe `VAR=valor comando` não existe nele): `$env:ADMIN_LOGIN='admin'; $env:ADMIN_SENHA='<senha escolhida na hora>'; .\mvnw.cmd spring-boot:run` (**não conferido** no Windows) | log com `Started RecursosApplication` |
+| 2 | Subir a aplicação com o administrador inicial. **Linux, macOS e Git Bash:** `ADMIN_LOGIN=admin@exemplo.com ADMIN_SENHA='<senha escolhida na hora>' ./mvnw spring-boot:run`. **PowerShell** (a sintaxe `VAR=valor comando` não existe nele): `$env:ADMIN_LOGIN='admin@exemplo.com'; $env:ADMIN_SENHA='<senha escolhida na hora>'; .\mvnw.cmd spring-boot:run` (**não conferido** no Windows) | log com `Started RecursosApplication` |
 | 3 | Abrir http://localhost:8080/actuator/health | responde `{"status":"UP"}` |
 | 4 | Carregar a massa de demonstração (seção 1) | o script imprime os ids criados |
 | 5 | Abrir as abas já logadas: `/login` (Solicitante), `/aprovacoes` (Responsável), `/admin/recursos` (Administrador) | três janelas prontas; **nada de digitar senha na frente da banca** |
@@ -29,12 +29,12 @@ set -euo pipefail
 API=http://localhost:8080/api
 read -rsp 'Senha do admin: ' SENHA; echo
 TOKEN=$(curl -s -X POST "$API/auth/login" -H 'Content-Type: application/json' \
-        -d "{\"login\":\"admin\",\"senha\":\"$SENHA\"}" | sed -E 's/.*"token":"([^"]+)".*/\1/')
+        -d "{\"login\":\"admin@exemplo.com\",\"senha\":\"$SENHA\"}" | sed -E 's/.*"token":"([^"]+)".*/\1/')
 auth=(-H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/json')
 
 # Pessoas (a senha de demonstração é só para a mesa; trocar depois)
-for p in '{"nome":"Ana Souza","login":"ana","senha":"demo-senha-123","perfil":"SOLICITANTE"}' \
-         '{"nome":"Bruno Lima","login":"bruno","senha":"demo-senha-123","perfil":"RESPONSAVEL"}'; do
+for p in '{"nome":"Ana Souza","login":"ana@exemplo.com","senha":"demo-senha-123","perfil":"SOLICITANTE"}' \
+         '{"nome":"Bruno Lima","login":"bruno@exemplo.com","senha":"demo-senha-123","perfil":"RESPONSAVEL"}'; do
   curl -s "${auth[@]}" -X POST "$API/usuarios" -d "$p" > /dev/null
 done
 

@@ -19,7 +19,7 @@ class AutenticacaoApiControllerTest extends ApiIntegracaoTest {
     void loginCertoDevolveTokenQueAbreAsRotasDoPerfil() throws Exception {
         usuario("ana", PerfilUsuario.SOLICITANTE);
 
-        MvcResult resultado = enviar(null, "/api/auth/login", "{\"login\":\"ana\",\"senha\":\"" + SENHA + "\"}")
+        MvcResult resultado = enviar(null, "/api/auth/login", "{\"login\":\"ana@exemplo.com\",\"senha\":\"" + SENHA + "\"}")
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.tipo").value("Bearer"))
                 .andExpect(jsonPath("$.expiraEm").value(AGORA.plus(VALIDADE_DO_TOKEN).toString()))
@@ -28,7 +28,7 @@ class AutenticacaoApiControllerTest extends ApiIntegracaoTest {
 
         obter(token, "/api/usuarios/me")
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.login").value("ana"))
+                .andExpect(jsonPath("$.login").value("ana@exemplo.com"))
                 .andExpect(jsonPath("$.perfil").value("SOLICITANTE"))
                 .andExpect(jsonPath("$.senha").doesNotExist())
                 .andExpect(jsonPath("$.senhaHash").doesNotExist());
@@ -38,17 +38,44 @@ class AutenticacaoApiControllerTest extends ApiIntegracaoTest {
     void senhaErradaELoginInexistenteDaoAMesmaResposta() throws Exception {
         usuario("ana", PerfilUsuario.SOLICITANTE);
 
-        String senhaErrada = enviar(null, "/api/auth/login", "{\"login\":\"ana\",\"senha\":\"outra-senha\"}")
+        String senhaErrada = enviar(null, "/api/auth/login", "{\"login\":\"ana@exemplo.com\",\"senha\":\"outra-senha\"}")
                 .andExpect(status().isUnauthorized())
                 .andExpect(header().string("WWW-Authenticate", "Bearer"))
                 .andExpect(jsonPath("$.type").value("urn:recursos:problema:credenciais-invalidas"))
                 .andReturn().getResponse().getContentAsString();
-        String loginInexistente = enviar(null, "/api/auth/login", "{\"login\":\"ninguem\",\"senha\":\"outra-senha\"}")
+        String loginInexistente = enviar(null, "/api/auth/login", "{\"login\":\"ninguem@exemplo.com\",\"senha\":\"outra-senha\"}")
                 .andExpect(status().isUnauthorized())
                 .andReturn().getResponse().getContentAsString();
 
-        assertThat(senhaErrada).isEqualTo(loginInexistente.replace("ninguem", "ana"));
+        assertThat(senhaErrada).isEqualTo(loginInexistente.replace("ninguem@exemplo.com", "ana@exemplo.com"));
         assertThat(senhaErrada).doesNotContain("outra-senha");
+    }
+
+    @Test
+    void caixaEEspacosNoEmailNaoImportamNoLogin() throws Exception {
+        usuario("ana", PerfilUsuario.SOLICITANTE);
+
+        enviar(null, "/api/auth/login", "{\"login\":\"  ANA@Exemplo.COM \",\"senha\":\"" + SENHA + "\"}")
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void textoQueNaoEEmailNoLoginDaOMesmo401DeSenhaErradaSemRevelarFormato() throws Exception {
+        usuario("ana", PerfilUsuario.SOLICITANTE);
+        String senhaErrada = enviar(null, "/api/auth/login", "{\"login\":\"ana@exemplo.com\",\"senha\":\"outra-senha\"}")
+                .andExpect(status().isUnauthorized()).andReturn().getResponse().getContentAsString();
+
+        String semArroba = enviar(null, "/api/auth/login", "{\"login\":\"ana\",\"senha\":\"outra-senha\"}")
+                .andExpect(status().isUnauthorized()).andReturn().getResponse().getContentAsString();
+
+        assertThat(semArroba).isEqualTo(senhaErrada);
+    }
+
+    @Test
+    void erroDeLoginFalaEmEmailESemRevelarSeAContaExiste() throws Exception {
+        enviar(null, "/api/auth/login", "{\"login\":\"ninguem@exemplo.com\",\"senha\":\"outra-senha\"}")
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.detail").value("E-mail ou senha inválidos."));
     }
 
     @Test

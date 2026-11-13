@@ -142,7 +142,7 @@ class LimiteDeTentativasDoLoginIntegracaoTest {
      */
     @Test
     void loginInexistenteTambemBloqueia() throws Exception {
-        String login = "ainda.nao.existe";
+        String login = "ainda.nao.existe@exemplo.com";
         errar(login, LIMITE);
 
         usuarios.garantirAdministrador("Usuário " + login, login, SENHA);
@@ -175,9 +175,11 @@ class LimiteDeTentativasDoLoginIntegracaoTest {
 
     // ---------------------------------------------------------------- apoio
 
-    private String usuario(String login) {
-        usuarios.garantirAdministrador("Usuário " + login, login, SENHA);
-        return login;
+    /** Cria o usuário e devolve o e-mail dele ({@code apelido@exemplo.com}). */
+    private String usuario(String apelido) {
+        String email = apelido + "@exemplo.com";
+        usuarios.garantirAdministrador("Usuário " + apelido, email, SENHA);
+        return email;
     }
 
     private void errar(String login, int vezes) throws Exception {

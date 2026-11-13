@@ -105,10 +105,22 @@ class LimiteDeTentativasApiTest extends ApiIntegracaoTest {
         entrarNaTela("api.tela", SENHA).andExpect(redirectedUrl("/login?erro"));
     }
 
+    /** O contador é por e-mail normalizado: "ANA@..." e "ana@..." são a mesma conta. */
+    @Test
+    void emailComCaixaDiferenteContaParaOMesmoLimite() throws Exception {
+        usuario("api.caixa", PerfilUsuario.SOLICITANTE);
+        String maiusculas = "{\"login\":\"API.CAIXA@EXEMPLO.COM\",\"senha\":\"" + SENHA_ERRADA + "\"}";
+        for (int i = 0; i < LIMITE; i++) {
+            enviar(null, "/api/auth/login", maiusculas).andExpect(status().isUnauthorized());
+        }
+
+        entrarNaApi("api.caixa", SENHA).andExpect(status().isUnauthorized());
+    }
+
     // ---------------------------------------------------------------- apoio
 
     private ResultActions entrarNaApi(String login, String senha) throws Exception {
-        return enviar(null, "/api/auth/login", "{\"login\":\"" + login + "\",\"senha\":\"" + senha + "\"}");
+        return enviar(null, "/api/auth/login", "{\"login\":\"" + email(login) + "\",\"senha\":\"" + senha + "\"}");
     }
 
     private void errarNaApi(String login, int vezes) throws Exception {
@@ -118,6 +130,6 @@ class LimiteDeTentativasApiTest extends ApiIntegracaoTest {
     }
 
     private ResultActions entrarNaTela(String login, String senha) throws Exception {
-        return mvc.perform(post("/login").param("login", login).param("senha", senha).with(csrf()));
+        return mvc.perform(post("/login").param("login", email(login)).param("senha", senha).with(csrf()));
     }
 }

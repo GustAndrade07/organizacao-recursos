@@ -53,10 +53,10 @@ class LoginComLimiteTest {
 
         assertThatThrownBy(() -> login.authenticate(pedido("certa")))
                 .isExactlyInstanceOf(BadCredentialsException.class)
-                .hasMessage("Login ou senha incorretos.");
+                .hasMessage("E-mail ou senha incorretos.");
         assertThatThrownBy(() -> login.authenticate(pedido("errada")))
                 .isExactlyInstanceOf(BadCredentialsException.class)
-                .hasMessage("Login ou senha incorretos.");
+                .hasMessage("E-mail ou senha incorretos.");
 
         assertThat(senhas.chamadas.get()).isEqualTo(chamadasAntes + 2);
     }
@@ -87,7 +87,7 @@ class LoginComLimiteTest {
         public Authentication authenticate(Authentication pedido) {
             chamadas.incrementAndGet();
             if (!"certa".equals(pedido.getCredentials())) {
-                throw new BadCredentialsException("Login ou senha incorretos.");
+                throw new BadCredentialsException("E-mail ou senha incorretos.");
             }
             return UsernamePasswordAuthenticationToken.authenticated(pedido.getName(), null, List.of());
         }
