@@ -60,6 +60,13 @@ public class SegurancaDasTelasConfig {
                                 "/actuator/health").permitAll()
                         .requestMatchers(HttpMethod.GET, "/login").permitAll()
 
+                        // Documentação da API (RF-14): rotas da biblioteca springdoc, não do pacote controller.
+                        // Exigem sessão como qualquer tela; a permissão está na seção "Rotas da documentação" de
+                        // docs/seguranca/matriz-autorizacao.md e é conferida por OpenApiDocumentacaoTest.
+                        .requestMatchers(HttpMethod.GET, "/v3/api-docs", "/v3/api-docs/**", "/swagger-ui.html",
+                                "/swagger-ui/**")
+                        .authenticated()
+
                         .requestMatchers(HttpMethod.GET, "/").authenticated()
 
                         // Solicitante (e quem mais pode reservar pela API): busca, nova reserva, minhas e detalhe
