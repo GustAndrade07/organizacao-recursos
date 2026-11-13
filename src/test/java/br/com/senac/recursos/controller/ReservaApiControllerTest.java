@@ -426,7 +426,7 @@ class ReservaApiControllerTest extends ApiIntegracaoTest {
                     .isEqualTo("REJEITADA");
             obter(administrador, "/api/reservas/" + id + "/historico")
                     .andExpect(jsonPath("$.length()").value(2))
-                    .andExpect(jsonPath("$[1].usuarioLogin").value("resp"))
+                    .andExpect(jsonPath("$[1].usuarioLogin").value("resp@exemplo.com"))
                     .andExpect(jsonPath("$[1].estadoAnterior").value("SOLICITADA"))
                     .andExpect(jsonPath("$[1].estadoNovo").value("REJEITADA"))
                     .andExpect(jsonPath("$[1].motivo").value("não vou mais usar"));
