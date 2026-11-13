@@ -1,0 +1,1 @@
+- RN-08: o cancelamento, o não comparecimento e a rejeição passam a ter a auditoria conferida em teste (quem, quando, estado anterior e novo, motivo), e uma transição recusada é testada para **não** deixar registro.

@@ -436,6 +436,83 @@ class ReservaApiControllerTest extends ApiIntegracaoTest {
         }
     }
 
+    /**
+     * RN-08 e RN-09: toda mudança de estado gera um registro com quem, quando (pelo {@code Clock}), estado anterior,
+     * estado novo e motivo. Criar, aprovar, alterar, retirar e devolver já são conferidos nas classes acima; aqui ficam
+     * cancelar, rejeitar e "não compareceu", e a transição recusada, que não pode deixar registro.
+     */
+    @Nested
+    class AuditoriaDeCadaTransicao {
+
+        private long registrosDe(long reserva) {
+            return contar("select count(*) from auditoria_reserva where reserva_id = ?", reserva);
+        }
+
+        @Test
+        void cancelamentoEntraNoHistoricoComQuemQuandoEMotivo() throws Exception {
+            long id = reservar(solicitante, dia("10:00"), dia("11:00"), sala.getId());
+            relogio.ajustar(Instant.parse("2026-11-05T09:00:00Z"));
+
+            enviar(solicitante, "/api/reservas/" + id + "/cancelamento", "{\"motivo\":\" aula suspensa \"}")
+                    .andExpect(status().isOk());
+
+            obter(responsavel, "/api/reservas/" + id + "/historico")
+                    .andExpect(jsonPath("$.length()").value(2))
+                    .andExpect(jsonPath("$[1].usuarioLogin").value("sol"))
+                    .andExpect(jsonPath("$[1].instante").value("2026-11-05T09:00:00Z"))
+                    .andExpect(jsonPath("$[1].estadoAnterior").value("APROVADA"))
+                    .andExpect(jsonPath("$[1].estadoNovo").value("CANCELADA"))
+                    .andExpect(jsonPath("$[1].motivo").value("aula suspensa"));
+            assertThat(registrosDe(id)).isEqualTo(2);
+        }
+
+        @Test
+        void naoComparecimentoEntraNoHistoricoComQuemQuandoEMotivo() throws Exception {
+            long id = reservar(solicitante, dia("10:00"), dia("11:00"), sala.getId());
+            relogio.ajustar(Instant.parse("2026-11-10T10:20:00Z"));
+
+            enviar(responsavel, "/api/reservas/" + id + "/nao-comparecimento", "{\"motivo\":\"ninguém veio buscar\"}")
+                    .andExpect(status().isOk());
+
+            obter(administrador, "/api/reservas/" + id + "/historico")
+                    .andExpect(jsonPath("$.length()").value(2))
+                    .andExpect(jsonPath("$[1].usuarioLogin").value("resp"))
+                    .andExpect(jsonPath("$[1].instante").value("2026-11-10T10:20:00Z"))
+                    .andExpect(jsonPath("$[1].estadoAnterior").value("APROVADA"))
+                    .andExpect(jsonPath("$[1].estadoNovo").value("NAO_COMPARECEU"))
+                    .andExpect(jsonPath("$[1].motivo").value("ninguém veio buscar"));
+            assertThat(registrosDe(id)).isEqualTo(2);
+        }
+
+        @Test
+        void rejeicaoEntraNoHistoricoComQuemEMotivo() throws Exception {
+            long id = reservar(solicitante, dia("10:00"), dia("11:00"), laboratorio.getId());
+
+            enviar(responsavel, "/api/reservas/" + id + "/rejeicao", "{\"motivo\":\"laboratório sem técnico\"}")
+                    .andExpect(status().isOk());
+
+            obter(responsavel, "/api/reservas/" + id + "/historico")
+                    .andExpect(jsonPath("$.length()").value(2))
+                    .andExpect(jsonPath("$[1].usuarioLogin").value("resp"))
+                    .andExpect(jsonPath("$[1].instante").value("2026-11-01T12:00:00Z"))
+                    .andExpect(jsonPath("$[1].estadoAnterior").value("SOLICITADA"))
+                    .andExpect(jsonPath("$[1].estadoNovo").value("REJEITADA"))
+                    .andExpect(jsonPath("$[1].motivo").value("laboratório sem técnico"));
+        }
+
+        /** Transição recusada (D3) não muda o estado, então não pode deixar registro (contagem no banco). */
+        @Test
+        void transicaoRecusadaNaoGravaAuditoria() throws Exception {
+            long id = reservar(solicitante, dia("10:00"), dia("11:00"), sala.getId());
+            enviar(solicitante, "/api/reservas/" + id + "/cancelamento", null).andExpect(status().isOk());
+
+            enviar(solicitante, "/api/reservas/" + id + "/cancelamento", null).andExpect(status().isConflict());
+            enviar(responsavel, "/api/reservas/" + id + "/nao-comparecimento", null).andExpect(status().isConflict());
+
+            assertThat(registrosDe(id)).isEqualTo(2);
+        }
+    }
+
     @Nested
     class Consulta {
 

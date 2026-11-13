@@ -1,0 +1,1 @@
+- `docs/testes/plano-tdd.md` (novo): matriz regra → caso (feliz, limite, inválido, conflito, estado proibido) → teste existente → situação, com as lacunas nomeadas em vez de escondidas.
