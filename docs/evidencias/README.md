@@ -52,7 +52,7 @@ Este é o ponto de entrada do professor: cada linha diz **qual evidência existe
 |---|---|---|
 | Registro de defeitos | [docs/defeitos/](../defeitos/) ([DEF-001](../defeitos/DEF-001.md)) | 1 defeito registrado e corrigido |
 | Relatório final de qualidade (fonte de cada número) | `docs/relatorio-qualidade.md` | no PR #42 (Leandro), ainda não na `main` |
-| Decisão de qualidade (liberar / ressalvas / bloquear, riscos aceitos) | `docs/decisao-qualidade.md` | **não existe** (Leandro); precisa trazer os 2 Critical aceitos (D4) |
+| Decisão de qualidade (liberar / ressalvas / bloquear, riscos aceitos) | `docs/decisao-qualidade.md` | Escrita em 12/11/2026 (Leandro, branch `docs/decisao-qualidade`): liberar com ressalvas, condicionada ao clone limpo; 11 riscos aceitos, entre eles os 2 Critical (D4). Faltam as declarações dos integrantes e a conferência no commit da tag |
 | Checklist de entrega e clone limpo | [checklist.md](../entrega/checklist.md), [roteiro-clone-limpo.md](../entrega/roteiro-clone-limpo.md) | na `main`; clone limpo **não feito** |
 | Prova oral | [perguntas.md](../prova-oral/perguntas.md), [ensaio.md](../prova-oral/ensaio.md) | na `main`, parcial |
 
