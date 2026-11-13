@@ -24,6 +24,5 @@
 | RF-14 Documentação da API | ausente | Rotas e regras descritas em `docs/seguranca/matriz-autorizacao.md`; falta OpenAPI | | Pedro |
 
 ## Pendências e divisão
-(preencher: ordem de prioridade e quem pega cada uma)
 
 Decisões do grupo que travam itens acima (seção 9 do plano, pendentes; decididas em 12/11/2026: a D12, autenticação das telas, pela opção (a), ADR-0009; a D13, RN-04 consulta e depois grava, com o risco aceito, ADR-0008; a D10, estado inicial e limites de perfil, e a D11, manutenção sobre reservas existentes, "fica como está no código"): D8 (premissas do relatório, RF-12) e D9 (quando o Solicitante altera e cancela, RF-04).
