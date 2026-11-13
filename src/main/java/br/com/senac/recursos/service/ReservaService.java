@@ -83,7 +83,7 @@ public class ReservaService {
 
     /**
      * Cria a reserva (RF-04). Recurso restrito nasce SOLICITADA e espera o Responsável (RF-07); sem recurso restrito,
-     * nasce APROVADA (proposta do back-end, pendente de confirmação do grupo: D10 do plano).
+     * nasce APROVADA (D10 do plano, decidida em 12/11/2026).
      */
     public ReservaResponse criar(List<Long> recursoIds, Periodo periodo, UsuarioAutenticado quem) {
         List<Long> ids = semRepeticao(recursoIds);
