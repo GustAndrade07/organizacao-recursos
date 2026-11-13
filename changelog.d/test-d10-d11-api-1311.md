@@ -1,0 +1,1 @@
+- Testes de API das decisões D10 (c) (Responsável rejeita a própria reserva), D10 (d) (sem limite de horário para retirada, devolução e não comparecimento) e D11 (manutenção mantém as reservas existentes e bloqueia só as novas).

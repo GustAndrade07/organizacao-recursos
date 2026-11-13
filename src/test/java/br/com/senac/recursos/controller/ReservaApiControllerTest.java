@@ -10,6 +10,7 @@ import br.com.senac.recursos.enums.PerfilUsuario;
 import br.com.senac.recursos.enums.TipoRecurso;
 import br.com.senac.recursos.model.Recurso;
 import br.com.senac.recursos.support.ApiIntegracaoTest;
+import java.sql.Timestamp;
 import java.time.Instant;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -63,7 +64,7 @@ class ReservaApiControllerTest extends ApiIntegracaoTest {
             assertThat(jdbc.queryForList("select recurso_id from reserva_recurso order by recurso_id", Long.class))
                     .containsExactly(sala.getId(), professor.getId());
             assertThat(contar("select count(*) from auditoria_reserva where estado_anterior is null "
-                    + "and estado_novo = 'APROVADA' and instante = ?", java.sql.Timestamp.from(AGORA))).isOne();
+                    + "and estado_novo = 'APROVADA' and instante = ?", Timestamp.from(AGORA))).isOne();
         }
 
         @Test
@@ -194,6 +195,32 @@ class ReservaApiControllerTest extends ApiIntegracaoTest {
 
             assertThat(reservasGravadas()).isZero();
             assertThat(contar("select count(*) from tentativa_recusada")).isZero();
+        }
+
+        /**
+         * D11 (decidida em 12/11/2026, "fica como está no código"): a manutenção é gravada mesmo com reserva no período;
+         * a reserva que já existia continua como estava (estado e histórico) e só as novas são recusadas (RN-04).
+         */
+        @Test
+        void manutencaoSobreReservaExistenteMantemAReservaEBloqueiaSoAsNovas() throws Exception {
+            long existente = reservar(solicitante, dia("10:00"), dia("11:00"), sala.getId());
+
+            enviar(administrador, "/api/recursos/" + sala.getId() + "/manutencoes", corpoPeriodo(dia("09:00"), dia("12:00")))
+                    .andExpect(status().isCreated());
+
+            obter(solicitante, "/api/reservas/" + existente)
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.estado").value("APROVADA"))
+                    .andExpect(jsonPath("$.inicio").value(dia("10:00")))
+                    .andExpect(jsonPath("$.fim").value(dia("11:00")));
+            assertThat(jdbc.queryForObject("select estado from reserva where id = ?", String.class, existente))
+                    .isEqualTo("APROVADA");
+            assertThat(contar("select count(*) from auditoria_reserva where reserva_id = ?", existente)).isOne();
+
+            enviar(outroSolicitante, "/api/reservas", corpoReserva(dia("11:00"), dia("12:00"), sala.getId()))
+                    .andExpect(status().isConflict())
+                    .andExpect(jsonPath("$.type").value("urn:recursos:problema:recurso-em-manutencao"));
+            assertThat(reservasGravadas()).isOne();
         }
     }
 
@@ -381,6 +408,76 @@ class ReservaApiControllerTest extends ApiIntegracaoTest {
 
             enviar(outroSolicitante, "/api/reservas", corpoReserva(dia("10:00"), dia("11:00"), laboratorio.getId()))
                     .andExpect(status().isCreated());
+        }
+
+        /**
+         * D10 (c), decidida em 12/11/2026: a RN-06 só proíbe aprovar a própria reserva; rejeitar a própria é permitido
+         * ao Responsável (equivale a desistir), e a rejeição entra no histórico com ele como autor.
+         */
+        @Test
+        void responsavelPodeRejeitarAPropriaReserva() throws Exception {
+            long id = reservar(responsavel, dia("10:00"), dia("11:00"), laboratorio.getId());
+
+            enviar(responsavel, "/api/reservas/" + id + "/rejeicao", "{\"motivo\":\"não vou mais usar\"}")
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.estado").value("REJEITADA"));
+
+            assertThat(jdbc.queryForObject("select estado from reserva where id = ?", String.class, id))
+                    .isEqualTo("REJEITADA");
+            obter(administrador, "/api/reservas/" + id + "/historico")
+                    .andExpect(jsonPath("$.length()").value(2))
+                    .andExpect(jsonPath("$[1].usuarioLogin").value("resp"))
+                    .andExpect(jsonPath("$[1].estadoAnterior").value("SOLICITADA"))
+                    .andExpect(jsonPath("$[1].estadoNovo").value("REJEITADA"))
+                    .andExpect(jsonPath("$[1].motivo").value("não vou mais usar"));
+        }
+    }
+
+    /**
+     * D10 (d), decidida em 12/11/2026: não há limite de horário para registrar retirada, devolução e "não compareceu".
+     * O relógio é fixo (regra 14 do AGENTS.md); a reserva é de 10/11/2026, das 10:00 às 11:00 (UTC).
+     */
+    @Nested
+    class SemLimiteDeHorarioNoCicloDeUso {
+
+        @ParameterizedTest(name = "retirada em {0}")
+        @CsvSource({
+            "2026-11-01T12:00:00Z", // nove dias antes do início
+            "2026-11-10T10:30:00Z", // durante
+            "2026-11-10T18:00:00Z"  // depois do fim
+        })
+        void retiradaEDevolucaoSaoAceitasEmQualquerHorario(String instante) throws Exception {
+            long id = reservar(solicitante, dia("10:00"), dia("11:00"), sala.getId());
+            relogio.ajustar(Instant.parse(instante));
+
+            enviar(responsavel, "/api/reservas/" + id + "/retirada", null)
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.estado").value("EM_USO"));
+            enviar(responsavel, "/api/reservas/" + id + "/devolucao", null)
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.estado").value("CONCLUIDA"));
+
+            assertThat(jdbc.queryForList("select instante from auditoria_reserva where reserva_id = ? order by id",
+                    Timestamp.class, id).stream().skip(1).map(Timestamp::toInstant))
+                    .containsExactly(Instant.parse(instante), Instant.parse(instante));
+        }
+
+        @ParameterizedTest(name = "não compareceu em {0}")
+        @CsvSource({
+            "2026-11-01T12:00:00Z", // antes do início
+            "2026-11-10T10:30:00Z", // durante
+            "2026-11-12T08:00:00Z"  // dois dias depois do fim
+        })
+        void naoComparecimentoEhAceitoEmQualquerHorario(String instante) throws Exception {
+            long id = reservar(solicitante, dia("10:00"), dia("11:00"), sala.getId());
+            relogio.ajustar(Instant.parse(instante));
+
+            enviar(responsavel, "/api/reservas/" + id + "/nao-comparecimento", null)
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.estado").value("NAO_COMPARECEU"));
+
+            assertThat(jdbc.queryForObject("select estado from reserva where id = ?", String.class, id))
+                    .isEqualTo("NAO_COMPARECEU");
         }
     }
 
