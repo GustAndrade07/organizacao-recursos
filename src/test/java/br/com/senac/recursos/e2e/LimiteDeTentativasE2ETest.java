@@ -94,7 +94,7 @@ class LimiteDeTentativasE2ETest extends E2ETeste {
         tentarPelaTela(login, SENHA);
 
         assertThat(caminhoAtual()).doesNotStartWith("/login");
-        assertThat(testid("menu-usuario")).hasText("Pessoa " + login);
+        assertThat(testid("menu-usuario")).hasText("Pessoa Limite");
     }
 
     @Test
