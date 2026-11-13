@@ -49,10 +49,12 @@ No bullet do back-end (PR #44), "ADR-0008, proposto" virou "ADR-0008, aceito no 
 - No item "Arquitetura: levar os números ... e fechar o RK9", marcado como feito, com o texto "ciclo-01, seções 8.1 (2610d6a) e 8.2 (bc40183, 13/11/2026); RK9 fechado e reconferido".
 - Continuam abertos: D8, a divergência com a tela 12 (seção 8) e a V2.
 
+## Decisões do Gustavo registradas neste PR (13/11/2026)
+- **Migração V2:** não entra antes da tag; fica como risco aceito (risco 6 de `docs/decisao-qualidade.md`). A V2 completa pode sair como `v1.0.0-rc2` antes da prova oral. Registrada na caixa das entidades (Etapa 3) do plano.
+- **Declaração do Gustavo** escrita na seção 4 de `docs/decisao-qualidade.md`. O arquivo é do Leandro; a edição foi combinada com ele e mexe só na linha do Gustavo.
+- **Commits com autor "Claude" na `main`:** não serão corrigidos. Reescrever a `main` exigiria force push (bloqueado pelo ruleset), mudaria hashes citados nos documentos e quebraria o histórico red → green. **Achado:** são **8**, não 7 — além dos 2 de 04/11 (`3ae747c`, `07606da`) e dos 5 do PR #52 (`cd14f8c`, `e86c777`, `f0777de`, `5c13534`, `eb6ad27`), há o `2c6c8f6` (09/11, merge de `origin/main` no PR #32). Conferido com `git log origin/main --author=noreply@anthropic.com`. A contagem "7" em `docs/decisao-qualidade.md` (seção 4) e em `docs/relatorio-qualidade.md` (seção 5) é do Leandro corrigir.
+
 ## Pendências manuais do Gustavo (fora deste PR)
-- [ ] Perguntar a D4 ao professor (risco aceito com justificativa reprova?).
-- [ ] Decidir se a migração V2 (localização, patrimônio, competências, motivo do bloqueio, `movimentacao_material`) será feita ou aceita como risco.
-- [ ] Escrever a declaração do Gustavo em `docs/decisao-qualidade.md` (arquivo do Leandro; combinar com ele).
-- [ ] Decidir sobre os 7 commits com autor "Claude" na `main`.
+- [ ] D4: registrar a decisão (texto a combinar; hoje o plano e a decisão de qualidade dizem "pergunta na Aula 14").
 - [ ] SonarCloud (logado): marcar os riscos novos de dependência, se houver, trocar a justificativa do CVE-2026-59276 de "não verificado" para "não atinge" (seção 8.1) e conferir o gate da `main`.
 - [ ] Tag anotada `v1.0.0-rc1` só depois do clone limpo humano (Pedro) e com CI e SonarCloud verdes no commit da tag.
