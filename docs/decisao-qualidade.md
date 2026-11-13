@@ -1,7 +1,7 @@
 # Decisão de qualidade — `v1.0.0-rc1`
 
 > Parecer de entrega (Aula 14, lacuna 2 do plano). Escrito pelo Leandro, dono da decisão de qualidade (`AGENTS.md`, seção 1), em 12/11/2026, noite.
-> - **Base:** [relatório de qualidade](relatorio-qualidade.md), versão 2 (PR #57), a [RTM](rtm.md) e os números da `main` em `6ce4478`. A `main` atual (`9acbbcd`) tem o mesmo código; desde então, só a documentação mudou.
+> - **Base:** [relatório de qualidade](relatorio-qualidade.md), versão 2 (PR #57), a [RTM](rtm.md) e os números da `main` em `6ce4478`. A `main` atual (`c152d01`, depois dos PRs #55 a #58) tem o mesmo código, só com dois comentários de Javadoc a mais (PR #58); o resto mudou só em documentação.
 > - **No commit da tag:** a decisão vale para o commit que receber a tag. Os números são conferidos de novo nele (relatório, seção 8) e a seção 1 abaixo é atualizada antes da tag.
 
 ## 1. Decisão
@@ -48,7 +48,7 @@ Cada risco com impacto, motivo de aceitar e responsável. A revisão de cada um 
 | 4 | D13: a recusa por manutenção (RN-04) é "consulta e depois grava" | Uma manutenção criada entre a consulta e o commit de uma reserva passa | Janela de milissegundos, só o Administrador cria manutenção, o caso não está no PRD (ADR-0008, decidida em 12/11/2026) | Gustavo / Pedro |
 | 5 | RF-11 (notificação) e RF-14 (OpenAPI) sem entrega | 2 dos 14 RF `ausente` | Não couberam no prazo; nenhum dos dois é limitador de nota. Ficam para depois da tag (`v1.0.0-rc2` ou seguinte) | Pedro |
 | 6 | RF-02 e RF-03 sem localização, patrimônio e competência; RF-12 com premissas pendentes (D8) | Busca sem dois filtros do PRD; campos na tela que não são gravados ("Não informado"); números do relatório apoiados em premissa | Dependem da migração V2 e da D8, não feitas no prazo. A premissa do relatório está testada com valores calculados à mão | Gustavo (V2) / grupo (D8) |
-| 7 | D9, D10 e D11 sem decisão do grupo | O comportamento é a proposta do back-end, não uma decisão; o professor pode discordar da regra | A proposta está implementada e testada; o PRD não decide esses pontos (regra 4 do `AGENTS.md`) | Grupo (Pedro propõe) |
+| 7 | D9 sem decisão do grupo; D10 e D11 decididas (PR #58, "fica como está no código") com lacunas de teste: D10 (c), D10 (d) e D11 na API | O comportamento de alterar e cancelar (D9) é a proposta do back-end, não uma decisão; o professor pode discordar da regra | A proposta está implementada e testada; o PRD não decide esse ponto (regra 4 do `AGENTS.md`). As regras de D10 e D11 sem teste estão no status do PR #58 | Grupo (Pedro propõe) |
 | 8 | Limite de tentativas do login em memória, sem limite por IP | Com mais de uma instância, cada uma conta as suas tentativas; uma senha tentada em muitos logins não é barrada; quem conhece um login pode bloqueá-lo por 15 min | Uma instância só na entrega (ADR-0009, ressalva 1) | Leandro (telas) / Pedro (API) |
 | 9 | Cookie de sessão sem `Secure` por padrão | Sessão exposta se rodar em HTTP fora da máquina local | `Secure` exige HTTPS; liga com `SESSAO_COOKIE_SEGURO=true` | Gustavo (ambiente) |
 | 10 | Desempenho medido só localmente | O p95 não vale para outra máquina nem para produção | JMeter, aplicação e banco na mesma máquina de 4 vCPUs; duas rodadas | Leandro |
@@ -56,13 +56,13 @@ Cada risco com impacto, motivo de aceitar e responsável. A revisão de cada um 
 
 ## 4. O que cada integrante fez
 
-Fonte: PRs mergeados na `main` até 12/11/2026, noite (lista do GitHub), e as áreas da seção 1 do `AGENTS.md`. A revisão foi em roda (Gustavo → Pedro → Leandro → Gustavo).
+Fonte: PRs mergeados na `main` até 13/11/2026, 11:29 (lista do GitHub; `git log --merges --first-parent`), e as áreas da seção 1 do `AGENTS.md`. A revisão foi em roda (Gustavo → Pedro → Leandro → Gustavo).
 
 | Integrante | Área | PRs mergeados | Entregas principais |
 |---|---|---|---|
 | **Gustavo Oliveira Fernandes de Andrade** | Banco, CI, SonarCloud, arquitetura e ADRs, README, tag | 30 (#1 a #55) | Esqueleto Spring Boot; CI com SonarCloud, gate do JaCoCo, CI vermelho proposital e checagem de migração imutável; migração V1 com a constraint contra reserva dupla e os testes de banco em TDD; auditoria e consultas do relatório no banco; ADRs 0001 a 0007; avaliação arquitetural (ciclo 01); riscos de dependências e a D4; plano de execução e `AGENTS.md`; índice de evidências; roteiro do clone limpo |
-| **Pedro Henrique** | Back-end, PRD | 1 (#44), mais as revisões dos PRs do Leandro | Back-end em camadas: API REST com JWT, serviço de reserva com a máquina de estados, auditoria na mesma transação, tradução do `23P01` em 409, manutenção, relatório; matriz de autorização lida pelo teste; testes de API, incluindo os 20 pedidos simultâneos; ADR-0008 (back-end em camadas, ainda "proposto") |
-| **Leandro Sato** | Front-end, RTM, relatório, decisão de qualidade | 21 (#5 a #52), e os PRs #56 e #57 abertos | As 16 telas em Thymeleaf e o design system; ligação das telas aos services com login por sessão (D12, ADR-0009); E2E Playwright em 375 px; limite de tentativas no login (telas e API) em TDD; DEF-001 e DEF-002; carga com JMeter; RTM, relatório de qualidade e esta decisão |
+| **Pedro Henrique** | Back-end, PRD | 2 (#44 e #58), mais as revisões dos PRs do Leandro | Back-end em camadas: API REST com JWT, serviço de reserva com a máquina de estados, auditoria na mesma transação, tradução do `23P01` em 409, manutenção, relatório; matriz de autorização lida pelo teste; testes de API, incluindo os 20 pedidos simultâneos; ADR-0008 (back-end em camadas, aceito no PR #58); decisões D10 e D11; mutação M1 repetida no nível da API (10 de 10 vermelhos) |
+| **Leandro Sato** | Front-end, RTM, relatório, decisão de qualidade | 23 (#5 a #57) | As 16 telas em Thymeleaf e o design system; ligação das telas aos services com login por sessão (D12, ADR-0009); E2E Playwright em 375 px; limite de tentativas no login (telas e API) em TDD; DEF-001 e DEF-002; carga com JMeter; RTM, relatório de qualidade e esta decisão |
 
 **Uso de IA**, declarado:
 - Parte do trabalho do Leandro foi feita com o Claude Code. Os commits trazem a linha `Co-Authored-By: Claude`.
@@ -79,5 +79,5 @@ Fonte: PRs mergeados na `main` até 12/11/2026, noite (lista do GitHub), e as á
 - **Teste que passa não é "pronto para produção".** As provas são de testes automatizados (PostgreSQL em container, MockMvc, navegador sem tela) e de uma carga numa máquina só. Nada aqui foi medido num ambiente de produção, e esta decisão não afirma nada sobre ele (`AGENTS.md`, seção 6).
 - **Uma instância.** A reserva dupla é barrada no banco e vale com várias instâncias. Já o limite de tentativas e a sessão das telas valem para uma só.
 - **Cobertura não é qualidade de teste.** As mutações feitas à mão mostram que os testes pegam as regras listadas no relatório (seção 3). Para as regras do serviço sem mutação registrada, isso **não foi medido**.
-- **Decisões pendentes:** o que está testado em D8 a D11 é a proposta, não uma regra decidida pelo grupo.
+- **Decisões pendentes:** o que está testado em D8 e D9 é a proposta, não uma regra decidida pelo grupo. D10 e D11 foram decididas no PR #58, mas D10 (c), D10 (d) e D11 na API não têm teste.
 - **Os números são de `6ce4478`.** No commit da tag, eles são conferidos de novo, e esta seção e a seção 1 são atualizadas antes da tag.
