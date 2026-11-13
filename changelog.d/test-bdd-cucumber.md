@@ -1,0 +1,2 @@
+- Os cenários BDD de aprovação e bloqueio deixaram de ser só texto: `src/test/resources/features/aprovacao-bloqueio.feature` roda no `verify` com Cucumber (13 cenários, aplicação real e PostgreSQL em Testcontainers).
+- `docs/testes/evidencia-tdd.md`: ciclos red → green → refactor com o hash de cada commit, e o que **não** nasceu de TDD.
