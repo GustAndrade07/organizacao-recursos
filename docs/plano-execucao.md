@@ -184,7 +184,7 @@ Leitura dos materiais das Aulas 01 a 17 e da especificação no site do professo
 | 5 | O README lista WireMock e Cucumber na pilha, mas nenhum dos dois está no `pom.xml`. Corrigir a linha ou incluir as ferramentas | 08 e 09 | Gustavo (README) | Não, mas a mesa confere o README |
 | 6 | Mutação manual: aprovação, manutenção e autorização seguem "pendente (Pedro)" em `docs/testes/mutacao-manual.md` | 12 (P3) | Pedro | Não |
 | 7 | `docs/testes/plano-tdd.md` (matriz regra → caso → teste → status) não existe | 05 (P1) e 06 (P1) | Pedro | Não |
-| 8 | Endpoint do relatório sem documentação e sem OpenAPI (RF-14 "ausente") | 11 (P3) | Pedro | Não |
+| 8 | ~~Endpoint do relatório sem documentação e sem OpenAPI~~ **feito em 13/11/2026**: `springdoc-openapi` 2.8.17, `/v3/api-docs` e `/swagger-ui`, `GET /api/relatorios/utilizacao` com resumo, parâmetros e respostas 200/400/401/403; `OpenApiDocumentacaoTest` (5 testes) confere que a documentação descreve exatamente as rotas `/api/**` da matriz | 11 (P3) | Pedro | Não |
 | 9 | Seção "Pendências e divisão" de `docs/status-requisitos.md` vazia | 11 (P1) | Leandro | Não |
 | 10 | `docs/avaliacao-arquitetural/ciclo-01.md` sem os números do JaCoCo e do Sonar, e com o RK9 "a confirmar" | 07 (P2) | Gustavo | Não |
 | 11 | Clone limpo e `docs/entrega/checklist.md` não feitos | 14 (P1) | Leandro ou Pedro | Sim |

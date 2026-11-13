@@ -1,0 +1,1 @@
+- Documentação da API (RF-14): `springdoc-openapi` gera `/v3/api-docs` e o Swagger UI em `/swagger-ui/index.html` (exigem login), com o `GET /api/relatorios/utilizacao` descrito por completo.
