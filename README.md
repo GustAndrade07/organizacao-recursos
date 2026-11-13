@@ -6,9 +6,11 @@ Projeto de Qualidade de Software (Senac, 2026.2, Prof. Afonso) — o foco é a *
 **Grupo:** Gustavo (banco de dados) · Pedro (back-end) · Leandro (front-end)
 
 ## Stack
-Java 21 · Spring Boot 3 · Maven Wrapper · Thymeleaf · Spring Security (JWT na API) · PostgreSQL 16 + Flyway · JUnit 5, Testcontainers, Playwright · GitHub Actions, JaCoCo, SonarCloud
+Java 21 · Spring Boot 3 · Maven Wrapper · Thymeleaf · Spring Security (JWT na API) · springdoc-openapi (RF-14) · PostgreSQL 16 + Flyway · JUnit 5, Testcontainers, Playwright, Cucumber · GitHub Actions, JaCoCo, SonarCloud · JMeter (carga, fora do `verify`)
 
-Cucumber entrou em 13/11/2026: os cenários de `docs/testes/bdd-aprovacao-bloqueio.md` rodam no `verify` (`src/test/resources/features/aprovacao-bloqueio.feature`). Previsto e **ainda não presente** (13/11/2026): WireMock (notificação externa, RF-11), que não está no `pom.xml` — o RF-11 segue ausente.
+- **Cucumber** (7.23.0, no `pom.xml` desde o PR #61, 13/11/2026): os cenários de `docs/testes/bdd-aprovacao-bloqueio.md` rodam no `verify` (`src/test/resources/features/aprovacao-bloqueio.feature`).
+- **JMeter** (5.6.3, PR #56, 12/11/2026): **não** está no `pom.xml` nem no CI; roda à parte, em modo CLI, contra a aplicação local (`perf/README.md`). Plano em `perf/reservas.jmx`, resultados brutos em `perf/resultados/` e a leitura em `docs/performance/resultado-01.md`.
+- Previsto e **ainda não presente** (conferido em 13/11/2026): **WireMock** (notificação externa, RF-11), que não está no `pom.xml` nem em `src/` — o RF-11 segue ausente.
 
 ## Pré-requisitos
 - **JDK 21** (o `JAVA_HOME` precisa apontar para ele; conferir com `java -version`)
@@ -23,7 +25,21 @@ docker compose up -d          # PostgreSQL 16 em localhost:5432
 ADMIN_LOGIN=admin@exemplo.com ADMIN_SENHA='<escolha uma senha>' ./mvnw spring-boot:run   # http://localhost:8080
 ```
 Conferir que subiu: abrir http://localhost:8080/actuator/health (deve responder `{"status":"UP"}`).
-No Windows (PowerShell) use `.\mvnw.cmd` no lugar de `./mvnw`.
+
+**No Windows** a forma `VAR=valor comando` da última linha é do bash e **não funciona** no PowerShell nem no cmd. Defina as variáveis antes e use `.\mvnw.cmd` no lugar de `./mvnw` (as variáveis valem só para aquela janela do terminal):
+```powershell
+# PowerShell
+$env:ADMIN_LOGIN='admin'; $env:ADMIN_SENHA='<escolha uma senha>'; .\mvnw.cmd spring-boot:run
+```
+```bat
+:: cmd (Prompt de Comando), sem aspas em volta da senha
+set ADMIN_LOGIN=admin
+set ADMIN_SENHA=<escolha uma senha>
+mvnw.cmd spring-boot:run
+```
+A forma do PowerShell foi rodada em 13/11/2026 no Windows 11 (commit `bc40183`, PowerShell 5.1): a aplicação subiu, criou o Administrador, respondeu `UP` e o `POST /api/auth/login` devolveu 200. A forma do cmd **não foi testada**.
+
+**Cookie de sessão das telas:** o cookie (`JSESSIONID`) sai sempre com `HttpOnly` e `SameSite=Lax`. O atributo `Secure` só é ligado com `SESSAO_COOKIE_SEGURO=true` (`server.servlet.session.cookie.secure` no `application.yml`), e isso só serve **com HTTPS**: com `Secure`, o navegador não devolve o cookie por HTTP e o login das telas deixa de funcionar. Por isso, em `http://localhost` (desenvolvimento local) a variável fica sem definir e o `Secure` fica **desligado**. Fora do desenvolvimento local, sirva a aplicação por HTTPS e defina `SESSAO_COOKIE_SEGURO=true`. Conferido em 13/11/2026 no `Set-Cookie` de `GET /login` (local, por HTTP): sem a variável, `HttpOnly; SameSite=Lax`; com ela, `Secure; HttpOnly; SameSite=Lax`. A aplicação atrás de HTTPS de verdade **não foi testada**.
 
 **Por que as duas variáveis:** o banco começa vazio e o cadastro de usuário exige um Administrador. `ADMIN_LOGIN` e `ADMIN_SENHA` criam o **primeiro Administrador** no start (`AdministradorInicialConfig`); sem elas a aplicação sobe, mas **ninguém consegue entrar** nem nas telas nem na API. Escolha a senha na hora e nunca a escreva no repositório. Esse mesmo login serve para o formulário em http://localhost:8080/login e para o `POST /api/auth/login`.
 
