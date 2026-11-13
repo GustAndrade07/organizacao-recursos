@@ -29,9 +29,11 @@ Não é parecer jurídico. Os dados que o repositório não tem aparecem como **
 - Na aplicação desta branch rodando local (porta 8081, PostgreSQL portátil), com `curl`: `GET /privacidade`, `/cookies` e `/termos` sem sessão respondem **200 e sem `Set-Cookie`**; `/login` continua criando o `JSESSIONID` (`HttpOnly; SameSite=Lax`); `/privacidade/` e `HEAD /privacidade` respondem 302. Confirma duas previsões da Spec.
 - No navegador (390 e 1280 px): rodapé com direitos e três links na tela de login e nas páginas, página de cookies com o bloco do cookie legível em 390 px, **sem rolagem horizontal** (`scrollWidth` igual à largura em 390; 1265 de 1280 em 1280 px, a barra de rolagem). 768 px **não** foi aberto à mão (o E2E cobre no CI).
 
+- **CI do PR #66, primeiro run (run 43500506336, 13/11/2026):** `verify` verde com **1205 testes, 0 falhas, 0 erros, 0 ignorados** e "All coverage checks have been met"; `PoliticasPublicasIntegracaoTest` com 11 testes verdes (200 sem `Set-Cookie`, `/privacidade/`, `.html`, `/Privacidade` e `HEAD` negados, `POST` por cenário, cookies emitidos só o `JSESSIONID`). Isso cobre o que não dava para rodar localmente sem Docker: a matriz, a integração e o E2E.
+- **SonarCloud:** Quality Gate passou, com 1 issue nova (`java:S8786`, regex com backtracking no `RodapeNosTemplatesTest`), corrigida no commit seguinte.
+
 ## Não verificado
-- `./mvnw -B verify` completo e todo teste que sobe Testcontainers (**sem Docker nesta máquina**): `MatrizAutorizacaoTest`, `PoliticasPublicasIntegracaoTest` (200 sem cookie, bordas do matcher, POST, cookies emitidos) e `PoliticasE2ETest` (390/768/1280). O CI é a prova; o `PoliticasPublicasIntegracaoTest` foi escrito sem poder ser rodado e pode precisar de ajuste.
-- Previsões da Spec que só esse teste confirma: que `/privacidade.html` e `/Privacidade` caem no `denyAll` (a barra final e o `HEAD` já foram vistos com `curl`) e o status de cada `POST`.
+- Resultado do CI depois do commit da regex (Auto-fix acompanha).
 - Lighthouse e contraste computado no navegador (só os pares de token foram calculados); 768 px à mão.
 - Specs do Notion (Front-end e Back-end): **a atualizar em até 24 h** (regra 7 da seção 9), pelo Leandro.
 - Revisão jurídica do texto.
