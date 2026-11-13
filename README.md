@@ -41,6 +41,21 @@ A forma do PowerShell foi rodada em 13/11/2026 no Windows 11 (commit `bc40183`, 
 
 **Cookie de sessão das telas:** o cookie (`JSESSIONID`) sai sempre com `HttpOnly` e `SameSite=Lax`. O atributo `Secure` só é ligado com `SESSAO_COOKIE_SEGURO=true` (`server.servlet.session.cookie.secure` no `application.yml`), e isso só serve **com HTTPS**: com `Secure`, o navegador não devolve o cookie por HTTP e o login das telas deixa de funcionar. Por isso, em `http://localhost` (desenvolvimento local) a variável fica sem definir e o `Secure` fica **desligado**. Fora do desenvolvimento local, sirva a aplicação por HTTPS e defina `SESSAO_COOKIE_SEGURO=true`. Conferido em 13/11/2026 no `Set-Cookie` de `GET /login` (local, por HTTP): sem a variável, `HttpOnly; SameSite=Lax`; com ela, `Secure; HttpOnly; SameSite=Lax`. A aplicação atrás de HTTPS de verdade **não foi testada**.
 
+**Ciclo de vida do cookie, conferido em 13/11/2026** (aplicação local na `main` `bf2584a`, por HTTP, com `curl`):
+
+| Momento | O que acontece |
+|---|---|
+| Página de política (`/cookies`, `/privacidade`, `/termos`) sem sessão | Nenhum `Set-Cookie` |
+| `GET /login` | Cria o `JSESSIONID` (`Path=/; HttpOnly; SameSite=Lax`, sem `Max-Age` nem `Expires`: é cookie de sessão do navegador) |
+| `POST /login` com a senha certa | Troca o identificador do `JSESSIONID` (proteção contra fixação de sessão, padrão do Spring Security) |
+| Navegação logada (início, recursos, reservas, aprovações, usuários, CSS, 404) | Nenhum cookie além do `JSESSIONID` |
+| `POST /api/auth/login` | 200 e nenhum `Set-Cookie`: o JWT vai só no corpo e volta no cabeçalho `Authorization` |
+| `POST /logout` | `JSESSIONID=; Max-Age=0`: o cookie é apagado; volta a `/login` |
+| `JSESSIONID` de sessão que não existe mais | 302 para `/login?expirou&destino=...` |
+| Tempo sem uso até a sessão vencer no servidor | **30 minutos**: `server.servlet.session.timeout` não está no `application.yml`, então vale o padrão do Spring Boot 3.5.16 (`Session.timeout = Duration.ofMinutes(30)`, lido no bytecode da classe) |
+
+O JavaScript das telas não usa `localStorage`, `sessionStorage` nem `document.cookie` (0 ocorrências em `src/main/resources/static`). Os testes que guardam esse comportamento: `PoliticasPublicasIntegracaoTest` (só o `JSESSIONID` sai), `PaginaNaoEncontradaIntegracaoTest` (`HttpOnly` e `SameSite=Lax`), `PortaDeEntradaDasTelasTest` (`?expirou`) e `PoliticasPaginaTest`, todos verdes em 13/11/2026.
+
 **Por que as duas variáveis:** o banco começa vazio e o cadastro de usuário exige um Administrador. `ADMIN_LOGIN` e `ADMIN_SENHA` criam o **primeiro Administrador** no start (`AdministradorInicialConfig`); sem elas a aplicação sobe, mas **ninguém consegue entrar** nem nas telas nem na API. Escolha a senha na hora e nunca a escreva no repositório. Esse mesmo login serve para o formulário em http://localhost:8080/login e para o `POST /api/auth/login`.
 
 ### API REST e primeiro acesso
