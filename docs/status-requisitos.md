@@ -59,9 +59,9 @@ Em ordem de prioridade, primeiro o que bloqueia a tag `v1.0.0-rc1` (entrega em 1
 | 7 | BDD executável com Cucumber e `docs/testes/evidencia-tdd.md` (lacuna 4) | Não, mas pesa em "qualidade dos testes" | Pedro | Feito em 13/11/2026 (PR #61): 13 cenários Cucumber no `verify` e `docs/testes/evidencia-tdd.md` |
 | 8 | Mutação manual das regras do serviço (aprovação, manutenção, autorização) em `docs/testes/mutacao-manual.md` (lacuna 6) | Não | Pedro | Feito em 13/11/2026 (PR #61): 8 mutações, todas pegas; a MAU1 achou a lacuna da RN-08 |
 | 9 | `docs/testes/plano-tdd.md` (lacuna 7) e OpenAPI do RF-14 (lacuna 8) | Não | Pedro | Feitos em 13/11/2026 (PR #61): `plano-tdd.md` e OpenAPI com `OpenApiDocumentacaoTest` |
-| 10 | RF-11 (notificação com WireMock) | Não (risco aceito se ficar de fora) | Pedro | Fora desta entrega: risco aceito (ver `docs/decisao-qualidade.md`) |
+| 10 | RF-11 (notificação com WireMock) | Não (risco aceito se ficar de fora) | Pedro | Fora desta entrega: **aceito como risco pelo Pedro em 13/11/2026** (`docs/decisao-qualidade.md`, risco 5) |
 | 11 | RN-08: conferir a auditoria do cancelamento e do não comparecimento em teste | Não | Pedro | Feito em 13/11/2026 (PR #61): `AuditoriaDeCadaTransicao`, 4 testes |
 | 12 | Perguntas da prova oral e ensaio (lacuna 12) | Não (Semana 47) | Todos | Perguntas: 15 de 15 (PR #62, 13/11/2026). **Ensaio cronometrado não feito** (humano) |
-| 13 | Pedro confirmar a mudança no `AutenticacaoService` feita pelo Leandro no PR #52 (pendência da aprovação do Gustavo) | Não | Pedro | Aguardando |
+| 13 | Pedro confirmar a mudança no `AutenticacaoService` feita pelo Leandro no PR #52 (pendência da aprovação do Gustavo) | Não | Pedro | **Confirmado em 13/11/2026** (Pedro): o hash é conferido antes da recusa por bloqueio, e login inexistente, senha errada e login bloqueado dão a mesma resposta (lido em `AutenticacaoService.entrar`), a tentativa durante o bloqueio não estende o bloqueio e o sucesso zera o contador; testes `LimiteDeTentativasApiTest` e `LimiteDeTentativasDoLoginIntegracaoTest`. Ver `docs/status/2026-11-13-docs-pedro-confirmacoes-1311.md` |
 
 Decisões já tomadas em 12/11/2026: D12 (autenticação das telas, opção (a), ADR-0009) e D13 (RN-04 "consulta e depois grava", risco aceito, ADR-0008).
