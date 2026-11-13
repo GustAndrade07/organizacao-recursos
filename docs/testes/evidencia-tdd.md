@@ -42,6 +42,11 @@ A mesma ordem vale para defeito, com `test(regressao)` no lugar de `test(red)` (
 
 - **As telas Thymeleaf (RF-13, telas 7 e 8)**: escritas antes dos testes; registrado desde 11/11/2026 no `docs/relatorio-qualidade.md` (commit `93f5de6`).
 - **A API em camadas (PR #44)**: controllers, serviços e testes de API entraram no mesmo commit, sem par red/green.
+- **A ligação das telas ao back-end (PR #48, commit `fa94726`) e a tela 16 de usuários (PR #51)**: código e testes no mesmo commit; registrado no `docs/relatorio-qualidade.md`, seção 5 (ressalva 3 da revisão do Gustavo no #48).
+- **O PR #61**: o OpenAPI (RF-14) entrou com o `OpenApiDocumentacaoTest` no mesmo commit, e os 4 testes da RN-08 (`AuditoriaDeCadaTransicao`) descrevem comportamento que já existia. A prova de que esses testes pegam a regra é a mutação MAU1 (`mutacao-manual.md`), não um `test(red)`.
+- **Os testes de D10 (c), D10 (d) e D11 na API e o teste do instantâneo do relatório (13/11/2026)**: descrevem comportamento que já estava no código; nasceram verdes. A prova é a mutação (MD10c, MD10d e MD11 no status do PR `test/d10-d11-api-1311`; MR4 em `mutacao-manual.md`).
+
+Proposta ao grupo (13/11/2026, Pedro; falta o aceite do Gustavo e do Leandro): esses casos ficam registrados como **desvio de processo**, não como TDD, e nenhum deles é reescrito para parecer red → green.
 - **Os cenários BDD deste PR** (seção 5): foram escritos **depois** do código que eles descrevem. Eles provam que a regra escrita no documento é a regra que roda; não provam TDD. Dizer o contrário seria evidência falsa.
 
 ## 5. BDD executável
