@@ -102,8 +102,8 @@ Rodada de 13/11/2026 (IA, container novo; horas em UTC):
 | 4 | 18:13 | **não** | `$env:ADMIN_LOGIN='admin'; $env:ADMIN_SENHA='<senha>'; .\mvnw.cmd spring-boot:run` (forma do README) baixou tudo e parou no Flyway: `org.postgresql.util.PSQLException: FATAL: autenticação do tipo senha falhou para o usuário "recursos"` e `BUILD FAILURE` (46,8 s). **Causa:** esta máquina tem um **PostgreSQL 18 nativo do Windows** (serviço `postgresql-x64-18`, início automático) escutando em `0.0.0.0:5432` e `[::]:5432`. O `docker compose` publicou a porta sem erro, mas a aplicação, em `localhost:5432`, falou com o PostgreSQL nativo, não com o container (o log do container não mostra nenhuma tentativa de login; a mensagem do erro está em português, a língua do PostgreSQL instalado, e não em inglês, a do container) |
 | 4b | 18:14 | sim, **com contorno fora do README** | Para seguir os outros passos sem mexer no serviço do Windows: `docker compose down`; o mesmo `postgres:16` com o mesmo banco, usuário e senha do `docker-compose.yml`, publicado na **5433**; e `$env:DB_URL='jdbc:postgresql://localhost:5433/recursos'` (variável que o `application.yml` já aceita). Resultado: `Successfully applied 1 migration ... now at version v1`, `Started RecursosApplication in 7.601 seconds`, `Administrador inicial 'admin' criado.` |
 | 5 | 18:15 | sim | `http://localhost:8080/actuator/health` respondeu `{"status":"UP"}` |
-| 6 | @@HORA6@@ | @@OK6@@ | @@VERIFY@@ |
-| 7 | @@HORA7@@ | @@OK7@@ | @@COBERTURA@@ |
+| 6 | — | **não rodado no clone** | Não rodado dentro da pasta do clone, por tempo. O mesmo código (`bf2584a`) mais 8 testes de API rodou `./mvnw -B verify` na pasta de trabalho desta máquina: `BUILD SUCCESS`, `Tests run: 1213, Failures: 0, Errors: 0, Skipped: 0`, `All coverage checks have been met`, 4 min 39 s (branch `test/d10-d11-api-1311`). Isso não prova o `verify` com cache vazio no Windows |
+| 7 | — | **não rodado no clone** | Depende do passo 6 |
 
 **Passos extras (aplicação de ponta a ponta, API e telas no mesmo banco):**
 

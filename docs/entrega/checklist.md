@@ -54,7 +54,7 @@
 
 **O que foi feito.** Clone novo de `bf2584a` numa pasta vazia do Windows 11 (PowerShell 5.1, JDK 21.0.13, Docker 29.9.3), com cache do Maven vazio, seguindo só o README e a forma `$env:` dele. Passo a passo e erros na seção 4.2 do [roteiro](roteiro-clone-limpo.md).
 
-**Resultado, em uma linha:** seguindo só o README, **a aplicação não subiu nesta máquina**: um PostgreSQL 18 nativo do Windows ocupa a porta 5432 e a aplicação falou com ele, não com o container (`autenticação do tipo senha falhou para o usuário "recursos"`). Com o banco do projeto na porta 5433 e `DB_URL` (contorno fora do README), tudo o mais passou: `UP`, 201 e 409 pela API, a reserva da API aparece nas telas e a da tela aparece na API, 409 pela tela, cancelamento visto nas duas pontas, Swagger só com sessão; `verify`: @@@.
+**Resultado, em uma linha:** seguindo só o README, **a aplicação não subiu nesta máquina**: um PostgreSQL 18 nativo do Windows ocupa a porta 5432 e a aplicação falou com ele, não com o container (`autenticação do tipo senha falhou para o usuário "recursos"`). Com o banco do projeto na porta 5433 e `DB_URL` (contorno fora do README), tudo o mais passou: `UP`, 201 e 409 pela API, a reserva da API aparece nas telas e a da tela aparece na API, 409 pela tela, cancelamento visto nas duas pontas, Swagger só com sessão; `verify` **não rodado dentro do clone** (o mesmo código deu 1213 testes, 0 falhas, na pasta de trabalho).
 
 | Bloqueador (rodada 2) | Correção | Dono |
 |---|---|---|
