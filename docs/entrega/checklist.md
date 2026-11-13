@@ -3,36 +3,37 @@
 > Formato do professor (Aula 14): **item → existe → atualizado → caminho**.
 > Deve ser preenchido a partir de um **clone limpo**, seguindo só o README, por quem **não** escreveu o README.
 > Nesta etapa só se anota; nada é corrigido. No fim, listar os bloqueadores em ordem.
-> Estado abaixo: **13/11/2026**, preenchido na rodada de clone limpo (commit `9acbbcd`, antes dos merges de #56 a #59). Quem rodou foi a **IA**, num container novo, não um integrante: ver a ressalva no fim desta seção e o [roteiro](roteiro-clone-limpo.md).
+> Estado abaixo: **13/11/2026**. A rodada de clone limpo é do commit `9acbbcd` (antes dos merges de #56 a #59). Quem rodou foi a **IA**, num container novo, não um integrante: ver a ressalva no fim desta seção e o [roteiro](roteiro-clone-limpo.md).
+> **Atualização de 13/11/2026, tarde** (depois dos PRs #56 a #62, `main` em `bc40183`): as linhas cujo arquivo entrou nesses PRs foram relidas **na árvore do repositório** em `bc40183`, **não** em clone. Cada uma diz isso. **Trocar `bc40183` pelo commit da tag** quando ele existir (o clone limpo humano e os números da tag ainda precisam ser refeitos nele).
 >
 > "Existe" = o arquivo está no commit testado. "Atualizado" = foi conferido nesta rodada **ou** traz data e fonte de uma medição desta semana; quando não deu para conferir, a coluna diz "não conferido" em vez de "sim".
 
 | Item | Existe | Atualizado | Caminho |
 |---|---|---|---|
-| Repositório público com revisão por pares (PRs revisados) | sim | sim | https://github.com/GustAndrade07/organizacao-recursos (55 PRs mergeados até `9acbbcd`; ruleset `proteger-main` com 1 aprovação e checks `verify` e `SonarCloud Code Analysis`) |
+| Repositório público com revisão por pares (PRs revisados) | sim | sim | https://github.com/GustAndrade07/organizacao-recursos (59 PRs mergeados até `bc40183`, #1 a #62, com 3 fechados sem merge; ruleset `proteger-main` com 1 aprovação e checks `verify` e `SonarCloud Code Analysis`) |
 | Aplicação executável (sobe seguindo o README) | sim | sim | `README.md`; rodada de 13/11: `{"status":"UP"}`, reserva gravada pela API e pela tela, 409 na sobreposição |
-| README e documentação da API (OpenAPI) | parcial | parcial | `README.md` conferido e corrigido em 13/11 (faltava dizer que `ADMIN_LOGIN`/`ADMIN_SENHA` são o único jeito de entrar). **OpenAPI continua ausente** (RF-14, lacuna 8 do plano) |
+| README e documentação da API (OpenAPI) | sim | parcial | `README.md` conferido e corrigido em 13/11 (faltava dizer que `ADMIN_LOGIN`/`ADMIN_SENHA` são o único jeito de entrar). **OpenAPI feito no PR #61** (RF-14): `/v3/api-docs` e `/swagger-ui/index.html`, com sessão, e `OpenApiDocumentacaoTest`; lido na árvore de `bc40183`. O comando do README para o PowerShell **não foi conferido** |
 | PRD com RF, RN e RNF numerados | sim | não conferido | `docs/prd.md` (RF-01 a RF-14, RN-01 a RN-13, RNF-01 a RNF-03) |
-| RTM (requisito → risco → teste → evidência) | sim | não nesta `main` | `docs/rtm.md` — a versão recontada está no PR #57, ainda aberto |
-| Status dos requisitos | sim | não nesta `main` | `docs/status-requisitos.md` — atualizações nos PRs #57 e #58 |
+| RTM (requisito → risco → teste → evidência) | sim | sim (lido em `bc40183`) | `docs/rtm.md` — recontada no PR #57; RF-14 e RN-08 `feito` no #61. Refazer o run no commit da tag |
+| Status dos requisitos | sim | sim (lido em `bc40183`) | `docs/status-requisitos.md` — atualizações nos PRs #57, #58 e #61 |
 | Diagramas: contexto, contêineres/componentes e sequências críticas | sim | não conferido | `docs/arquitetura.md` (C4 e sequências em Mermaid; pacotes e rotas ainda marcados como proposta) |
-| ADRs (JWT, anti reserva dupla, Thymeleaf, Playwright) | sim | sim | `docs/adr/0001` a `0009` (o 0008 passa a aceito no PR #58) |
-| Plano de testes | parcial | não | `docs/plano-de-teste.md` existe; **`docs/testes/plano-tdd.md` não existe** (lacuna 7) |
-| Evidência de TDD (commits red → green → refactor) | não | não | `docs/testes/evidencia-tdd.md` **não existe**; os pares `test(red)`/`feat(green)` estão só no `git log` (lacuna 4) |
-| BDD (cenários e `.feature`) | parcial | não | `docs/testes/bdd-aprovacao-bloqueio.md` (texto). **Sem `.feature` e sem Cucumber no `pom.xml`** no `9acbbcd` (lacuna 4) |
-| Mutação manual das regras críticas | parcial | parcial | `docs/testes/mutacao-manual.md`: banco (M1 a M5) e, no PR #58, a M1 no nível da API. Aprovação, manutenção e autorização seguiam pendentes no `9acbbcd` (lacuna 6) |
+| ADRs (JWT, anti reserva dupla, Thymeleaf, Playwright) | sim | sim | `docs/adr/0001` a `0009` (o 0008 ficou aceito no PR #58) |
+| Plano de testes | sim | sim (lido em `bc40183`) | `docs/plano-de-teste.md` e `docs/testes/plano-tdd.md` (PR #61, lacuna 7; cita só teste que existe e nomeia 3 lacunas) |
+| Evidência de TDD (commits red → green → refactor) | sim | sim (lido em `bc40183`) | `docs/testes/evidencia-tdd.md` (PR #61): 4 ciclos red → green com o hash de cada commit e a lista do que **não** nasceu de TDD (telas 7 e 8, API em camadas, BDD) |
+| BDD (cenários e `.feature`) | sim | sim (lido em `bc40183`) | `docs/testes/bdd-aprovacao-bloqueio.md` e `src/test/resources/features/aprovacao-bloqueio.feature`; Cucumber 7.23.0 no `pom.xml`; 13 cenários rodam no `verify` (PR #61) |
+| Mutação manual das regras críticas | sim | sim (lido em `bc40183`) | `docs/testes/mutacao-manual.md`: banco (M1 a M5), a M1 na API (PR #58) e 8 mutações do serviço (PR #61): as seis regras críticas. Serviço do relatório sem mutação (**não medido**) |
 | Matriz de autorização | sim | sim | `docs/seguranca/matriz-autorizacao.md` + `MatrizAutorizacaoTest` (lê a matriz e falha se houver rota fora dela) |
 | Pipeline de CI (verde) | sim | sim | `.github/workflows/ci.yml`; `verify` rodado no clone limpo: 1116 testes, 0 falhas, 0 ignorados |
 | Relatório do JaCoCo (≥ 80% linhas / 70% branches) | sim | sim | `target/site/jacoco/index.html` gerado no clone limpo: **95,8% de linhas** (1464/1528) e **81,3% de branches** (422/519); gate de 80/70 atendido |
 | Quality Gate do SonarCloud | sim | não conferido nesta rodada | https://sonarcloud.io/project/overview?id=GustAndrade07_organizacao-recursos (último registro: OK no `2610d6a`, ver `docs/plano-execucao.md`, seção 4.1). **O gate do commit da tag ainda precisa ser lido** |
-| Plano de carga (JMeter) | não no `9acbbcd` | não | `perf/reservas.jmx` — está no PR #56, aberto |
-| RNF de desempenho (escrito antes da rodada) | não no `9acbbcd` | não | `docs/performance/rnf.md` — PR #56 |
-| Resultado do teste de carga | não no `9acbbcd` | não | `docs/performance/resultado-01.md` + `perf/resultados/rodada-01.jtl` — PR #56 |
+| Plano de carga (JMeter) | sim | sim (lido em `bc40183`) | `perf/reservas.jmx` (PR #56) |
+| RNF de desempenho (escrito antes da rodada) | sim | sim (lido em `bc40183`) | `docs/performance/rnf.md` (PR #56, commit `0464847` antes da rodada). A meta de p95 ≤ 300 ms ainda **não foi validada com o professor** |
+| Resultado do teste de carga | sim | sim (lido em `bc40183`) | `docs/performance/resultado-01.md` + `perf/resultados/rodada-01.jtl` e `rodada-02.jtl` (PR #56). Só local |
 | Registro de defeitos | sim | sim | `docs/defeitos/DEF-001.md` (templates fora da varredura) e `DEF-002.md` (relógio real no teste de tela), os dois com correção e teste |
-| Relatório final de qualidade (fonte de cada número) | sim | não nesta `main` | `docs/relatorio-qualidade.md` — versão 2 no PR #57 |
-| Banco de perguntas e ensaio da prova oral | parcial | não | `docs/prova-oral/perguntas.md` (4 de 15 perguntas no `9acbbcd`), `docs/prova-oral/ensaio.md` (ensaio não feito) |
-| Apresentação e demonstração do sistema (roteiro de 8 min com demo ensaiada) | não | não | roteiro não existia no `9acbbcd`; o ensaio é humano |
-| Decisão de qualidade | não no `9acbbcd` | não | `docs/decisao-qualidade.md` — PR #59, aberto |
+| Relatório final de qualidade (fonte de cada número) | sim | parcial | `docs/relatorio-qualidade.md` — versão 2 (PR #57), com a atualização de 13/11/2026 sobre o #61. Números por nível e cobertura ainda de `6ce4478`: refazer no commit da tag |
+| Banco de perguntas e ensaio da prova oral | parcial | parcial | `docs/prova-oral/perguntas.md` (15 de 15, PR #62), `docs/prova-oral/ensaio.md` (**ensaio não feito**, é humano) |
+| Apresentação e demonstração do sistema (roteiro de 8 min com demo ensaiada) | parcial | não | `docs/prova-oral/roteiro-demo.md` (PR #62). **Demo não ensaiada**: o ensaio cronometrado e quem fala cada parte são humanos |
+| Decisão de qualidade | sim | parcial | `docs/decisao-qualidade.md` (PR #59, atualizada em 13/11/2026). Faltam as declarações dos três integrantes e a conferência no commit da tag |
 
 ## Entregáveis finais
 - [ ] Tag anotada `v1.0.0-rc1` com CI verde **no commit da tag** (se corrigir depois: `rc2`; nunca mover tag já usada)
