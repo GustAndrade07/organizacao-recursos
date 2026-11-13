@@ -16,6 +16,7 @@ Java 21 · Spring Boot 3 · Maven Wrapper · Thymeleaf · Spring Security (JWT n
 - **JDK 21** (o `JAVA_HOME` precisa apontar para ele; conferir com `java -version`)
 - **Docker** (PostgreSQL local e testes com Testcontainers)
 - Git. O Maven não precisa estar instalado: o Maven Wrapper (`mvnw`) baixa o Maven sozinho.
+- **Porta 5432 livre.** Se a máquina já tiver um PostgreSQL instalado (serviço do Windows, por exemplo), a aplicação fala com ele em vez do container e para no Flyway com "autenticação do tipo senha falhou para o usuário recursos" (achado no clone limpo de 13/11/2026, `docs/entrega/roteiro-clone-limpo.md`). Pare esse serviço ou suba o banco do projeto em outra porta, como em "Porta 5432 ocupada", abaixo.
 
 ## Como subir
 ```bash
@@ -29,15 +30,28 @@ Conferir que subiu: abrir http://localhost:8080/actuator/health (deve responder 
 **No Windows** a forma `VAR=valor comando` da última linha é do bash e **não funciona** no PowerShell nem no cmd. Defina as variáveis antes e use `.\mvnw.cmd` no lugar de `./mvnw` (as variáveis valem só para aquela janela do terminal):
 ```powershell
 # PowerShell
-$env:ADMIN_LOGIN='admin'; $env:ADMIN_SENHA='<escolha uma senha>'; .\mvnw.cmd spring-boot:run
+$env:ADMIN_LOGIN='admin@exemplo.com'; $env:ADMIN_SENHA='<escolha uma senha>'; .\mvnw.cmd spring-boot:run
 ```
 ```bat
 :: cmd (Prompt de Comando), sem aspas em volta da senha
-set ADMIN_LOGIN=admin
+set ADMIN_LOGIN=admin@exemplo.com
 set ADMIN_SENHA=<escolha uma senha>
 mvnw.cmd spring-boot:run
 ```
-A forma do PowerShell foi rodada em 13/11/2026 no Windows 11 (commit `bc40183`, PowerShell 5.1): a aplicação subiu, criou o Administrador, respondeu `UP` e o `POST /api/auth/login` devolveu 200. A forma do cmd **não foi testada**.
+O `ADMIN_LOGIN` é um **e-mail** (desde o PR #67): com um valor sem `@`, como `admin`, a aplicação **não sobe**. A forma do cmd **não foi testada**.
+
+**Porta 5432 ocupada** (PostgreSQL já instalado na máquina): suba o container em outra porta e aponte a aplicação para ela com `DB_URL`, que o `application.yml` já aceita. Sem `DB_PORTA`, o container continua na 5432. O `verify` não usa essa porta: o Testcontainers sobe o próprio banco numa porta livre.
+```powershell
+# PowerShell
+$env:DB_PORTA='5433'; docker compose up -d
+$env:DB_URL='jdbc:postgresql://localhost:5433/recursos'
+$env:ADMIN_LOGIN='admin@exemplo.com'; $env:ADMIN_SENHA='<escolha uma senha>'; .\mvnw.cmd spring-boot:run
+```
+```bash
+# bash
+DB_PORTA=5433 docker compose up -d
+DB_URL=jdbc:postgresql://localhost:5433/recursos ADMIN_LOGIN=admin@exemplo.com ADMIN_SENHA='<escolha uma senha>' ./mvnw spring-boot:run
+```
 
 **Cookie de sessão das telas:** o cookie (`JSESSIONID`) sai sempre com `HttpOnly` e `SameSite=Lax`. O atributo `Secure` só é ligado com `SESSAO_COOKIE_SEGURO=true` (`server.servlet.session.cookie.secure` no `application.yml`), e isso só serve **com HTTPS**: com `Secure`, o navegador não devolve o cookie por HTTP e o login das telas deixa de funcionar. Por isso, em `http://localhost` (desenvolvimento local) a variável fica sem definir e o `Secure` fica **desligado**. Fora do desenvolvimento local, sirva a aplicação por HTTPS e defina `SESSAO_COOKIE_SEGURO=true`. Conferido em 13/11/2026 no `Set-Cookie` de `GET /login` (local, por HTTP): sem a variável, `HttpOnly; SameSite=Lax`; com ela, `Secure; HttpOnly; SameSite=Lax`. A aplicação atrás de HTTPS de verdade **não foi testada**.
 
