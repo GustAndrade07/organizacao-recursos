@@ -27,29 +27,29 @@ Só documentação, a partir da `main` (`bc40183`, merge do #62; CI run #251 com
 - **Painel "Dependency risks" do SonarCloud:** a API respondeu 401 sem login; não se sabe se o painel acusa algo das dependências novas. Pendência manual do Gustavo.
 - **Contagem de testes no log do CI** (run #251): o log do Actions exige login; vale o `verify` local.
 - **Diferença de branches** entre JaCoCo (81,31%) e Sonar (81,7%): não investigada.
-- **Spec do Notion:** não atualizada por este PR. O navegador integrado estava logado e a página era editável, mas a escrita no Notion foi bloqueada pela checagem de permissão da sessão (nada foi alterado lá; conferido depois). O texto está abaixo, para o Gustavo colar.
 
-## Para colar no Notion ("Specs do Banco de Dados")
-**Seção 1, "Situação hoje"** (substituir os dois últimos parágrafos). Na leitura de 13/11/2026, os itens que trazem o estado da `main` são o bullet que começa em "Testes de banco em ..." (números de 12/11 em `2610d6a`) e o que começa em "Os PRs #48, #49, #50 e #51 ..."; os dois últimos bullets da seção (`pom.xml`/Flyway e back-end do PR #44) continuam valendo. Conferir antes de colar qual par trocar. Texto:
+## Spec do Notion "Specs do Banco de Dados" (aplicado em 13/11/2026)
+Aplicado pelo navegador integrado, logado, com a autorização explícita do Gustavo na sessão (a primeira tentativa tinha sido bloqueada pela checagem de permissão). Conferido recarregando a página: os textos abaixo estão na spec e as caixas marcadas ficaram marcadas. Link: https://app.notion.com/p/Specs-do-Banco-de-Dados-4108bb977b7b81aabca5c5aae9b050ee
+
+**Seção 1, "Situação hoje":** os dois itens com o estado da `main` (o que começava em "Testes de banco em ...", com os números de 12/11 em `2610d6a`, e o que começava em "Os PRs #48, #49, #50 e #51 ...") foram trocados pelo texto abaixo, em dois itens. Os dois últimos bullets da seção (`pom.xml`/Flyway e back-end do PR #44) continuam valendo e não foram apagados. Texto:
 
 > Em 13/11/2026 a main está em bc40183 (merge do #62). Desde 12/11 entraram #52, #56 a #59, #60, #61 e #62. Nenhuma migração nova: db/migration continua só com a V1. verify local do #61: 1138 testes, 0 falhas, 0 ignorados. Cobertura medida em 9acbbcd: 95,8% de linhas e 81,3% de branches (refazer no commit da tag).
 
-No bullet do back-end (PR #44), trocar "ADR-0008, proposto" por "ADR-0008, aceito".
+No bullet do back-end (PR #44), "ADR-0008, proposto" virou "ADR-0008, aceito no PR #58".
 
-**Seção 5, "Testes do banco":** trocar "Falta o vermelho sem a proteção no nível da API (Pedro)." por:
+**Seção 5, "Testes do banco":** trocado "Falta o vermelho sem a proteção no nível da API (Pedro)." por:
 
 > Mutação M1 na API (Pedro, 12/11/2026): sem a constraint, ConcorrenciaReservaApiTest fica com 10 de 10 vermelhos; com ela, 10 de 10 verdes. Medida só na máquina do Pedro.
 
 **Seção 6, "Pontos em aberto":**
-- Marcar como feito "Atualizar a tabela de fronteiras de docs/testes/bdd-aprovacao-bloqueio.md com a D1" (PR #61).
-- No item do custo da constraint GiST e da trava da D7, trocar o texto por: "Medido com a constraint e a trava ativas, só local: busca com p95 de 17 e 8 ms; criação sob disputa só 201 ou 409 (80 × 201 e 3920 × 409). O custo isolado da constraint continua não medido." (deixar aberto).
-- No item dos riscos aceitos que tocam o banco, trocar "que ainda não existe na main (plano, seção 4.1, lacuna 2)" por "mergeado no PR #59 (D13 é o risco 4 e a V2 é o risco 6)" e marcar como feito.
-- No item da D13, depois de "depende da D11", acrescentar "(D11 decidida no PR #58)".
-- No item "Arquitetura: levar os números ... e fechar o RK9", marcar como feito: "ciclo-01, seções 8.1 (2610d6a) e 8.2 (bc40183, 13/11/2026); RK9 fechado e reconferido".
-- Manter abertos: D8, a divergência com a tela 12 (seção 8) e a V2.
+- Marcado como feito (com "Feito no PR #61.") "Atualizar a tabela de fronteiras de docs/testes/bdd-aprovacao-bloqueio.md com a D1" (PR #61).
+- No item do custo da constraint GiST e da trava da D7, o texto depois dos dois-pontos foi trocado por: "Medido com a constraint e a trava ativas, só local: busca com p95 de 17 e 8 ms; criação sob disputa só 201 ou 409 (80 × 201 e 3920 × 409). O custo isolado da constraint continua não medido." (continua aberto).
+- No item dos riscos aceitos que tocam o banco, trocado "que ainda não existe na main (plano, seção 4.1, lacuna 2)" por "mergeado no PR #59 (D13 é o risco 4 e a V2 é o risco 6)" e marcado como feito.
+- No item da D13, depois de "depende da D11", acrescentado "(D11 decidida no PR #58)".
+- No item "Arquitetura: levar os números ... e fechar o RK9", marcado como feito, com o texto "ciclo-01, seções 8.1 (2610d6a) e 8.2 (bc40183, 13/11/2026); RK9 fechado e reconferido".
+- Continuam abertos: D8, a divergência com a tela 12 (seção 8) e a V2.
 
 ## Pendências manuais do Gustavo (fora deste PR)
-- [ ] Colar o texto acima na spec "Specs do Banco de Dados" do Notion (até 24 h, regra 7 do `AGENTS.md`).
 - [ ] Perguntar a D4 ao professor (risco aceito com justificativa reprova?).
 - [ ] Decidir se a migração V2 (localização, patrimônio, competências, motivo do bloqueio, `movimentacao_material`) será feita ou aceita como risco.
 - [ ] Escrever a declaração do Gustavo em `docs/decisao-qualidade.md` (arquivo do Leandro; combinar com ele).
