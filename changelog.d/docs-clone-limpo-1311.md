@@ -1,0 +1,2 @@
+- README corrigido: a seção "Como subir" passa a mandar subir a aplicação já com `ADMIN_LOGIN` e `ADMIN_SENHA` e explica que sem elas ninguém entra nem nas telas nem na API.
+- Clone limpo rodado em 13/11/2026 no commit `9acbbcd` (por IA, em container novo): resultado no `docs/entrega/checklist.md` e na seção 4 de `docs/entrega/roteiro-clone-limpo.md`.
