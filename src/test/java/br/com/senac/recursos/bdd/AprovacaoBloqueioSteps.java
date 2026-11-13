@@ -207,7 +207,7 @@ public class AprovacaoBloqueioSteps {
         chamar(get("/api/reservas/" + reserva + "/historico"), "auditor", null);
         JsonNode historico = corpo();
         assertThat(historico).hasSize(quantos);
-        assertThat(historico.get(quantos - 1).get("usuarioLogin").asText()).isEqualTo(login);
+        assertThat(historico.get(quantos - 1).get("usuarioLogin").asText()).isEqualTo(login + "@exemplo.com");
     }
 
     @Então("depois da devolução a reserva fica {string}")
@@ -239,7 +239,7 @@ public class AprovacaoBloqueioSteps {
         if (tokenDe.containsKey(login)) {
             return;
         }
-        Usuario novo = usuarios.save(new Usuario("Usuário " + login, login, codificadorDeSenha.encode(SENHA), perfil));
+        Usuario novo = usuarios.save(new Usuario("Usuário " + login, login + "@exemplo.com", codificadorDeSenha.encode(SENHA), perfil));
         tokenDe.put(login, tokens.emitir(novo).token());
     }
 

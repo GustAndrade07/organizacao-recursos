@@ -134,3 +134,5 @@ Rodada de 13/11/2026 (IA, container novo; horas em UTC):
 1. Entregue este arquivo preenchido ao Gustavo, em PR seu (sua autoria) ou colado no grupo.
 2. Com base nos bloqueadores, o Gustavo corrige o README e o resto **em PR separado**, citando este roteiro.
 3. Só depois disso o [checklist](checklist.md) tem as colunas "Existe" e "Atualizado" preenchidas **por quem fez o clone**; até lá, o que está no checklist é só o que foi conferido sem clone (seção "Conferido sem clone").
+
+> **Nota (13/11/2026):** a partir desta data o login é um e-mail. Quem refizer estes passos deve subir a aplicação com `ADMIN_LOGIN=<e-mail>` (por exemplo `admin@exemplo.com`) e entrar no formulário e na API com esse e-mail. Banco local antigo (usuários sem `@`) se recria com `docker compose down -v`. A rodada registrada acima foi feita antes da troca e não foi repetida.

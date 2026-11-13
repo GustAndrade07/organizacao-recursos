@@ -14,7 +14,7 @@ Os documentos da análise ficam em `docs/performance/`:
 
 ## Como rodar (somente modo CLI, contra a aplicação local, nunca ambiente compartilhado)
 ```bash
-jmeter -n -t perf/reservas.jmx -Jadmin_login=<login> -Jadmin_senha=<senha> -l perf/resultados/rodada-01.jtl -e -o perf/relatorio-01
+jmeter -n -t perf/reservas.jmx -Jadmin_login=<e-mail> -Jadmin_senha=<senha> -l perf/resultados/rodada-01.jtl -e -o perf/relatorio-01
 ```
 
 - **Preparação** (setUp do plano, fora das métricas): o Administrador cria os 50 usuários do CSV e uma sala nova a cada rodada.

@@ -24,10 +24,10 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 /**
  * Tela 16 do inventário: usuários, só do Administrador (matriz), ligada ao {@link UsuarioService}, o mesmo de
- * {@code POST /api/usuarios}. Lista quem tem acesso e cadastra um usuário novo com nome, login, senha e perfil.
+ * {@code POST /api/usuarios}. Lista quem tem acesso e cadastra um usuário novo com nome completo, e-mail (o login, DEF-010), senha e perfil.
  *
  * <p>As regras dos campos são as do {@link UsuarioRequest} da API (as mesmas mensagens), conferidas aqui pelo
- * {@link Validator} antes de chamar o service; login repetido vira erro no campo. A senha nunca volta ao formulário
+ * {@link Validator} antes de chamar o service; e-mail repetido (sem diferenciar maiúsculas) vira erro no campo. A senha nunca volta ao formulário
  * nem aparece na lista: o service só guarda o hash BCrypt. O service ainda não tem alterar nem desativar usuário, então
  * a tela também não tem.
  */
@@ -84,19 +84,20 @@ public class UsuarioController {
             @RequestParam(required = false) String senha,
             @RequestParam(required = false) String perfil,
             Model model, RedirectAttributes redirecionamento, HttpServletResponse resposta) {
-        String loginLimpo = login == null ? null : login.trim();
-        Formulario formulario = new Formulario(nome, loginLimpo, perfil);
-        UsuarioRequest pedido = new UsuarioRequest(nome, loginLimpo, senha, perfilDe(perfil));
+        // O UsuarioRequest normaliza (e-mail em minúsculas e sem espaços nas pontas, nome sem espaços repetidos): é o
+        // mesmo pedido da API, e o formulário devolve o que foi normalizado.
+        UsuarioRequest pedido = new UsuarioRequest(nome, login, senha, perfilDe(perfil));
+        Formulario formulario = new Formulario(pedido.nome(), pedido.login(), perfil);
 
         Map<String, String> erros = erros(validador.validate(pedido));
         if (erros.isEmpty()) {
             try {
                 UsuarioResponse criado = usuarios.criar(pedido);
                 redirecionamento.addFlashAttribute("confirmacao", Map.of("titulo", "Usuário cadastrado",
-                        "texto", criado.nome() + " já pode entrar com o login " + criado.login() + "."));
+                        "texto", criado.nome() + " já pode entrar com o e-mail " + criado.login() + "."));
                 return "redirect:/admin/usuarios";
             } catch (LoginEmUsoException repetido) {
-                erros.put("login", "Já existe um usuário com este login.");
+                erros.put("login", "Já existe um usuário com este e-mail.");
             }
         }
         model.addAttribute("usuario", formulario);

@@ -208,9 +208,9 @@ class MatrizAutorizacaoTest extends ApiIntegracaoTest {
     private static String corpo(String chave, PerfilUsuario perfil) {
         return switch (chave) {
             case "POST /api/auth/login" -> "{\"login\":\"" + (perfil == null ? "solicitante" : perfil.name().toLowerCase())
-                    + "\",\"senha\":\"" + SENHA + "\"}";
+                    + "@exemplo.com\",\"senha\":\"" + SENHA + "\"}";
             case "POST /api/usuarios" ->
-                    "{\"nome\":\"Novo\",\"login\":\"novo\",\"senha\":\"senha-nova-123\",\"perfil\":\"SOLICITANTE\"}";
+                    "{\"nome\":\"Novo Usuario\",\"login\":\"novo@exemplo.com\",\"senha\":\"senha-nova-123\",\"perfil\":\"SOLICITANTE\"}";
             case "POST /api/recursos" -> "{\"tipo\":\"MATERIAL\",\"nome\":\"Projetor\",\"restrito\":false}";
             case "PUT /api/recursos/{id}" -> "{\"nome\":\"Sala renomeada\",\"capacidade\":10,\"restrito\":false}";
             case "POST /api/recursos/{id}/manutencoes" -> corpoPeriodo("2026-12-01T10:00:00Z", "2026-12-01T12:00:00Z");
