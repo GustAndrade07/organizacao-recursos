@@ -144,7 +144,7 @@ Nenhum dos três está na lista KEV de exploração conhecida. Na mesma leitura,
 
 **Versão corrigida:** a 6.5.12 existe, mas o advisory a marca como **"Enterprise Support only"**; no Maven Central a última 6.5.x continua sendo a 6.5.11 (`maven-metadata.xml` de `spring-security-core` lido em 13/11/2026). As correções abertas (OSS) são 7.0.7 e 7.1.1, que exigem o Spring Boot 4. A decisão da seção 8 (aceito com justificativa, responsável Gustavo) continua, agora com o motivo "componente afetado não usado" em vez de "provavelmente não atinge".
 
-**Não verificado:** a justificativa do Accepted no painel do SonarCloud ainda cita "não verificado"; trocar o texto exige login (pendência manual do Gustavo).
+**Painel atualizado em 13/11/2026 (logado):** o risco continua **Accepted**, com um comentário novo que registra o veredito "verificado, não atinge" e aponta para esta seção. O comentário de 12/11 ("não verificado") ficou no histórico; o painel não abriu a edição dele na largura usada.
 
 ## 9. Dependências novas desde o último registro (13/11/2026, Gustavo)
 
@@ -154,7 +154,7 @@ Comparação do `pom.xml` da `main` `bc40183` com o que este documento citava at
 - Versões e escopo: `.\mvnw.cmd -B dependency:tree` na `main` `bc40183`.
 - CVE conhecido: consulta à base pública **OSV** (`api.osv.dev/v1/query`, que agrega GitHub Security Advisories e NVD), pacote a pacote, com a versão exata resolvida. Para o CVE do `commons-lang3`, também o registro do **NVD**.
 - Versão mais nova: `maven-metadata.xml` de cada artefato no **Maven Central**.
-- Painel "Dependency risks" do SonarCloud: **não verificado**. A API (`api.sonarcloud.io/sca/...`) respondeu 401 sem login em 13/11/2026; a leitura do painel fica como pendência manual do Gustavo.
+- Painel "Dependency risks" do SonarCloud, logado, branch `main`, lido em 13/11/2026 (a API sem login respondeu 401): **54 riscos em 174 dependências**, e **nenhum** é das dependências desta seção (0 menções a `commons-lang3`, springdoc, swagger, webjars, Cucumber, gherkin, Playwright ou `junit-platform`).
 
 | Dependência (versão resolvida) | Escopo | Motivo | CVE conhecido (OSV, 13/11/2026) | Observação |
 |---|---|---|---|---|
@@ -167,4 +167,4 @@ Comparação do `pom.xml` da `main` `bc40183` com o que este documento citava at
 
 **Leitura:** só uma dependência nova vai para produção com risco conhecido na versão gerenciada pelo Boot, o `commons-lang3`, e ela já está corrigida pelo override. As de escopo test não entram no jar. Nenhum CVE foi inventado: onde a OSV não devolve nada, a coluna diz "Nenhum", com a data da consulta, e isso não garante que o SonarCloud não acuse algo que a OSV ainda não tem.
 
-**Pendência (manual, Gustavo, exige login):** abrir o painel "Dependency risks" da `main` e conferir se aparece algum risco das dependências acima; se aparecer, tratar pela regra 5 do `AGENTS.md` e registrar aqui.
+**Painel, mesma leitura (13/11/2026):** nada a marcar para as dependências desta seção. Seguem **abertos** riscos que não são delas: `commons-compress` 1.24.0 (2, test), `json-smart` 2.5.2 (test), `spring-web`, `spring-webmvc`, `spring-beans` e `spring-expression` 6.2.19 (vários, quase todos "Unscored (pending)"), `HdrHistogram` e `LatencyUtils` (Low, runtime) e um novo no `logback-classic` 1.5.38 (CVE-2026-104721, "Unscored (pending)"). Não foram avaliados neste PR; ficam para a próxima leitura (seção 5). Lidos 52 dos 54 itens da lista; 2 não carregaram na página.

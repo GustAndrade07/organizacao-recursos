@@ -24,7 +24,6 @@ Só documentação, a partir da `main` (`bc40183`, merge do #62; CI run #251 com
 ## Não verificado
 - **Forma do cmd** do README: não rodada.
 - **Aplicação atrás de HTTPS** com `Secure`: não testada (só o cabeçalho por HTTP local).
-- **Painel "Dependency risks" do SonarCloud:** a API respondeu 401 sem login; não se sabe se o painel acusa algo das dependências novas. Pendência manual do Gustavo.
 - **Contagem de testes no log do CI** (run #251): o log do Actions exige login; vale o `verify` local.
 - **Diferença de branches** entre JaCoCo (81,31%) e Sonar (81,7%): não investigada.
 
@@ -54,7 +53,9 @@ No bullet do back-end (PR #44), "ADR-0008, proposto" virou "ADR-0008, aceito no 
 - **Declaração do Gustavo** escrita na seção 4 de `docs/decisao-qualidade.md`. O arquivo é do Leandro; a edição foi combinada com ele e mexe só na linha do Gustavo.
 - **Commits com autor "Claude" na `main`:** não serão corrigidos. Reescrever a `main` exigiria force push (bloqueado pelo ruleset), mudaria hashes citados nos documentos e quebraria o histórico red → green. **Achado:** são **8**, não 7 — além dos 2 de 04/11 (`3ae747c`, `07606da`) e dos 5 do PR #52 (`cd14f8c`, `e86c777`, `f0777de`, `5c13534`, `eb6ad27`), há o `2c6c8f6` (09/11, merge de `origin/main` no PR #32). Conferido com `git log origin/main --author=noreply@anthropic.com`. A contagem "7" em `docs/decisao-qualidade.md` (seção 4) e em `docs/relatorio-qualidade.md` (seção 5) é do Leandro corrigir.
 
+- **SonarCloud (logado, 13/11/2026):** painel "Dependency risks" lido (54 riscos em 174 dependências; nenhum das dependências novas, então nada a marcar); comentário novo no CVE-2026-59276 com o veredito "não atinge" (continua Accepted); gate da `main` Passed. Registrado em `docs/seguranca/riscos-dependencias.md`, seções 8.1 e 9.
+
 ## Pendências manuais do Gustavo (fora deste PR)
 - [ ] D4: registrar a decisão (texto a combinar; hoje o plano e a decisão de qualidade dizem "pergunta na Aula 14").
-- [ ] SonarCloud (logado): marcar os riscos novos de dependência, se houver, trocar a justificativa do CVE-2026-59276 de "não verificado" para "não atinge" (seção 8.1) e conferir o gate da `main`.
+- [ ] Pedir ao Leandro para corrigir "7" → "8" commits com autor "Claude" em `docs/decisao-qualidade.md` e `docs/relatorio-qualidade.md` (incluir o `2c6c8f6`).
 - [ ] Tag anotada `v1.0.0-rc1` só depois do clone limpo humano (Pedro) e com CI e SonarCloud verdes no commit da tag.
