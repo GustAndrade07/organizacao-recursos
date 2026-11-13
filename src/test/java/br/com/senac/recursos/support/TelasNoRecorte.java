@@ -6,6 +6,7 @@ import br.com.senac.recursos.service.RelatorioService;
 import br.com.senac.recursos.service.ReservaService;
 import br.com.senac.recursos.service.UsuarioService;
 import br.com.senac.recursos.web.FormatoDasTelas;
+import br.com.senac.recursos.web.RodapeDoSite;
 import br.com.senac.recursos.web.VisaoDasReservas;
 import java.time.Clock;
 import java.time.Instant;
@@ -45,6 +46,15 @@ public class TelasNoRecorte {
     @Primary
     Clock relogioFixoDasTelas() {
         return Clock.fixed(Instant.parse("2026-11-01T12:00:00Z"), ZoneOffset.UTC);
+    }
+
+    /**
+     * Declarado como bean (e não no {@code @Import}) para ter o nome {@code rodapeDoSite}, que o layout usa em
+     * {@code ${@rodapeDoSite.ano()}}: uma classe importada recebe o nome completo da classe, e a expressão não a acharia.
+     */
+    @Bean
+    RodapeDoSite rodapeDoSite(FormatoDasTelas formato) {
+        return new RodapeDoSite(formato);
     }
 
     @Bean
