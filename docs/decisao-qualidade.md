@@ -8,19 +8,18 @@
 
 ## 1. Decisão
 
-**Liberar `v1.0.0-rc1` com ressalvas, condicionada ao clone limpo.**
+**Liberar `v1.0.0-rc1` com ressalvas.** A condição do clone limpo humano foi cumprida em 13/11/2026, noite (tabela abaixo).
 
 | Condição | Situação em 13/11/2026 | Se não for cumprida |
 |---|---|---|
-| O clone limpo, seguindo só o `README.md` e feito por quem não o escreveu, sobe a aplicação (`docs/entrega/roteiro-clone-limpo.md`, registro em `docs/entrega/checklist.md`) | **Parcial** (lacuna 11). Rodada feita **pela IA** em 13/11/2026 (PR #60, commit `9acbbcd`): sobe, `/actuator/health` responde `UP`, 409 na sobreposição, `verify` verde. **Falta a conferência humana**: uma pessoa que não escreveu o README (Pedro, decidido pelo grupo) segue o README e anota o que faltar. A rodada da IA não foi feita em Windows | A decisão passa a **bloquear** até o README ser corrigido e o clone passar |
+| O clone limpo, seguindo só o `README.md` e feito por quem não o escreveu, sobe a aplicação (`docs/entrega/roteiro-clone-limpo.md`, registro em `docs/entrega/checklist.md`) | **Cumprida em 13/11/2026, noite.** O **Pedro** seguiu o README (commit `38cd0ce`) no Windows: `verify` verde no clone (1366 testes), aplicação `UP`, reserva gravada e auditada, e dois cliques simultâneos na mesma sala deram 1 reserva e 1 recusa 409. Nenhum bloqueador; os achados viraram ajuste no README no mesmo PR (`docs/entrega/checklist.md`, "Terceira rodada"). Limite: feito na máquina do Gustavo, que já tinha JDK, Docker e cache do Maven | A decisão passa a **bloquear** até o README ser corrigido e o clone passar |
 | CI (`verify` e SonarCloud) verde no commit da tag | Verde na `main`: `ci.yml` com `success` no merge do #61 (run 248) e no do #62, `bc40183` (run 251). O Quality Gate do SonarCloud não foi relido nesta atualização | **Bloquear** e corrigir antes da tag (correção depois da tag vira `v1.0.0-rc2`) |
 | A D4 (resposta do professor sobre "0 vulnerabilidades críticas") não dizer que risco aceito com justificativa reprova | **Cumprida.** O professor não respondeu até a entrega, e a D4 foi **decidida pelo grupo em 13/11/2026** (seção 9 do plano) com a leitura mais rígida: as duas medições aparecem separadas (Quality Gate: 0 vulnerabilidades; CVSS das dependências: 0 Critical aberto), e os 2 Critical do `spring-webmvc` 6.2.19 ficam como risco residual aceito (risco 1) | Se o professor disser depois que "aceito com justificativa" não vale, reavaliar: bloquear, ou corrigir numa `v1.0.0-rc2` |
 
 **Por que não "liberar" sem ressalvas:** 1 dos 14 RF não tem entrega (RF-11, notificação), 3 estão parciais (RF-02, RF-03 e RF-12), e há riscos aceitos, não corrigidos (seção 3). O RF-14 (OpenAPI) deixou de estar ausente no PR #61.
 
 **Por que não "bloquear":**
-- Dos quatro limitadores de nota (`AGENTS.md`, seção 2), três têm prova em teste e no CI: pipeline verde, sem falha de autorização e sem reserva dupla.
-- O quarto, "a aplicação executa", tem prova nos testes, em `java -jar` (seção 2) e na rodada de clone limpo feita pela IA; falta só a conferência por uma pessoa, que é a condição acima.
+- Os quatro limitadores de nota (`AGENTS.md`, seção 2) têm prova: pipeline verde, sem falha de autorização e sem reserva dupla em teste e no CI; "a aplicação executa" nos testes, em `java -jar` (seção 2) e no clone limpo humano do Pedro.
 
 ## 2. Critérios, com a evidência
 
@@ -33,7 +32,7 @@
 | Pipeline presente e verde (limitador) | Verde | `ci.yml` com `success` no merge do #73 (`4ab8075`, run 295, id 43526793482), do #72 (run 293), do #70 (run 289), do #69 (run 287) e do #68 (run 285); o run 291 (merge do #71) foi `cancelled` pelo push seguinte, não falhou. Ruleset exige `verify` e SonarCloud | API do GitHub (`actions/runs?branch=main`), lida em 13/11/2026, noite; o run do commit da tag fica no índice de evidências | Sim |
 | Sem reserva dupla (limitador) | 20 pedidos → 1 aceito | Banco: 1 aceito e 19 recusados. API: 1 × 201 e 19 × 409. Carga: uma reserva por horário em 80 horários disputados | `ConcorrenciaReservaBancoTest`, `ConcorrenciaReservaApiTest`, mutações M1 e M2; `docs/performance/resultado-01.md` (PR #56) | Sim |
 | Sem falha de autorização (limitador) | Toda rota com regra, testada por perfil | Matriz com 222 casos; rota fora da matriz é negada e o teste falha se surgir rota nova; limite de tentativas no login | `MatrizAutorizacaoTest`, `LimiteDeTentativasApiTest`, `AcessoE2ETest` | Sim |
-| Aplicação executa (limitador) | Sobe seguindo o README | Sobe nos testes (`AplicacaoSmokeTest`), subiu com `java -jar` e `docker compose` para a carga e subiu no clone limpo da IA (`9acbbcd`: `UP`, 409, `verify` com 1116 testes e 0 falhas) | Run 43303372662; `docs/performance/resultado-01.md`; `docs/entrega/checklist.md`, seção "Rodada de clone limpo" | **Parcial**: falta o clone limpo por uma pessoa (condição da seção 1) |
+| Aplicação executa (limitador) | Sobe seguindo o README | Sobe nos testes (`AplicacaoSmokeTest`), subiu com `java -jar` e `docker compose` para a carga e subiu no clone limpo da IA (`9acbbcd`: `UP`, 409, `verify` com 1116 testes e 0 falhas) | Run 43303372662; `docs/performance/resultado-01.md`; `docs/entrega/checklist.md`, seção "Rodada de clone limpo" | **Sim**: clone limpo humano do Pedro em 13/11/2026, noite (seção 1) |
 | RNF-01: busca | p95 ≤ 300 ms com 50 usuários | p95 = 17 ms e 8 ms | `perf/resultados/*.jtl`; meta escrita antes em `docs/performance/rnf.md` | Sim, só local |
 | RNF-03: criação sob carga | só 201 ou 409 | 80 × 201 e 3920 × 409, nada mais | Mesmos `.jtl` | Sim, só local |
 | Defeitos registrados antes da correção | Todo defeito que chegou à `main` vira `DEF-xxx` | 10 registrados (DEF-001 a DEF-010): 3 corrigidos (DEF-001, DEF-002 e DEF-010), 1 em parte (DEF-005) e 6 abertos, de severidade média ou baixa, nenhum nos quatro limitadores | `docs/defeitos/`; relatório, seção 5 | Sim (registro); os abertos são o risco 12 |
