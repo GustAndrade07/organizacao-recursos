@@ -1,1 +1,0 @@
-- RTM, status dos requisitos e relatório de qualidade (versão 2) recontados sobre a `main` em `6ce4478` (run 43303372662): RF-01 e RF-06, os dois críticos, `feito`; 9 RF, 12 RN e 3 RNF `feito`; 1116 testes; cobertura de 95,8% das linhas e 81,3% dos branches. A recomendação do relatório passa a "liberar com ressalvas, desde que o clone limpo passe antes da tag".

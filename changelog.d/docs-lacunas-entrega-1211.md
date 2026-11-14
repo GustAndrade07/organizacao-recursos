@@ -1,1 +1,0 @@
-- Plano: conferência contra as aulas em 12/11/2026 (CI e SonarCloud atendidos; 12 lacunas com dono) e CVE-2026-92877 marcado como Accepted no SonarCloud.

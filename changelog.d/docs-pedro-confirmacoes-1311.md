@@ -1,1 +1,0 @@
-- Declaração do Pedro na decisão de qualidade; RF-11 aceito como risco; confirmação do limite de tentativas (PR #52) e das rotas do Swagger fora da matriz (PR #61); desvios de TDD dos PRs #48, #51 e #61 registrados em `docs/testes/evidencia-tdd.md`.

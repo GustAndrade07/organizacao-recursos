@@ -27,6 +27,10 @@ ADMIN_LOGIN=admin@exemplo.com ADMIN_SENHA='<escolha uma senha>' ./mvnw spring-bo
 ```
 Conferir que subiu: abrir http://localhost:8080/actuator/health (deve responder `{"status":"UP"}`).
 
+**Dois cuidados** (achados no clone limpo do Pedro, 13/11/2026):
+- **A ordem importa:** sem o `docker compose up -d` antes, não há banco, e o `spring-boot:run` para com um erro genérico do Maven (`MojoExecutionException`).
+- **Troque `<escolha uma senha>` inteiro**, inclusive os sinais `<` e `>`, pela senha que você vai usar para entrar. Se colar o comando sem trocar, a senha do Administrador vira literalmente `<escolha uma senha>`. Subir de novo com outra `ADMIN_SENHA` não troca a senha de um Administrador que já existe: para recomeçar, `docker compose down -v`.
+
 **No Windows** a forma `VAR=valor comando` da última linha é do bash e **não funciona** no PowerShell nem no cmd. Defina as variáveis antes e use `.\mvnw.cmd` no lugar de `./mvnw` (as variáveis valem só para aquela janela do terminal):
 ```powershell
 # PowerShell
@@ -84,7 +88,7 @@ Mande o token em cada requisição: `Authorization: Bearer <token>`. Rotas e per
 
 **Documentação da API (RF-14):** com a aplicação de pé e **depois de entrar pelo `/login`**, abra http://localhost:8080/swagger-ui/index.html (o JSON fica em `/v3/api-docs`). É gerada do próprio código pelo `springdoc-openapi`, e um teste (`OpenApiDocumentacaoTest`) falha se ela deixar de bater com a matriz de autorização. Fora do desenvolvimento, defina também `JWT_SECRET` (32 bytes ou mais); sem ele, os tokens deixam de valer quando a aplicação reinicia.
 
-> Passo a passo **rodado em clone limpo pela IA em 13/11/2026**, no commit `9acbbcd`, num container novo: sobe, responde `UP`, grava reserva pela API e pela tela e recusa a sobreposição com 409 (`docs/entrega/roteiro-clone-limpo.md`, seção 4). A conferência da Aula 14 pede **uma pessoa que não escreveu o README**, e essa continua pendente (etapa 6 do plano).
+> Passo a passo **rodado em clone limpo pela IA em 13/11/2026**, no commit `9acbbcd`, num container novo: sobe, responde `UP`, grava reserva pela API e pela tela e recusa a sobreposição com 409 (`docs/entrega/roteiro-clone-limpo.md`, seção 4). A conferência da Aula 14 pede **uma pessoa que não escreveu o README**: o **Pedro** a fez em 13/11/2026, noite, no Windows, no commit `38cd0ce` (`verify` verde, `UP`, reserva gravada, dois cliques simultâneos na mesma sala → 1 reserva e 1 recusa 409), sem bloqueador (`docs/entrega/checklist.md`, "Terceira rodada").
 
 ## Como testar
 ```bash

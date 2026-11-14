@@ -1,2 +1,0 @@
-- D10 e D11 decididas: as regras de reserva e de manutenção ficam como estão no código. ADR-0008 (API REST em camadas) passa para aceito.
-- Concorrência de ponta a ponta fechada: `ConcorrenciaReservaApiTest` no CI (run 43302104277) e vermelho sem a constraint de exclusão (mutação M1 no nível da API, 10 de 10).

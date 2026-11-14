@@ -1,1 +1,0 @@
-- `docs/seguranca/riscos-dependencias.md`, seção 6: os 2 Critical do `spring-webmvc` 6.2.19 marcados como Accepted no SonarCloud em 11/11/2026 (painel com 19 riscos abertos, 0 Critical e 1 High) e situação da D4 sem resposta do professor. Só documentação.

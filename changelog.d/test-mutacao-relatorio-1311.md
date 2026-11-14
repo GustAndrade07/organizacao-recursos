@@ -1,1 +1,0 @@
-- Mutação do serviço do relatório (MR1 a MR5, todas pegas) e `RelatorioInstantaneoTest`, que prende o instantâneo único (REPEATABLE READ) das três partes do relatório.

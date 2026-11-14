@@ -1,1 +1,0 @@
-- `docs/evidencias/README.md`: esqueleto do índice de evidências da entrega (onde está cada evidência e o estado em 11/11/2026), a fechar com os links do commit da tag `v1.0.0-rc1`.

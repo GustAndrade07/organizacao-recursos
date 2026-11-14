@@ -1,1 +1,0 @@
-- Mutação manual das regras do serviço (aprovação, manutenção, autorização e auditoria) em `docs/testes/mutacao-manual.md`: 8 quebras, todas pegas por teste. A MAU1 achou uma lacuna real — apagar a auditoria do cancelamento e do não comparecimento não deixava nenhum teste vermelho.

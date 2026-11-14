@@ -1,1 +1,0 @@
-- README: ciclo de vida do cookie de sessão (`JSESSIONID`) conferido na aplicação rodando: criação no `/login`, troca do identificador no login, nenhum outro cookie, API sem cookie, apagado no logout, `?expirou` com sessão vencida e tempo sem uso de 30 minutos (padrão do Spring Boot).

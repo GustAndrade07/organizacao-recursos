@@ -1,2 +1,0 @@
-- Prova oral: as 15 perguntas de `docs/prova-oral/perguntas.md` escritas, cada uma com o arquivo da resposta, a descrição de uma resposta fraca e quem responde (ninguém sobre a própria área).
-- `docs/prova-oral/roteiro-demo.md` (novo): demonstração de 8 minutos, com o preparo antes da sala, a massa de dados criada pela própria API e o que cortar se faltar tempo.

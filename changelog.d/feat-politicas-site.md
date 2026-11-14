@@ -1,1 +1,0 @@
-- Páginas públicas de política: `/privacidade`, `/cookies` e `/termos` (rascunho técnico, ainda sem revisão jurídica), abertas sem login. Todas as telas ganham um rodapé com "© ano Organização de Recursos" (ano pelo relógio do sistema) e os links das três páginas.

@@ -1,1 +1,0 @@
-- Status de cada PR passa a ficar em `docs/status/` e a entrada do changelog em `changelog.d/` (juntada antes da tag), para os PRs abertos ao mesmo tempo não conflitarem mais no topo do plano e do `CHANGELOG.md`. Só processo e documentação.
