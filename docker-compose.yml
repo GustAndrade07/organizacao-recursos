@@ -6,7 +6,7 @@ services:
       POSTGRES_USER: recursos
       POSTGRES_PASSWORD: recursos_dev   # só para desenvolvimento local
     ports:
-      - "5432:5432"
+      - "${DB_PORTA:-5432}:5432"   # outra porta se a 5432 estiver ocupada (README, "Porta 5432 ocupada")
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:

@@ -1,1 +1,0 @@
-- README sem WireMock, Cucumber e JMeter na stack (ainda não estão no projeto); ciclo ATAM 01 com as medidas do JaCoCo e do SonarCloud no `2610d6a` e o RK9 fechado.

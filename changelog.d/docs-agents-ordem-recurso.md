@@ -1,1 +1,0 @@
-- `AGENTS.md`, seção 5: a regra da ordem crescente de `recurso_id` passa a dizer como se confere de verdade (revisão e teste do serviço); `ConcorrenciaReservaBancoTest` não confere a ordem.

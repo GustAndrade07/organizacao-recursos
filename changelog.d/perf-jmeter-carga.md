@@ -1,1 +1,0 @@
-- Teste de carga com JMeter (RNF-01 e RNF-03): metas em `docs/performance/rnf.md`, escritas antes da rodada; plano `perf/reservas.jmx`, usuários fictícios em `perf/usuarios.csv` e resultado em `docs/performance/resultado-01.md`. Medido só localmente: busca com p95 de 17 ms (rodada 01) e 8 ms (rodada 02, com 50 usuários ativos ao mesmo tempo); criação de reserva só 201 ou 409.

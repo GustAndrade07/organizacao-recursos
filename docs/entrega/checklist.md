@@ -3,6 +3,7 @@
 > Formato do professor (Aula 14): **item → existe → atualizado → caminho**.
 > Deve ser preenchido a partir de um **clone limpo**, seguindo só o README, por quem **não** escreveu o README.
 > Nesta etapa só se anota; nada é corrigido. No fim, listar os bloqueadores em ordem.
+> **Rodada humana feita em 13/11/2026, noite, pelo Pedro** (seção "Terceira rodada", no fim): é a conferência que a Aula 14 pede. As linhas da tabela abaixo continuam com o estado da rodada da IA quando não dizem outra coisa.
 > Estado abaixo: **13/11/2026**. A rodada de clone limpo é do commit `9acbbcd` (antes dos merges de #56 a #59). Quem rodou foi a **IA**, num container novo, não um integrante: ver a ressalva no fim desta seção e o [roteiro](roteiro-clone-limpo.md).
 > **Atualização de 13/11/2026, tarde** (depois dos PRs #56 a #62, `main` em `bc40183`): as linhas cujo arquivo entrou nesses PRs foram relidas **na árvore do repositório** em `bc40183`, **não** em clone. Cada uma diz isso. **Trocar `bc40183` pelo commit da tag** quando ele existir (o clone limpo humano e os números da tag ainda precisam ser refeitos nele).
 >
@@ -49,6 +50,7 @@
 4. Possibilidade de reserva dupla
 5. **Nenhum encontrado na rodada de 13/11/2026** (clone limpo pela IA, commit `9acbbcd`): nenhum dos quatro limitadores apareceu — a aplicação executa, o `verify` ficou verde, a matriz de autorização é testada e a sobreposição respondeu 409 com a reserva única no banco.
 6. **Rodada 2 (Windows, `bf2584a`, máquina do Pedro):** "aplicação não executa" **seguindo só o README** numa máquina com PostgreSQL nativo na porta 5432. É lacuna do README, não do código (com outra porta, sobe e passa). Ver a seção "Segunda rodada" abaixo.
+7. **Rodada 3 (humana, Pedro, `38cd0ce`, 13/11/2026, noite): nenhum bloqueador.** A aplicação sobe seguindo o README corrigido, o `verify` fica verde (1366 testes) e dois cliques simultâneos na mesma sala dão 1 reserva e 1 recusa 409. Ver "Terceira rodada", abaixo.
 
 ## Segunda rodada — Windows, máquina do Pedro, 13/11/2026 (feita pela IA a pedido do Pedro)
 
@@ -102,3 +104,29 @@
 **Pontos que o README da `main` tem hoje e que o clone deve confirmar:** o README diz que "sem Docker os testes são ignorados"; o PR #28 corrige isso (teste sem Docker falha). A seção "Histórico de CI vermelho proposital" do README está vazia na `main`; o PR #30 a preenche. Os dois PRs estão abertos, sem aprovação de pessoa, em 07/11/2026.
 
 **Não conferido:** se a aplicação sobe seguindo o README, o `verify` em máquina limpa, o resultado dos runs do CI na `main`, o Quality Gate atual e qualquer coluna "Atualizado".
+
+## Terceira rodada — clone limpo humano, Pedro, 13/11/2026, noite
+
+**Quem e onde.** O **Pedro** (não escreveu o README) seguiu o README no PowerShell, com Gustavo e Leandro ao lado, na **máquina do Gustavo** (Windows 11, PowerShell 5.1, JDK 21, Docker Desktop). Clone novo da branch `docs/finalizacao-rc1` no commit `38cd0ce` (código igual ao da `main` `4ab8075`, mais o README corrigido). A IA ajudou a diagnosticar os tropeços (passos 2 e 5) e rodou o teste de concorrência do passo 7 com o Pedro presente; os comandos do README foram digitados pelo Pedro.
+
+**Limite:** a máquina não é limpa: já tinha JDK, Docker e o cache do Maven (`~/.m2`) do Gustavo. O banco do clone foi um volume novo (`clone-pedro`), sem reaproveitar dados.
+
+| Passo | Resultado | Evidência |
+|---|---|---|
+| 1. Clonar | Feito, mas na pasta errada: `cd $env:USERPROFILE\Desktop` falha quando a Área de Trabalho está no OneDrive, e o clone caiu na pasta em que o terminal estava | `clone-pedro` em `Downloads\organizacao-recursos\organizacao-recursos` |
+| 8. `.\mvnw.cmd -B verify` (rodado antes da aplicação) | **Verde**: 1366 testes, 0 falhas, 0 erros, 0 ignorados; JaCoCo 96,1% das linhas e 83,7% dos branches; jar empacotado às 21:00 | `target/surefire-reports` e `target/site/jacoco/jacoco.csv` do clone. A linha `BUILD SUCCESS` não foi copiada do terminal |
+| 3. `spring-boot:run` (primeira vez) | **Falhou** (`MojoExecutionException`): o passo 2, `docker compose up -d`, não tinha sido rodado, e não havia banco | `docker compose ps` vazio na pasta do clone |
+| 2. `docker compose up -d` | Sobe o `postgres:16` (`clone-pedro-db-1`, `healthy`) | `docker ps` |
+| 3. `spring-boot:run` (com `ADMIN_LOGIN` e-mail) | Sobe às 21:04; Flyway aplica V1 e V2; Administrador inicial criado | `flyway_schema_history` (V1 e V2 às 21:04:47); `usuario` id 1 |
+| 4. `/actuator/health` | `{"status":"UP"}` | `curl` |
+| 5. Entrar | Primeiro "não consigo logar": a senha escolhida no comando não era a digitada na tela (o exemplo `<escolha uma senha>` do README pode ser copiado como senha). Depois, login e cadastro de usuários pelas telas | `usuario` ids 2 e 3 criados pelo Administrador |
+| 6. Reserva pela tela | Pedro (Solicitante) reservou o Projetor (restrito) para 15/11, 13:00–18:00; Gustavo (Responsável) aprovou | `reserva` 1 `APROVADA`; `auditoria_reserva` 1 (`SOLICITADA`) e 2 (`APROVADA`) |
+| 7. Mesmo horário de novo, **dois cliques ao mesmo tempo** | Duas Solicitantes de teste (Ana e Bruno, criadas no banco do clone) em dois navegadores (Playwright) clicaram "Confirmar reserva" juntas na mesma sala, 16/11, 10:00–11:00: **Bruno 201 (reserva 2), Ana 409** com "Esse horário acabou de ser reservado ou se sobrepõe a outra reserva" | `reserva` 2 às 21:29:55.165; `tentativa_recusada` 1, `SOBREPOSICAO`, às 21:29:55.243 (78 ms depois); prints em `docs/evidencias/clone-limpo-humano/` |
+| 9. Desligar | **Não feito na hora do registro**: o grupo seguiu testando a aplicação do clone. Rodar `docker compose down -v` na pasta do clone ao terminar | — |
+
+**Resultado, em uma linha:** seguindo o README corrigido, **a aplicação sobe, grava, audita e recusa a reserva dupla**; o `verify` fica verde no clone. Nenhum dos quatro limitadores apareceu.
+
+**Bloqueadores da rodada 3:** nenhum. **Achados** (não bloqueiam; viram ajuste no README, feito no mesmo PR pelo Gustavo):
+1. O exemplo `<escolha uma senha>` pode ser colado literalmente e vira a senha; o README passa a dizer que se troca o texto inteiro, sem `<` e `>`.
+2. O README não diz que a ordem importa: sem o passo 2, o passo 3 falha com uma mensagem genérica do Maven.
+3. Área de Trabalho no OneDrive: `$env:USERPROFILE\Desktop` não existe. É do roteiro dado ao Pedro, não do README.

@@ -1,1 +1,0 @@
-- Registrados `DEF-003` a `DEF-010`, achados num teste como usuário com Playwright: reserva em data passada, localização descartada no cadastro de sala, emoji em campos de texto, nome de recurso duplicado, retirada antes do horário, mensagem de login bloqueado, 403/favicon em URL inexistente e login que deveria ser e-mail. Nenhum corrigido ainda.

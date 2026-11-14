@@ -1,1 +1,0 @@
-- Riscos de dependência: os 3 CVEs do Spring Security 6.5.11 (CVE-2026-41707, CVE-2026-47842, CVE-2026-59276) avaliados e aceitos com justificativa; sem correção na linha 6.5.
